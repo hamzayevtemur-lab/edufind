@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Center Detail — EduFind</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #050508;
+            --indigo: #4f46e5;
+            --purple: #7c3aed;
+            --orange: #f97316;
+            --muted: rgba(255, 255, 255, 0.55);
+            --border: rgba(255, 255, 255, 0.10);
+            --card: rgba(255, 255, 255, 0.04);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--black);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 24px;
+            background: rgba(5, 5, 8, .97);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 17px;
+            letter-spacing: 3px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--grad);
+            box-shadow: 0 0 12px rgba(79, 70, 229, .7);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 9px 18px;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            transition: all .25s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, .3);
+        }
+
+        .center-hero {
+            margin-top: 64px;
+            padding: 64px 24px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .center-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(79, 70, 229, .18) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, .12) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .center-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255, 255, 255, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .02) 1px, transparent 1px);
+            background-size: 52px 52px;
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .center-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, .2);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .center-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-info {
+            flex: 1;
+        }
+
+        .hero-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, .15);
+            border: 1px solid rgba(16, 185, 129, .3);
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+        }
+
+        .hero-name {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .hero-city {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 22px;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .rating-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            font-size: 16px;
+        }
+
+        .star.filled {
+            color: #f59e0b;
+        }
+
+        .star.empty {
+            color: rgba(255, 255, 255, .18);
+        }
+
+        .rating-num {
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .rating-cnt {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .meta-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-call {
+            padding: 13px 28px;
+            border-radius: 50px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .3s;
+            box-shadow: 0 6px 20px rgba(249, 115, 22, .35);
+        }
+
+        .btn-call:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            padding: 13px 28px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(79, 70, 229, .5);
+            background: rgba(79, 70, 229, .08);
+        }
+
+        .page-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 36px;
+            align-items: start;
+        }
+
+        .tabs-wrap {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 36px;
+            display: flex;
+        }
+
+        .tab {
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: none;
+            transition: all .2s;
+        }
+
+        .tab:hover {
+            color: #fff;
+        }
+
+        .tab.active {
+            color: #fff;
+            border-bottom-color: #4f46e5;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .about-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, .75);
+            line-height: 1.85;
+            margin-bottom: 36px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .info-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: border-color .3s;
+        }
+
+        .info-card:hover {
+            border-color: rgba(79, 70, 229, .35);
+        }
+
+        .info-icon {
+            font-size: 20px;
+            width: 42px;
+            height: 42px;
+            background: rgba(79, 70, 229, .15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .info-value a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .info-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── COURSE CARDS (rich) ── */
+        .courses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .course-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all .3s;
+        }
+
+        .course-card:hover {
+            border-color: rgba(79, 70, 229, .45);
+            background: rgba(79, 70, 229, .04);
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--grad);
+            border-radius: 3px 0 0 3px;
+        }
+
+        .course-card.coming-soon {
+            border-color: rgba(245, 158, 11, .25);
+        }
+
+        .course-card.coming-soon:hover {
+            border-color: rgba(245, 158, 11, .5);
+        }
+
+        .course-card.coming-soon::before {
+            background: linear-gradient(180deg, #f59e0b, #f97316);
+        }
+
+        .cc-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .cc-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, .3);
+        }
+
+        .course-card.coming-soon .cc-icon {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, .3);
+        }
+
+        .cc-name {
+            font-size: 16px;
+            font-weight: 800;
+            flex: 1;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        .cc-status {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 11px;
+            border-radius: 50px;
+        }
+
+        .cc-status.active {
+            background: rgba(16, 185, 129, .15);
+            border: 1px solid rgba(16, 185, 129, .3);
+            color: #34d399;
+        }
+
+        .cc-status.soon {
+            background: rgba(245, 158, 11, .15);
+            border: 1px solid rgba(245, 158, 11, .3);
+            color: #f59e0b;
+        }
+
+        .cc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .cc-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 11px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .75);
+        }
+
+        .cc-chip .ci {
+            font-size: 14px;
+        }
+
+        .cc-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            gap: 12px;
+        }
+
+        .cc-price {
+            font-size: 18px;
+            font-weight: 900;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .course-card.coming-soon .cc-price {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+        }
+
+        .cc-seats {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .cc-seats strong {
+            color: #fff;
+        }
+
+        .cc-enroll {
+            padding: 8px 18px;
+            border-radius: 50px;
+            background: var(--grad);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(79, 70, 229, .3);
+            transition: all .25s;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .cc-enroll:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, .5);
+        }
+
+        .cc-enroll.soon {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            box-shadow: 0 3px 10px rgba(245, 158, 11, .3);
+        }
+
+        .cc-enroll.soon:hover {
+            box-shadow: 0 6px 18px rgba(245, 158, 11, .5);
+        }
+
+        /* ── REVIEWS ── */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .review-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 24px;
+        }
+
+        .review-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .reviewer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reviewer-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .reviewer-name {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .reviewer-date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .review-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .review-comment {
+            font-size: 14px;
+            color: rgba(255, 255, 255, .7);
+            line-height: 1.7;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .review-form {
+            background: rgba(79, 70, 229, .06);
+            border: 1px solid rgba(79, 70, 229, .2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .review-form h4 {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 7px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .25s;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: rgba(79, 70, 229, .5);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, .3);
+        }
+
+        .star-picker {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .star-pick {
+            font-size: 28px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, .2);
+            transition: color .15s, transform .15s;
+            line-height: 1;
+        }
+
+        .star-pick:hover,
+        .star-pick.sel {
+            color: #f59e0b;
+            transform: scale(1.2);
+        }
+
+        .submit-btn {
+            margin-top: 6px;
+            padding: 12px 30px;
+            border-radius: 50px;
+            background: var(--grad);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, .35);
+            transition: all .25s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: sticky;
+            top: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .side-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .side-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #818cf8;
+            margin-bottom: 18px;
+        }
+
+        .rating-big {
+            text-align: center;
+            padding: 8px 0 20px;
+        }
+
+        .rating-big .num {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rating-big .stars-row {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin: 8px 0 6px;
+        }
+
+        .rating-big .cnt {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .rating-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .rbar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rbar-label {
+            font-size: 12px;
+            color: var(--muted);
+            width: 28px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .rbar-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, .08);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .rbar-fill {
+            height: 100%;
+            background: var(--grad);
+            border-radius: 50px;
+            transition: width .6s ease;
+        }
+
+        .rbar-cnt {
+            font-size: 12px;
+            color: var(--muted);
+            width: 16px;
+        }
+
+        .quick-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quick-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .quick-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .quick-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 3px;
+        }
+
+        .quick-value {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .quick-value a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .quick-value a:hover {
+            text-decoration: underline;
+        }
+
+        .state-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 20px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid rgba(79, 70, 229, .2);
+            border-top-color: #4f46e5;
+            animation: spin .8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 14px;
+        }
+
+        .state-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .state-sub {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* ── MAP ── */
+        #center-map {
+            width: 100%;
+            height: 400px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .distance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(52, 211, 153, .12);
+            border: 1px solid rgba(52, 211, 153, .3);
+            color: #34d399;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+        }
+
+        .leaflet-container {
+            background: #0c0c14;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #12121f;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 14px;
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+        }
+
+        .leaflet-popup-tip {
+            background: #12121f;
+        }
+
+        .leaflet-popup-content {
+            margin: 14px 16px;
+        }
+
+        .leaflet-control-zoom a {
+            background: #12121f !important;
+            color: #fff !important;
+            border-color: rgba(255, 255, 255, .15) !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: #1e1e35 !important;
+        }
+
+        .leaflet-control-attribution {
+            background: rgba(5, 5, 8, .8) !important;
+            color: rgba(255, 255, 255, .4) !important;
+        }
+
+        .leaflet-control-attribution a {
+            color: #818cf8 !important;
+        }
+
+        @media (max-width:860px) {
+            .page-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .hero-inner {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .center-avatar {
+                width: 90px;
+                height: 90px;
+                border-radius: 18px;
+                font-size: 2rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a class="logo" href="index.html">
+                <div class="logo-dot"></div>EDUFIND
+            </a>
+            <a class="back-btn" href="centers.html">← Back to Centers</a>
+        </div>
+    </header>
+
+    <div id="root">
+        <div class="state-center">
+            <div class="spinner"></div>
+            <div class="state-title">Loading center…</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const API = 'http://localhost:8000';
+        const centerId = new URLSearchParams(window.location.search).get('id');
+
+        if (!centerId) {
+            document.getElementById('root').innerHTML = `
+            <div class="state-center">
+                <div class="state-icon">🔍</div>
+                <div class="state-title">No center selected</div>
+                <div class="state-sub"><a href="centers.html" style="color:#a5b4fc">Browse all centers →</a></div>
+            </div>`;
+        } else {
+            loadCenter(centerId);
+        }
+
+        async function loadCenter(id) {
+            try {
+                const res = await fetch(`${API}/public/centers/${id}`);
+                if (!res.ok) throw new Error(res.status);
+                render(await res.json());
+            } catch (_) {
+                document.getElementById('root').innerHTML = `
+                <div class="state-center">
+                    <div class="state-icon">😕</div>
+                    <div class="state-title">Center not found</div>
+                    <div class="state-sub">It may have been removed or is not yet approved.<br>
+                        <a href="centers.html" style="color:#a5b4fc;display:inline-block;margin-top:12px">← Back to centers</a>
+                    </div>
+                </div>`;
+            }
+        }
+
+        function starsHtml(rating, size) {
+            const r = Math.round(rating || 0);
+            return Array.from({ length: 5 }, (_, i) =>
+                `<span class="star ${i < r ? 'filled' : 'empty'}" style="font-size:${size || 16}px">★</span>`
+            ).join('');
+        }
+
+        const grads = [
+            'linear-gradient(135deg,#1e1b4b,#312e81)',
+            'linear-gradient(135deg,#0c1a3a,#1e3a8a)',
+            'linear-gradient(135deg,#14002e,#4c1d95)',
+            'linear-gradient(135deg,#001a12,#065f46)',
+            'linear-gradient(135deg,#1a0505,#7f1d1d)',
+        ];
+
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function fmtPrice(price, currency) {
+            if (!price) return 'Free';
+            return currency === 'UZS'
+                ? Number(price).toLocaleString() + ' UZS'
+                : '$' + Number(price).toFixed(0);
+        }
+
+        function courseEmoji(name) {
+            const n = (name || '').toLowerCase();
+            if (n.includes('english') || n.includes('ielts') || n.includes('toefl')) return '🇬🇧';
+            if (n.includes('math')) return '📐';
+            if (n.includes('python') || n.includes('program') || n.includes('web') || n.includes('code')) return '💻';
+            if (n.includes('russian')) return '🇷🇺';
+            if (n.includes('chinese')) return '🇨🇳';
+            if (n.includes('sat')) return '🎓';
+            if (n.includes('art')) return '🎨';
+            return '📚';
+        }
+
+        function ratingBars(reviews) {
+            const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+            (reviews || []).forEach(r => { if (counts[r.rating] !== undefined) counts[r.rating]++; });
+            const total = (reviews || []).length || 1;
+            return [5, 4, 3, 2, 1].map(s => ({ star: s, count: counts[s], pct: Math.round((counts[s] / total) * 100) }));
+        }
+
+        /* ── Rich course card ── */
+        function buildCourseCard(course) {
+            const isSoon = course.status === 'coming_soon';
+            const enrolled = course.enrolled || 0;
+            const maxS = course.max_students || 0;
+            const seatsLeft = maxS ? maxS - enrolled : null;
+            const fillPct = maxS ? Math.round((enrolled / maxS) * 100) : 0;
+
+            const chips = [
+                course.teacher_name ? `<div class="cc-chip"><span class="ci">👤</span>${course.teacher_name}</div>` : '',
+                course.schedule ? `<div class="cc-chip"><span class="ci">🕐</span>${course.schedule}</div>` : '',
+                course.duration_weeks ? `<div class="cc-chip"><span class="ci">📅</span>${course.duration_weeks} weeks</div>` : '',
+                maxS ? `<div class="cc-chip"><span class="ci">👥</span>${enrolled}/${maxS} students</div>` : '',
+                isSoon && course.starts_at ? `<div class="cc-chip"><span class="ci">🚀</span>Starts ${fmtDate(course.starts_at)}</div>` : '',
+            ].filter(Boolean).join('');
+
+            const footer = (course.price || seatsLeft !== null) ? `
+            <div class="cc-footer">
+                <div>
+                    <div class="cc-price">${fmtPrice(course.price, course.currency)}</div>
+                    ${seatsLeft !== null ? `
+                    <div class="cc-seats"><strong>${seatsLeft}</strong> seats left of ${maxS}</div>
+                    <div style="margin-top:5px;height:3px;background:rgba(255,255,255,.08);border-radius:50px;overflow:hidden;width:120px">
+                        <div style="height:100%;width:${fillPct}%;background:var(--grad);border-radius:50px"></div>
+                    </div>` : ''}
+                </div>
+                <a href="tel:${window._centerPhone || ''}" class="cc-enroll ${isSoon ? 'soon' : ''}">
+                    ${isSoon ? '🔔 Notify Me' : '📞 Enroll Now'}
+                </a>
+            </div>` : '';
+
+            return `
+            <div class="course-card ${isSoon ? 'coming-soon' : ''}">
+                <div class="cc-top">
+                    <div class="cc-icon">${courseEmoji(course.name)}</div>
+                    <div class="cc-name">${course.name}
+                        ${course.description ? `<div style="font-size:12px;font-weight:400;color:var(--muted);margin-top:3px;line-height:1.5">${course.description}</div>` : ''}
+                    </div>
+                    <div class="cc-status ${isSoon ? 'soon' : 'active'}">${isSoon ? '🟡 Soon' : '🟢 Active'}</div>
+                </div>
+                ${chips ? `<div class="cc-meta">${chips}</div>` : ''}
+                ${footer}
+            </div>`;
+        }
+
+        /* ── Main render ── */
+        function render(c) {
+            document.title = `${c.name} — EduFind`;
+
+            const ini = (c.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            const bg = grads[c.id % grads.length];
+            const bars = ratingBars(c.reviews);
+
+            window._centerLat = c.latitude || null;
+            window._centerLng = c.longitude || null;
+            window._centerName = c.name;
+            window._centerCity = c.city;
+            window._centerPhone = c.phone || '';
+
+            const activeCourses = (c.courses || []).filter(x => x.status === 'active');
+            const soonCourses = (c.courses || []).filter(x => x.status === 'coming_soon');
+            const allCourses = [...activeCourses, ...soonCourses];
+
+            document.getElementById('root').innerHTML = `
+            <div class="center-hero">
+                <div class="hero-inner">
+                    <div class="center-avatar" style="background:${bg}">
+                        ${c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" onerror="this.parentElement.textContent='${ini}'">` : ini}
+                    </div>
+                    <div class="hero-info">
+                        <div class="hero-status">✓ Verified Center</div>
+                        <div class="hero-name">${c.name}</div>
+                        <div class="hero-city">📍 ${c.city || 'Uzbekistan'}</div>
+                        <div class="hero-meta">
+                            ${c.avg_rating
+                    ? `<div class="rating-row"><div class="stars">${starsHtml(c.avg_rating, 18)}</div><span class="rating-num">${c.avg_rating}</span><span class="rating-cnt">(${c.review_count} reviews)</span></div>`
+                    : `<span style="color:var(--muted);font-size:14px">No reviews yet</span>`}
+                            <div class="meta-chip">📚 ${activeCourses.length} active${soonCourses.length > 0 ? ' · ' + soonCourses.length + ' soon' : ''}</div>
+                            ${c.phone ? `<div class="meta-chip">📞 ${c.phone}</div>` : ''}
+                        </div>
+                        <div class="hero-actions">
+                            ${c.phone ? `<a class="btn-call"      href="tel:${c.phone}">📞 Call Now</a>` : ''}
+                            ${c.website ? `<a class="btn-secondary" href="${c.website}" target="_blank" rel="noopener">🌐 Website</a>` : ''}
+                            ${c.email ? `<a class="btn-secondary" href="mailto:${c.email}">✉️ Email</a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-body">
+                <div>
+                    <div class="tabs-wrap">
+                        <button class="tab active" onclick="switchTab(this,'about')">About</button>
+                        <button class="tab" onclick="switchTab(this,'courses')">Courses (${activeCourses.length}${soonCourses.length > 0 ? ' + ' + soonCourses.length : ''})</button>
+                        <button class="tab" onclick="switchTab(this,'reviews')">Reviews (${c.reviews.length})</button>
+                        <button class="tab" onclick="switchTab(this,'map')">🗺 Map</button>
+                    </div>
+
+                    <!-- ABOUT -->
+                    <div class="tab-panel active" id="tab-about">
+                        <p class="about-description">${c.description || 'No description provided yet.'}</p>
+                        <div class="info-grid">
+                            ${c.phone ? `<div class="info-card"><div class="info-icon">📞</div><div><div class="info-label">Phone</div><div class="info-value"><a href="tel:${c.phone}">${c.phone}</a></div></div></div>` : ''}
+                            ${c.email ? `<div class="info-card"><div class="info-icon">✉️</div><div><div class="info-label">Email</div><div class="info-value"><a href="mailto:${c.email}">${c.email}</a></div></div></div>` : ''}
+                            ${c.website ? `<div class="info-card"><div class="info-icon">🌐</div><div><div class="info-label">Website</div><div class="info-value"><a href="${c.website}" target="_blank">${c.website.replace(/^https?:\/\//, '')}</a></div></div></div>` : ''}
+                            ${c.address ? `<div class="info-card"><div class="info-icon">📍</div><div><div class="info-label">Address</div><div class="info-value">${c.address}</div></div></div>` : ''}
+                            ${c.city ? `<div class="info-card"><div class="info-icon">🏙️</div><div><div class="info-label">City</div><div class="info-value">${c.city}</div></div></div>` : ''}
+                            <div class="info-card"><div class="info-icon">📅</div><div><div class="info-label">Member Since</div><div class="info-value">${fmtDate(c.created_at)}</div></div></div>
+                        </div>
+                    </div>
+
+                    <!-- COURSES -->
+                    <div class="tab-panel" id="tab-courses">
+                        ${allCourses.length === 0
+                    ? `<div style="text-align:center;padding:60px 20px;color:var(--muted)">
+                                   <div style="font-size:3rem;margin-bottom:12px">📚</div>
+                                   <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">No courses yet</div>
+                               </div>`
+                    : `<div class="courses-list">${allCourses.map(buildCourseCard).join('')}</div>`}
+                    </div>
+
+                    <!-- REVIEWS -->
+                    <div class="tab-panel" id="tab-reviews">
+                        ${c.reviews.length > 0
+                    ? `<div class="reviews-list">
+                                   ${c.reviews.map(r => `
+                                       <div class="review-card">
+                                           <div class="review-top">
+                                               <div class="reviewer">
+                                                   <div class="reviewer-avatar">${(r.student_name[0] || '?').toUpperCase()}</div>
+                                                   <div><div class="reviewer-name">${r.student_name}</div><div class="reviewer-date">${fmtDate(r.created_at)}</div></div>
+                                               </div>
+                                               <div class="review-stars">${starsHtml(r.rating, 15)}</div>
+                                           </div>
+                                           ${r.comment ? `<div class="review-comment">${r.comment}</div>` : ''}
+                                       </div>`).join('')}
+                               </div>`
+                    : `<div style="text-align:center;padding:40px 20px 28px;color:var(--muted)">
+                                   <div style="font-size:3rem;margin-bottom:12px">⭐</div>
+                                   <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">No reviews yet</div>
+                                   <div>Be the first to leave a review!</div>
+                               </div>`}
+                        <div class="review-form">
+                            <h4>✍️ Leave a Review</h4>
+                            <div class="form-group"><label>Your Name</label><input type="text" id="rName" placeholder="e.g. Sardor Aliyev"/></div>
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <div class="star-picker">${[1, 2, 3, 4, 5].map(n => `<span class="star-pick" data-val="${n}" onclick="pickStar(${n})">★</span>`).join('')}</div>
+                            </div>
+                            <div class="form-group"><label>Comment (optional)</label><textarea id="rComment" rows="3" placeholder="Share your experience…"></textarea></div>
+                            <div id="submitWrap"><button class="submit-btn" onclick="submitReview(${c.id})">Submit Review</button></div>
+                        </div>
+                    </div>
+
+                    <!-- MAP -->
+                    <div class="tab-panel" id="tab-map">
+                        <div id="distanceBadge" style="display:none" class="distance-badge">📏 <span id="distText"></span> from your location</div>
+                        <div id="center-map"></div>
+                        ${!c.latitude || !c.longitude
+                    ? `<p style="color:var(--muted);font-size:14px;margin-top:16px;text-align:center">📍 Location coordinates not specified for this center yet.</p>`
+                    : ''}
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="side-card">
+                        <div class="side-title">Rating Summary</div>
+                        <div class="rating-big">
+                            <div class="num">${c.avg_rating || '—'}</div>
+                            <div class="stars-row">${starsHtml(c.avg_rating, 22)}</div>
+                            <div class="cnt">${c.review_count} review${c.review_count !== 1 ? 's' : ''}</div>
+                        </div>
+                        <div class="rating-bars">
+                            ${bars.map(b => `
+                                <div class="rbar-row">
+                                    <span class="rbar-label">${b.star}★</span>
+                                    <div class="rbar-track"><div class="rbar-fill" style="width:${b.pct}%"></div></div>
+                                    <span class="rbar-cnt">${b.count}</span>
+                                </div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="side-card">
+                        <div class="side-title">Quick Info</div>
+                        <div class="quick-row"><div class="quick-icon">🟢</div><div><div class="quick-label">Active Courses</div><div class="quick-value">${activeCourses.length}</div></div></div>
+                        <div class="quick-row"><div class="quick-icon">🟡</div><div><div class="quick-label">Coming Soon</div><div class="quick-value">${soonCourses.length}</div></div></div>
+                        <div class="quick-row"><div class="quick-icon">🏙️</div><div><div class="quick-label">City</div><div class="quick-value">${c.city || '—'}</div></div></div>
+                        ${c.phone ? `<div class="quick-row"><div class="quick-icon">📞</div><div><div class="quick-label">Phone</div><div class="quick-value"><a href="tel:${c.phone}">${c.phone}</a></div></div></div>` : ''}
+                        ${c.email ? `<div class="quick-row"><div class="quick-icon">✉️</div><div><div class="quick-label">Email</div><div class="quick-value"><a href="mailto:${c.email}">${c.email}</a></div></div></div>` : ''}
+                        ${c.website ? `<div class="quick-row"><div class="quick-icon">🌐</div><div><div class="quick-label">Website</div><div class="quick-value"><a href="${c.website}" target="_blank">Visit →</a></div></div></div>` : ''}
+                        ${c.address ? `<div class="quick-row"><div class="quick-icon">📍</div><div><div class="quick-label">Address</div><div class="quick-value">${c.address}</div></div></div>` : ''}
+                    </div>
+                </aside>
+            </div>`;
+
+            /* ─────────────────────────────────────────────
+               MAP FIX: switchTab defined HERE, inside render()
+               initCenterMap() called directly — no wrapper
+            ───────────────────────────────────────────── */
+            window.switchTab = (btn, name) => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(`tab-${name}`).classList.add('active');
+                if (name === 'map') initCenterMap();  // direct call, no broken wrapper
+            };
+        }
+
+        let selectedRating = 0;
+        window.pickStar = (val) => {
+            selectedRating = val;
+            document.querySelectorAll('.star-pick').forEach(s =>
+                s.classList.toggle('sel', parseInt(s.dataset.val) <= val)
+            );
+        };
+
+        window.submitReview = async (id) => {
+            const name = document.getElementById('rName').value.trim();
+            const comment = document.getElementById('rComment').value.trim();
+            if (!name) return alert('Please enter your name.');
+            if (!selectedRating) return alert('Please select a star rating.');
+            const btn = document.querySelector('.submit-btn');
+            btn.disabled = true; btn.textContent = 'Submitting…';
+            try {
+                const res = await fetch(`${API}/public/reviews`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ center_id: id, student_name: name, rating: selectedRating, comment }),
+                });
+                if (!res.ok) throw new Error();
+                document.getElementById('submitWrap').innerHTML =
+                    `<div style="padding:16px;text-align:center;color:#34d399;font-weight:700">✅ Thank you! Your review is pending approval.</div>`;
+            } catch (_) {
+                btn.disabled = false; btn.textContent = 'Submit Review';
+                alert('Could not submit review. Please try again.');
+            }
+        };
+
+        /* ── MAP ── */
+        let centerMap = null;
+        let userPos = null;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => { userPos = [pos.coords.latitude, pos.coords.longitude]; },
+                () => { }
+            );
+        }
+
+        function distKm(lat1, lng1, lat2, lng2) {
+            const R = 6371, dL = (lat2 - lat1) * Math.PI / 180, dl = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dL / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dl / 2) ** 2;
+            return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
+        }
+
+        function initCenterMap() {
+            if (centerMap) return;
+            const lat = window._centerLat;
+            const lng = window._centerLng;
+            if (!lat || !lng) return;
+
+            centerMap = L.map('center-map').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
+            }).addTo(centerMap);
+
+            const pinIcon = L.divIcon({
+                className: '',
+                html: `<div style="width:32px;height:32px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 4px 14px rgba(79,70,229,.6)"></div>`,
+                iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -34],
+            });
+
+            L.marker([lat, lng], { icon: pinIcon })
+                .addTo(centerMap)
+                .bindPopup(`<strong style="font-size:14px">${window._centerName}</strong><br>
+                        <span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${window._centerCity || ''}</span>`)
+                .openPopup();
+
+            if (userPos) {
+                const meIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:14px;height:14px;background:#f97316;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(249,115,22,.3)"></div>`,
+                    iconSize: [14, 14], iconAnchor: [7, 7],
+                });
+                L.marker(userPos, { icon: meIcon }).addTo(centerMap)
+                    .bindPopup('<strong style="color:#f97316">📍 You are here</strong>');
+                L.polyline([userPos, [lat, lng]], { color: '#4f46e5', weight: 2, dashArray: '6 8', opacity: 0.6 }).addTo(centerMap);
+                centerMap.fitBounds([[lat, lng], userPos], { padding: [40, 40] });
+                const km = distKm(userPos[0], userPos[1], lat, lng);
+                const badge = document.getElementById('distanceBadge');
+                const text = document.getElementById('distText');
+                if (badge && text) { text.textContent = `${km} km`; badge.style.display = 'inline-flex'; }
+            }
+        }
+    </script>
+</body>
+
+</html>

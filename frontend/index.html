@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduFind — Discover Learning Centers</title>
+    <style>
+        /* ==================== GLOBAL ==================== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #050508;
+            --ink: #0c0c14;
+            --indigo: #4f46e5;
+            --purple: #7c3aed;
+            --orange: #f97316;
+            --muted: rgba(255, 255, 255, 0.55);
+            --border: rgba(255, 255, 255, 0.10);
+            --card: rgba(255, 255, 255, 0.04);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--black);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ==================== HEADER ==================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 24px;
+            background: linear-gradient(180deg, rgba(5, 5, 8, .96) 0%, rgba(5, 5, 8, 0) 100%);
+            backdrop-filter: blur(12px);
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 17px;
+            letter-spacing: 3px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--grad);
+            box-shadow: 0 0 12px rgba(79, 70, 229, .7);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all .25s;
+        }
+
+        nav a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .07);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-ghost {
+            padding: 9px 20px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .25s;
+            display: inline-block;
+        }
+
+        .btn-ghost:hover {
+            border-color: rgba(255, 255, 255, .3);
+            color: #fff;
+        }
+
+        .btn-primary {
+            padding: 9px 22px;
+            border-radius: 24px;
+            background: var(--grad);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            box-shadow: 0 4px 18px rgba(79, 70, 229, .4);
+            transition: all .25s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(79, 70, 229, .55);
+        }
+
+        .hamburger {
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 13px;
+            border-radius: 9px;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        /* ==================== HERO ==================== */
+        .hero {
+            height: 100vh;
+            min-height: 640px;
+            background:
+                linear-gradient(to bottom, rgba(5, 5, 8, .3) 0%, rgba(5, 5, 8, .6) 55%, rgba(5, 5, 8, 1) 100%),
+                url('images/hero-bg.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 820px;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(79, 70, 229, .15);
+            border: 1px solid rgba(79, 70, 229, .35);
+            border-radius: 50px;
+            padding: 7px 20px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #a5b4fc;
+            margin-bottom: 30px;
+        }
+
+        .hero-kicker .pulse {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px #34d399;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.4rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1.07;
+            letter-spacing: -2px;
+            margin-bottom: 22px;
+            text-transform: uppercase;
+        }
+
+        .grad-text {
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: var(--muted);
+            max-width: 540px;
+            margin: 0 auto 42px;
+            line-height: 1.75;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 64px;
+        }
+
+        .cta-orange {
+            padding: 15px 40px;
+            border-radius: 50px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .3s;
+            box-shadow: 0 6px 24px rgba(249, 115, 22, .4);
+        }
+
+        .cta-orange:hover {
+            background: #ea580c;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(249, 115, 22, .5);
+        }
+
+        .cta-outline {
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            background: rgba(255, 255, 255, .06);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .3s;
+            backdrop-filter: blur(8px);
+        }
+
+        .cta-outline:hover {
+            border-color: rgba(255, 255, 255, .4);
+            background: rgba(255, 255, 255, .12);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid var(--border);
+            padding-top: 36px;
+        }
+
+        .hero-stat {
+            flex: 1;
+            max-width: 200px;
+            padding: 0 32px;
+            border-right: 1px solid var(--border);
+        }
+
+        .hero-stat:last-child {
+            border-right: none;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .hero-stat small {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* ==================== SECTION BASE ==================== */
+        section {
+            padding: 90px 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 54px;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #818cf8;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .section-sub {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 520px;
+            margin: 12px auto 0;
+            line-height: 1.7;
+        }
+
+        /* ==================== CATEGORIES ==================== */
+        .categories-section {
+            background: var(--black);
+        }
+
+        .cats-carousel {
+            display: flex;
+            gap: 22px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 6px 0 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            scrollbar-width: none;
+        }
+
+        .cats-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-card {
+            position: relative;
+            min-width: 300px;
+            flex: 0 0 300px;
+            height: 280px;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all .35s;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, .5);
+            border-color: rgba(79, 70, 229, .4);
+        }
+
+        .cat-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .55s;
+        }
+
+        .cat-card:hover img {
+            transform: scale(1.07);
+        }
+
+        /* When no image, fallback bg is set inline */
+        .cat-card .cat-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+
+        .cat-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 5, 8, .95) 0%, rgba(5, 5, 8, .35) 60%, transparent 100%);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .cat-tag {
+            display: inline-block;
+            background: rgba(79, 70, 229, .3);
+            border: 1px solid rgba(79, 70, 229, .5);
+            color: #a5b4fc;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 50px;
+            margin-bottom: 9px;
+            width: fit-content;
+        }
+
+        .cat-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .cat-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .cat-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: #fff;
+            padding: 9px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            width: fit-content;
+            transition: all .25s;
+            backdrop-filter: blur(8px);
+        }
+
+        .cat-btn:hover {
+            background: rgba(255, 255, 255, .22);
+        }
+
+        /* ==================== FEATURED / CENTERS ==================== */
+        .featured-section {
+            background: #08080f;
+        }
+
+        .filter-wrap {
+            max-width: 900px;
+            margin: 0 auto 44px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .fpill {
+            padding: 10px 22px;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            background: var(--card);
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s;
+        }
+
+        .fpill:hover {
+            border-color: rgba(79, 70, 229, .5);
+            color: #fff;
+        }
+
+        .fpill.active {
+            background: var(--grad);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(79, 70, 229, .4);
+        }
+
+        .places-carousel {
+            display: flex;
+            gap: 22px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding: 6px 0 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .places-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .place-card {
+            position: relative;
+            min-width: 340px;
+            flex: 0 0 340px;
+            height: 500px;
+            border-radius: 22px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all .35s;
+        }
+
+        .place-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 28px 56px rgba(0, 0, 0, .6);
+        }
+
+        .place-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform .55s;
+            position: relative;
+        }
+
+        .place-card:hover .place-img {
+            transform: scale(1.06);
+        }
+
+        .place-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 5, 8, 1) 0%, rgba(5, 5, 8, .55) 45%, transparent 100%);
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .place-badge {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--orange);
+            margin-bottom: 8px;
+        }
+
+        .place-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .place-city {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Like button */
+        .like-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(255, 255, 255, .9);
+            border: none;
+            border-radius: 50px;
+            padding: 9px 16px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            transition: all .25s;
+        }
+
+        .like-btn:hover {
+            background: #fff;
+            transform: scale(1.06);
+        }
+
+        .like-btn .heart {
+            font-size: 18px;
+            color: #999;
+            transition: color .3s;
+        }
+
+        .like-btn.liked .heart {
+            color: #ef4444;
+        }
+
+        .like-btn .cnt {
+            font-size: 13px;
+            font-weight: 700;
+            color: #222;
+            min-width: 20px;
+        }
+
+        @keyframes heartPop {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            30% {
+                transform: scale(1.45);
+            }
+
+            60% {
+                transform: scale(1.15);
+            }
+        }
+
+        /* view all link */
+        .view-all-wrap {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .view-all {
+            display: inline-block;
+            padding: 13px 38px;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .25s;
+        }
+
+        .view-all:hover {
+            border-color: rgba(79, 70, 229, .5);
+            color: #fff;
+        }
+
+        /* ==================== STATS BAR ==================== */
+        .stats-bar {
+            background: linear-gradient(135deg, rgba(79, 70, 229, .1), rgba(124, 58, 237, .1));
+            border-top: 1px solid rgba(79, 70, 229, .18);
+            border-bottom: 1px solid rgba(79, 70, 229, .18);
+            padding: 40px 24px;
+        }
+
+        .stats-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0 24px;
+            border-right: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-num {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 900;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 7px;
+        }
+
+        .stat-lbl {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* ==================== HOW IT WORKS ==================== */
+        .how-section {
+            background: #07070f;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-section::before {
+            content: '';
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, .1), transparent 70%);
+            top: -200px;
+            right: -200px;
+            pointer-events: none;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .how-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 22px;
+            text-align: center;
+            transition: all .3s;
+            position: relative;
+        }
+
+        .how-card:hover {
+            border-color: rgba(79, 70, 229, .45);
+            transform: translateY(-5px);
+            background: rgba(79, 70, 229, .06);
+        }
+
+        .how-card::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -1px;
+            right: 18px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #818cf8;
+            background: rgba(79, 70, 229, .15);
+            border: 1px solid rgba(79, 70, 229, .3);
+            padding: 3px 10px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .how-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, .35);
+        }
+
+        .how-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .how-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ==================== CTA BAND ==================== */
+        .cta-band {
+            background: var(--grad);
+            padding: 84px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-band::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .04) 0px, rgba(255, 255, 255, .04) 1px, transparent 1px, transparent 24px);
+        }
+
+        .cta-band h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .cta-band p {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, .8);
+            max-width: 540px;
+            margin: 0 auto 38px;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .cta-band-btns {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .cta-white {
+            padding: 15px 40px;
+            border-radius: 50px;
+            background: #fff;
+            color: var(--indigo);
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .25);
+            transition: all .3s;
+        }
+
+        .cta-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, .35);
+        }
+
+        .cta-border-w {
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, .5);
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all .3s;
+        }
+
+        .cta-border-w:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, .1);
+        }
+
+        /* ==================== SERVICES ==================== */
+        .services-section {
+            background: var(--black);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 36px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .3s;
+        }
+
+        .service-card:hover {
+            border-color: rgba(79, 70, 229, .45);
+            background: rgba(79, 70, 229, .06);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, .4);
+        }
+
+        .svc-icon {
+            font-size: 46px;
+            margin-bottom: 18px;
+        }
+
+        .svc-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .svc-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ==================== CONTACT ==================== */
+        .contact-section {
+            position: relative;
+            padding: 100px 24px;
+            text-align: center;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .contact-section .bg-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5, 5, 8, .55), rgba(5, 5, 8, .85));
+            z-index: 1;
+        }
+
+        .contact-section>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            max-width: 680px;
+            margin-bottom: 16px;
+        }
+
+        .contact-section>p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 540px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+
+        .contact-chips {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 36px;
+        }
+
+        .cchip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 50px;
+            padding: 12px 26px;
+            font-size: 15px;
+            backdrop-filter: blur(8px);
+            transition: all .3s;
+        }
+
+        .cchip:hover {
+            background: rgba(255, 255, 255, .15);
+            transform: translateY(-4px);
+        }
+
+        .cchip .ci {
+            font-size: 20px;
+        }
+
+        /* ==================== PARTNER ==================== */
+        .partner-section {
+            background: #07070f;
+            padding: 90px 24px;
+        }
+
+        .partner-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .partner-inner h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            margin-bottom: 14px;
+        }
+
+        .partner-inner>p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 620px;
+            margin: 0 auto 42px;
+            line-height: 1.7;
+        }
+
+        .partner-benefits {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 42px;
+        }
+
+        .bchip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 28px;
+            min-width: 130px;
+            transition: all .3s;
+        }
+
+        .bchip:hover {
+            border-color: rgba(79, 70, 229, .4);
+            background: rgba(79, 70, 229, .07);
+            transform: translateY(-4px);
+        }
+
+        .bchip .bi {
+            font-size: 28px;
+        }
+
+        .bchip span {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .partner-btn {
+            display: inline-block;
+            padding: 16px 50px;
+            border-radius: 50px;
+            background: #fff;
+            color: var(--indigo);
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .3);
+            transition: all .3s;
+        }
+
+        .partner-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, .4);
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: #030305;
+            padding: 64px 24px 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 52px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 280px;
+            margin-top: 14px;
+        }
+
+        .footer-col h4 {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #818cf8;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .25s;
+        }
+
+        .footer-col a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            text-align: center;
+            color: rgba(255, 255, 255, .28);
+            font-size: 13px;
+        }
+
+        /* ==================== LOADING ==================== */
+        .spinner {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 3px solid rgba(79, 70, 229, .2);
+            border-top-color: #4f46e5;
+            animation: spin .8s linear infinite;
+            margin: 56px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ==================== MOBILE ==================== */
+        @media (max-width: 768px) {
+            header {
+                padding: 12px 16px;
+                background: rgba(5, 5, 8, .97);
+            }
+
+            nav {
+                display: none;
+            }
+
+            nav.open {
+                display: flex;
+                position: fixed;
+                top: 58px;
+                left: 0;
+                right: 0;
+                background: rgba(5, 5, 8, .98);
+                backdrop-filter: blur(16px);
+                flex-direction: column;
+                gap: 0;
+                z-index: 999;
+                border-bottom: 1px solid var(--border);
+                padding: 8px 0;
+            }
+
+            nav.open a {
+                display: block;
+                padding: 14px 24px;
+                border-radius: 0;
+                font-size: 16px;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .btn-ghost {
+                display: none;
+            }
+
+            section {
+                padding: 64px 16px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                border-top: none;
+                padding-top: 0;
+                gap: 0;
+            }
+
+            .hero-stat {
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 16px 0;
+            }
+
+            .hero-stat:last-child {
+                border-bottom: none;
+            }
+
+            .cat-card {
+                min-width: 272px;
+                flex: 0 0 272px;
+                height: 250px;
+            }
+
+            .place-card {
+                min-width: 300px;
+                flex: 0 0 300px;
+                height: 440px;
+            }
+
+            .how-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-inner {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-item:nth-child(2) {
+                border-right: none;
+            }
+
+            .stat-item {
+                padding: 14px 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, .05);
+            }
+
+            .stat-item:nth-child(3),
+            .stat-item:nth-child(4) {
+                border-bottom: none;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+                gap: 32px;
+            }
+
+            .footer-brand {
+                grid-column: 1 / -1;
+            }
+
+            .contact-chips {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cchip {
+                width: 100%;
+                max-width: 340px;
+                justify-content: center;
+            }
+
+            .filter-wrap {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 4px;
+                scrollbar-width: none;
+            }
+
+            .filter-wrap::-webkit-scrollbar {
+                display: none;
+            }
+
+            .fpill {
+                flex-shrink: 0;
+            }
+
+            .partner-benefits {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .bchip {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════════════════ HEADER ════════════════ -->
+    <header>
+        <div class="header-inner">
+            <a class="logo" href="index.html">
+                <div class="logo-dot"></div>
+                EDUFIND
+            </a>
+
+            <nav id="mainNav">
+                <a href="#categories">Categories</a>
+                <a href="#featured">Centers</a>
+                <a href="#how">How It Works</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <div class="header-right">
+                <a class="btn-ghost" href="partner-login.html">Partner Login</a>
+                <a class="btn-primary" href="partner-signup.html">List Your Center</a>
+                <button class="hamburger" id="hamburger" onclick="toggleNav()">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ════════════════ HERO ════════════════ -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>
+                FIND THE BEST<br>
+                <span class="grad-text">LEARNING CENTERS</span><br>
+                NEAR YOU
+            </h1>
+            <p>Compare courses, prices, schedules and teachers across hundreds of verified learning centers — all in one
+                place.</p>
+            <div class="hero-cta">
+                <a href="#featured" class="cta-orange">Browse Centers →</a>
+                <a href="partner-signup.html" class="cta-outline">List Your Center</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong id="statCenters">50+</strong>
+                    <small>Learning Centers</small>
+                </div>
+                <div class="hero-stat">
+                    <strong id="statCourses">300+</strong>
+                    <small>Active Courses</small>
+                </div>
+                <div class="hero-stat">
+                    <strong id="statTeachers">—</strong>
+                    <small>Expert Teachers</small>
+                </div>
+                <div class="hero-stat">
+                    <strong>Free</strong>
+                    <small>Always Free to Browse</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ CATEGORIES ════════════════ -->
+    <section class="categories-section" id="categories">
+        <div class="section-header">
+            <p class="eyebrow">Browse by Subject</p>
+            <h2 class="section-title">What do you want to learn?</h2>
+            <p class="section-sub">Tap a subject to find all centers offering that course</p>
+        </div>
+
+        <div class="cats-carousel">
+
+            <div class="cat-card" onclick="location.href='centers.html?search=English'"
+                style="background:linear-gradient(135deg,#1e1b4b,#312e81)">
+                <div class="cat-fallback">🇬🇧</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Language</div>
+                    <div class="cat-title">English</div>
+                    <div class="cat-desc">IELTS, TOEFL, General & Business English</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=IELTS'"
+                style="background:linear-gradient(135deg,#0c1a3a,#1e3a8a)">
+                <div class="cat-fallback">📝</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Exam Prep</div>
+                    <div class="cat-title">IELTS & TOEFL</div>
+                    <div class="cat-desc">Achieve your target band score fast</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=Math'"
+                style="background:linear-gradient(135deg,#14002e,#4c1d95)">
+                <div class="cat-fallback">📐</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Science</div>
+                    <div class="cat-title">Mathematics</div>
+                    <div class="cat-desc">School math, SAT prep & Olympiad training</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=Programming'"
+                style="background:linear-gradient(135deg,#001a12,#065f46)">
+                <div class="cat-fallback">💻</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Technology</div>
+                    <div class="cat-title">Programming</div>
+                    <div class="cat-desc">Python, Web Dev, Data Science, Mobile</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=SAT'"
+                style="background:linear-gradient(135deg,#1a0505,#7f1d1d)">
+                <div class="cat-fallback">🎓</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Exam Prep</div>
+                    <div class="cat-title">SAT Prep</div>
+                    <div class="cat-desc">Full SAT preparation — Math, Reading & Writing</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=Russian'"
+                style="background:linear-gradient(135deg,#1a0a00,#92400e)">
+                <div class="cat-fallback">🇷🇺</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Language</div>
+                    <div class="cat-title">Russian</div>
+                    <div class="cat-desc">All levels — conversation, grammar & writing</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+            <div class="cat-card" onclick="location.href='centers.html?search=Art'"
+                style="background:linear-gradient(135deg,#001a1a,#134e4a)">
+                <div class="cat-fallback">🎨</div>
+                <div class="cat-overlay">
+                    <div class="cat-tag">Creative</div>
+                    <div class="cat-title">Art & Design</div>
+                    <div class="cat-desc">Drawing, digital art, graphic design</div>
+                    <div class="cat-btn">Explore →</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ════════════════ FEATURED CENTERS ════════════════ -->
+    <section class="featured-section" id="featured">
+        <div class="section-header">
+            <p class="eyebrow">Top Picks</p>
+            <h2 class="section-title">Most Popular Centers</h2>
+            <p class="section-sub">Verified centers with approved courses, real reviews and great results</p>
+        </div>
+
+        <div class="filter-wrap">
+            <button class="fpill active" onclick="filterCenters(this,'all')">All Cities</button>
+            <button class="fpill" onclick="filterCenters(this,'tashkent')">Tashkent</button>
+            <button class="fpill" onclick="filterCenters(this,'samarkand')">Samarkand</button>
+            <button class="fpill" onclick="filterCenters(this,'bukhara')">Bukhara</button>
+            <button class="fpill" onclick="filterCenters(this,'fergana')">Fergana</button>
+            <button class="fpill" onclick="filterCenters(this,'namangan')">Namangan</button>
+            <button class="fpill" onclick="filterCenters(this,'andijan')">Andijan</button>
+        </div>
+
+        <div class="places-carousel" id="centersCarousel">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="view-all-wrap">
+            <a href="centers.html" class="view-all">View All Centers →</a>
+        </div>
+    </section>
+
+    <!-- ════════════════ HOW IT WORKS ════════════════ -->
+    <section class="how-section" id="how">
+        <div class="section-header">
+            <p class="eyebrow">Simple Process</p>
+            <h2 class="section-title">How EduFind Works</h2>
+            <p class="section-sub">Find the perfect learning center in minutes, not days</p>
+        </div>
+
+        <div class="how-grid">
+            <div class="how-card" data-step="Step 1">
+                <div class="how-icon">🔍</div>
+                <div class="how-title">Search</div>
+                <div class="how-desc">Enter your subject, city, or center name and instantly see all matching results.
+                </div>
+            </div>
+            <div class="how-card" data-step="Step 2">
+                <div class="how-icon">⚖️</div>
+                <div class="how-title">Compare</div>
+                <div class="how-desc">Compare prices, schedules, teachers, and student reviews side by side.</div>
+            </div>
+            <div class="how-card" data-step="Step 3">
+                <div class="how-icon">📞</div>
+                <div class="how-title">Contact</div>
+                <div class="how-desc">Reach out directly to the center — call, email, or visit their profile page.</div>
+            </div>
+            <div class="how-card" data-step="Step 4">
+                <div class="how-icon">🎓</div>
+                <div class="how-title">Learn</div>
+                <div class="how-desc">Start your course at the center that perfectly fits your goals and budget.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ CTA BAND ════════════════ -->
+    <div class="cta-band">
+        <h2>Ready to find your course?</h2>
+        <p>Browse hundreds of verified learning centers and find the perfect match for your goals and budget.</p>
+        <div class="cta-band-btns">
+            <a href="centers.html" class="cta-white">🔍 Browse Centers</a>
+            <a href="courses.html" class="cta-border-w">View All Courses</a>
+        </div>
+    </div>
+
+    <!-- ════════════════ SERVICES ════════════════ -->
+    <section class="services-section" id="services">
+        <div class="section-header">
+            <p class="eyebrow">How We Help</p>
+            <h2 class="section-title">Our Services</h2>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card" onclick="location.href='centers.html'">
+                <div class="svc-icon">🏫</div>
+                <div class="svc-title">Center Discovery</div>
+                <div class="svc-desc">Find and compare learning centers in your city with detailed profiles and verified
+                    reviews.</div>
+            </div>
+            <div class="service-card" onclick="location.href='courses.html'">
+                <div class="svc-icon">📚</div>
+                <div class="svc-title">Course Catalog</div>
+                <div class="svc-desc">Browse courses with full details — prices, schedules, levels and teacher profiles.
+                </div>
+            </div>
+            <div class="service-card" onclick="location.href='centers.html'">
+                <div class="svc-icon">⭐</div>
+                <div class="svc-title">Verified Reviews</div>
+                <div class="svc-desc">Real student reviews moderated by our team to help you make the right choice.
+                </div>
+            </div>
+            <div class="service-card" onclick="location.href='partner-signup.html'">
+                <div class="svc-icon">📊</div>
+                <div class="svc-title">Partner Dashboard</div>
+                <div class="svc-desc">Learning centers manage courses, track profile views, and grow their student base.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ CONTACT ════════════════ -->
+    <section class="contact-section" id="contact">
+        <h2>Need Help Finding a Center?</h2>
+        <p>Our team is ready to help you choose the right learning center and course for your goals.</p>
+        <div class="contact-chips">
+            <div class="cchip"><span class="ci">📞</span> +998 71 123-45-67</div>
+            <div class="cchip"><span class="ci">✉️</span> hello@edufind.uz</div>
+            <div class="cchip"><span class="ci">📍</span> Tashkent, Uzbekistan</div>
+        </div>
+        <a href="mailto:hello@edufind.uz" class="cta-orange">Contact Us Now</a>
+    </section>
+
+    <!-- ════════════════ PARTNER ════════════════ -->
+    <section class="partner-section">
+        <div class="partner-inner">
+            <h2>Grow Your Learning Center</h2>
+            <p>Join EduFind and connect with thousands of students looking for courses like yours — completely free to
+                start.</p>
+            <div class="partner-benefits">
+                <div class="bchip"><span class="bi">🌟</span><span>Free Listing</span></div>
+                <div class="bchip"><span class="bi">📊</span><span>Analytics</span></div>
+                <div class="bchip"><span class="bi">✅</span><span>Verified Badge</span></div>
+                <div class="bchip"><span class="bi">💬</span><span>Reviews</span></div>
+                <div class="bchip"><span class="bi">📱</span><span>Mobile Ready</span></div>
+            </div>
+            <a href="partner-signup.html" class="partner-btn">🚀 Register Your Center</a>
+        </div>
+    </section>
+
+    <!-- ════════════════ FOOTER ════════════════ -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a class="logo" href="index.html" style="display:inline-flex">
+                        <div class="logo-dot"></div>EDUFIND
+                    </a>
+                    <p>Connecting students with the best verified learning centers across Uzbekistan.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>For Students</h4>
+                    <ul>
+                        <li><a href="centers.html">Browse Centers</a></li>
+                        <li><a href="courses.html">Browse Courses</a></li>
+                        <li><a href="centers.html">Find by City</a></li>
+                        <li><a href="centers.html">Find by Subject</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>For Partners</h4>
+                    <ul>
+                        <li><a href="partner-signup.html">Register Center</a></li>
+                        <li><a href="partner-login.html">Partner Login</a></li>
+                        <li><a href="partner-portal.html">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="admin.html">Admin Panel</a></li>
+                        <li><a href="#">About EduFind</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 EduFind. All rights reserved. Built for students, powered by learning.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ════════════════ JAVASCRIPT ════════════════ -->
+    <script>
+        const API = 'http://localhost:8000';
+
+        /* ── Mobile nav ── */
+        function toggleNav() {
+            const nav = document.getElementById('mainNav');
+            const btn = document.getElementById('hamburger');
+            const open = nav.classList.toggle('open');
+            btn.textContent = open ? '✕' : '☰';
+        }
+
+        document.querySelectorAll('#mainNav a').forEach(a => {
+            a.addEventListener('click', () => {
+                document.getElementById('mainNav').classList.remove('open');
+                document.getElementById('hamburger').textContent = '☰';
+            });
+        });
+
+        document.addEventListener('click', e => {
+            const nav = document.getElementById('mainNav');
+            const btn = document.getElementById('hamburger');
+            if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+                nav.classList.remove('open');
+                btn.textContent = '☰';
+            }
+        });
+
+        /* ── Stats ── */
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API}/public/stats`);
+                if (!res.ok) return;
+                const s = await res.json();
+                console.log(s)
+                ['statCenters', 's1'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = s.centers; });
+                ['statCourses', 's2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = s.courses; });
+                ['statTeachers', 's3'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = s.teachers; });
+
+            } catch (_) { }
+        }
+
+        /* ── Centers carousel ── */
+        let allCenters = [];
+
+        function stars(r) {
+            r = Math.round(r || 0);
+            return Array.from({ length: 5 }, (_, i) =>
+                `<span style="color: ${i < r ? '#f59e0b' : 'rgba(255,255,255,0.2)'} ; font-size: 13px">★</span>`
+            ).join('');
+        }
+
+        // Gradient backgrounds for centers without logos
+
+        const gradients = [
+            'linear-gradient(135deg,#1e1b4b,#312e81)',
+            'linear-gradient(135deg,#0c1a3a,#1e3a8a)',
+            'linear-gradient(135deg,#14002e,#4c1d95)',
+            'linear-gradient(135deg,#001a12,#065f46)',
+            'linear-gradient(135deg,#1a0505,#7f1d1d)',
+            'linear-gradient(135deg,#1a0a00,#92400e)',
+        ];
+
+        function buildCard(c, idx) {
+            const ini = (c.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            const bg = gradients[idx % gradients.length];
+            const starsHtml = (() => {
+                const r = Math.round(c.avg_rating || 0);
+                return Array.from({ length: 5 }, (_, i) => `<span style="color:${i < r ? '#f59e0b' : 'rgba(255,255,255,.2)'};font-size:13px">★</span>`).join('');
+            })();
+
+            return `
+      <div class="place-card" data-city="${(c.city || '').toLowerCase()}" onclick="location.href='center.html?id=${c.id}'">
+        <div class="place-img" style="background:${bg};display:flex;align-items:center;justify-content:center;position:relative">
+          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,.1);font-family:Arial">${ini}</div>
+        </div>
+
+        <button
+            class="like-btn"
+            data-center-id="${c.id}"
+            data-liked="false"
+            onclick="toggleLike(${c.id}, this, event)"
+            style="display: flex; align-items: center;gap: 5px;background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.12);
+                border-radius: 50px; padding: 6px 12px;font-size: 13px;font-weight: 700;cursor: pointer;color: #333;transition: all 0.2s;backdrop-filter: blur(8px);">
+
+                <span class="like-heart">♡</span>
+                <span class="like-count">${c.likes_count || 0}</span>
+                =
+        </button>
+
+        <div class="place-overlay">
+          <div class="place-badge">✓ Verified</div>
+          <div class="place-name">${c.name}</div>
+          <div class="place-city">📍 ${c.city || 'Uzbekistan'}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <div>${starsHtml}</div>
+            <span style="font-size:12px;color:rgba(255,255,255,.5)">${c.avg_rating ? `${c.avg_rating} · ${c.review_count} reviews` : 'No reviews yet'}</span>
+          </div>
+          <div style="margin-top:12px">
+            <span style="background:rgba(79,70,229,.25);border:1px solid rgba(79,70,229,.4);color:#a5b4fc;border-radius:50px;padding:4px 14px;font-size:12px;font-weight:700">📚 ${c.course_count || 0} courses</span>
+          </div>
+        </div>
+      </div>`;
+        }
+
+        async function loadCenters() {
+            const car = document.getElementById('centersCarousel');
+            try {
+                const res = await fetch(`${API}/public/featured`);
+                if (!res.ok) throw new Error();
+
+                allCenters = await res.json();
+
+                if (!allCenters.length) {
+                    car.innerHTML = '<p style="color:rgba(255,255,255,.35);padding:48px;text-align:center;width:100%">No centers yet. Be the first to register!</p>';
+                    return;
+                }
+                car.innerHTML = allCenters.map((c, i) => buildCard(c, i)).join('');
+                initLikes();
+            } catch (_) {
+                // Placeholder cards when API is not running
+                car.innerHTML = Array.from({ length: 4 }, (_, i) => `
+        <div class="place-card" style="cursor:default" data-city="tashkent">
+          <div class="place-img" style="background:${gradients[i]};display:flex;align-items:center;justify-content:center">
+            <div style="font-size:3rem;color:rgba(255,255,255,.1);font-weight:900">EC</div>
+          </div>
+          <div class="place-overlay">
+            <div class="place-badge" style="color:rgba(255,255,255,.4)">Coming Soon</div>
+            <div class="place-name">Example Center ${i + 1}</div>
+            <div class="place-city">📍 Tashkent</div>
+            <div style="margin-top:10px"><span style="background:rgba(255,255,255,.08);border-radius:50px;padding:4px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.4)">📚 0 courses</span></div>
+          </div>
+        </div>`).join('');
+            }
+        }
+
+        /* ── Filter ── */
+        function filterCenters(btn, city) {
+            document.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('#centersCarousel .place-card').forEach(card => {
+                card.style.display = (city === 'all' || card.dataset.city === city) ? '' : 'none';
+            });
+        }
+
+        /* ── Likes ── */
+        const liked = new Set(JSON.parse(localStorage.getItem('ef_liked') || '[]'));
+
+        function initLikes() {
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                const id = btn.dataset.id;
+                if (liked.has(id)) {
+                    btn.classList.add('liked');
+                    btn.querySelector('.heart').textContent = '♥';
+                    btn.querySelector('.heart').style.color = '#ef4444';
+                }
+            });
+        }
+
+        /* ── Smooth scroll for anchors ── */
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const t = document.querySelector(a.getAttribute('href'));
+                if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+            });
+        });
+
+        /* ── Init ── */
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadCenters();
+        });
+
+        /* ── User token: generated once per browser, lives in localStorage ── */
+        function getUserToken() {
+            let token = localStorage.getItem('edufind_user_token');
+            if (!token) {
+                // Generate a random UUID-like token
+                token = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                localStorage.setItem('edufind_user_token', token);
+            }
+            return token;
+        }
+
+        /* ── Main like toggle function ── */
+        async function toggleLike(centerId, btn, event) {
+            // Stop click from also navigating to center page
+            event.stopPropagation();
+
+            const API = 'http://localhost:8000';
+            const token = getUserToken();
+
+            // Optimistic UI — update immediately before server responds
+            const countEl = btn.querySelector('.like-count');
+            const heartEl = btn.querySelector('.like-heart');
+            const isLiked = btn.dataset.liked === 'true';
+            const prevCount = parseInt(countEl.textContent) || 0;
+
+            // Flip state immediately (feels instant)
+            btn.dataset.liked = isLiked ? 'false' : 'true';
+            countEl.textContent = isLiked ? prevCount - 1 : prevCount + 1;
+            heartEl.textContent = isLiked ? '♡' : '♥';
+            btn.style.color = isLiked ? '' : '#ef4444';
+            btn.style.borderColor = isLiked ? '' : '#ef4444';
+
+            try {
+                const res = await fetch(`${API}/public/centers/${centerId}/like`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_token: token }),
+                });
+
+                if (!res.ok) throw new Error('Server error');
+
+                const data = await res.json();
+
+                // Sync with server's authoritative count
+                countEl.textContent = data.likes_count;
+                btn.dataset.liked = data.liked ? 'true' : 'false';
+                heartEl.textContent = data.liked ? '♥' : '♡';
+                btn.style.color = data.liked ? '#ef4444' : '';
+                btn.style.borderColor = data.liked ? '#ef4444' : '';
+
+            } catch (_) {
+                // Revert optimistic update on failure
+                btn.dataset.liked = isLiked ? 'true' : 'false';
+                countEl.textContent = prevCount;
+                heartEl.textContent = isLiked ? '♥' : '♡';
+                btn.style.color = isLiked ? '#ef4444' : '';
+                btn.style.borderColor = isLiked ? '#ef4444' : '';
+            }
+        }
+
+        /* ── Load liked status for all visible cards ── */
+        async function loadLikedStatuses() {
+            const API = 'http://localhost:8000';
+            const token = getUserToken();
+
+            // Find all like buttons on the page
+            const btns = document.querySelectorAll('[data-center-id]');
+            if (!btns.length) return;
+
+            // Check each center's like status for this user
+            btns.forEach(async (btn) => {
+                const centerId = btn.dataset.centerId;
+                try {
+                    const res = await fetch(`${API}/public/centers/${centerId}/like-status?user_token=${token}`);
+                    const data = await res.json();
+                    const heartEl = btn.querySelector('.like-heart');
+                    const countEl = btn.querySelector('.like-count');
+
+                    btn.dataset.liked = data.liked ? 'true' : 'false';
+                    if (countEl) countEl.textContent = data.likes_count;
+                    if (heartEl) heartEl.textContent = data.liked ? '♥' : '♡';
+                    btn.style.color = data.liked ? '#ef4444' : '';
+                    btn.style.borderColor = data.liked ? '#ef4444' : '';
+                } catch (_) { }
+            });
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', loadLikedStatuses);
+        // Also run if cards are loaded dynamically (after fetch)
+        window._loadLikedStatuses = loadLikedStatuses;
+
+    </script>
+
+</body>
+
+</html>

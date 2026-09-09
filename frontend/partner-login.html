@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Login — EduFind</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #07070c;
+            --surface: #0f0f18;
+            --card: #13131f;
+            --border: rgba(255, 255, 255, .07);
+            --border2: rgba(255, 255, 255, .14);
+            --indigo: #4f46e5;
+            --violet: #7c3aed;
+            --muted: rgba(255, 255, 255, .45);
+            --text: rgba(255, 255, 255, .9);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* decorative bg circles */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: rgba(79, 70, 229, .15);
+            top: -100px;
+            right: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(124, 58, 237, .1);
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .box {
+            background: var(--card);
+            border: 1px solid var(--border2);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+            position: relative;
+            z-index: 1;
+            animation: fadeUp .4s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: .9rem;
+            letter-spacing: .2em;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            text-align: center;
+            margin-bottom: .5rem;
+        }
+
+        .sub {
+            text-align: center;
+            color: var(--muted);
+            font-size: .875rem;
+            margin-bottom: 2rem;
+        }
+
+        .field {
+            margin-bottom: 1.25rem;
+        }
+
+        .field label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .45rem;
+        }
+
+        .field input {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border2);
+            border-radius: 12px;
+            padding: .875rem 1rem;
+            color: var(--text);
+            font-size: .95rem;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: .2s;
+        }
+
+        .field input::placeholder {
+            color: rgba(255, 255, 255, .2);
+        }
+
+        .field input:focus {
+            border-color: rgba(79, 70, 229, .6);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+        }
+
+        .btn {
+            width: 100%;
+            padding: .9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background: var(--grad);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 4px 18px rgba(79, 70, 229, .35);
+            transition: .2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(79, 70, 229, .5);
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .err {
+            background: rgba(244, 63, 94, .1);
+            border: 1px solid rgba(244, 63, 94, .3);
+            border-radius: 10px;
+            padding: .875rem;
+            color: #fb7185;
+            font-size: .875rem;
+            margin-bottom: 1.25rem;
+            display: none;
+        }
+
+        .err.show {
+            display: block;
+            animation: shake .4s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        .divider {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: .82rem;
+            color: var(--muted);
+        }
+
+        .divider a {
+            color: #a5b4fc;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .divider a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="logo">EDUFIND</div>
+        <h1>Partner Login</h1>
+        <p class="sub">Sign in to manage your learning centers</p>
+
+        <div class="err" id="err-box"></div>
+
+        <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" autofocus>
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+        </div>
+
+        <button class="btn" id="login-btn" onclick="login()">Sign In →</button>
+
+        <div class="divider">
+            Not a partner yet? <a href="partner-signup.html">Apply here →</a>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:8000';
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('login-btn');
+            const errBox = document.getElementById('err-box');
+
+            if (!email || !password) {
+                showErr('Please enter your email and password.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Signing in…';
+            errBox.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API}/portal/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Login failed');
+
+                localStorage.setItem('edufind_partner', JSON.stringify(data));
+                window.location.href = 'partner-portal.html';
+            } catch (e) {
+                showErr(e.message);
+                btn.disabled = false;
+                btn.textContent = 'Sign In →';
+            }
+        }
+
+        function showErr(msg) {
+            const el = document.getElementById('err-box');
+            el.textContent = '⚠️ ' + msg;
+            el.classList.add('show');
+        }
+    </script>
+</body>
+
+</html>

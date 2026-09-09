@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Courses — EduFind</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #050508;
+      --ink:   #0c0c14;
+      --indigo: #4f46e5;
+      --purple: #7c3aed;
+      --orange: #f97316;
+      --muted:  rgba(255,255,255,0.55);
+      --border: rgba(255,255,255,0.10);
+      --card:   rgba(255,255,255,0.04);
+      --grad:   linear-gradient(135deg,#4f46e5,#7c3aed);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: Arial, sans-serif; background: var(--black); color: #fff; overflow-x: hidden; }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 16px 24px;
+      background: rgba(5,5,8,.97);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 17px; letter-spacing: 3px; text-decoration: none; color: #fff; }
+    .logo-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 12px rgba(79,70,229,.7); }
+    nav { display: flex; align-items: center; gap: 2px; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 8px; transition: all .25s; }
+    nav a:hover, nav a.active { color: #fff; background: rgba(255,255,255,.07); }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost { padding: 9px 20px; border: 1px solid var(--border); border-radius: 24px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all .25s; display: inline-block; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+    .btn-primary { padding: 9px 22px; border-radius: 24px; background: var(--grad); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; border: none; box-shadow: 0 4px 18px rgba(79,70,229,.4); transition: all .25s; display: inline-block; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(79,70,229,.55); }
+    .hamburger { display: none; background: var(--card); border: 1px solid var(--border); color: #fff; padding: 8px 13px; border-radius: 9px; font-size: 1.4rem; cursor: pointer; }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 130px 24px 60px;
+      background:
+        linear-gradient(to bottom, rgba(5,5,8,.4) 0%, rgba(5,5,8,.85) 70%, rgba(5,5,8,1) 100%),
+        radial-gradient(ellipse at 30% 50%, rgba(79,70,229,.2) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(124,58,237,.15) 0%, transparent 55%),
+        var(--ink);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(79,70,229,.14); border: 1px solid rgba(79,70,229,.32); border-radius: 50px; padding: 7px 18px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #a5b4fc; margin-bottom: 22px; }
+    .page-hero h1 { font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 14px; text-transform: uppercase; }
+    .grad-text { background: linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .page-hero p { font-size: 1rem; color: var(--muted); max-width: 480px; margin: 0 auto 32px; line-height: 1.75; }
+    .hero-search { display: flex; gap: 10px; max-width: 540px; margin: 0 auto; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 50px; padding: 8px 8px 8px 22px; backdrop-filter: blur(10px); transition: border-color .25s; }
+    .hero-search:focus-within { border-color: rgba(79,70,229,.6); }
+    .hero-search input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; }
+    .hero-search input::placeholder { color: var(--muted); }
+    .hero-search button { padding: 11px 26px; border-radius: 40px; background: var(--grad); color: #fff; font-size: 14px; font-weight: 700; border: none; cursor: pointer; flex-shrink: 0; transition: all .25s; box-shadow: 0 4px 16px rgba(79,70,229,.4); }
+    .hero-search button:hover { box-shadow: 0 6px 22px rgba(79,70,229,.6); }
+
+    /* ── CATEGORY PILLS ── */
+    .cats-row { max-width: 1400px; margin: 0 auto; padding: 32px 24px 0; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .cpill { padding: 9px 20px; border: 1px solid var(--border); border-radius: 50px; background: var(--card); color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .25s; display: flex; align-items: center; gap: 6px; }
+    .cpill:hover { border-color: rgba(79,70,229,.5); color: #fff; }
+    .cpill.active { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 4px 18px rgba(79,70,229,.4); }
+
+    /* ── MAIN LAYOUT ── */
+    .page-body { max-width: 1400px; margin: 0 auto; padding: 36px 24px 100px; display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: start; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { position: sticky; top: 90px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 22px; padding: 28px 22px; }
+    .sidebar-title { font-size: 13px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #818cf8; margin-bottom: 22px; }
+    .filter-group { margin-bottom: 24px; }
+    .filter-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.4); margin-bottom: 10px; display: block; }
+    .filter-select { width: 100%; padding: 11px 14px; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 14px; cursor: pointer; transition: border-color .25s; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .filter-select:focus { border-color: rgba(79,70,229,.5); }
+    .filter-select option { background: #1a1a2e; }
+    .reset-btn { width: 100%; padding: 11px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1); background: transparent; color: rgba(255,255,255,.5); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .25s; margin-top: 6px; }
+    .reset-btn:hover { border-color: rgba(249,115,22,.4); color: var(--orange); }
+
+    /* ── COURSES GRID ── */
+    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .results-count { font-size: 14px; color: var(--muted); }
+    .results-count strong { color: #fff; font-weight: 800; }
+    .sort-select { padding: 9px 14px; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 13px; cursor: pointer; outline: none; transition: border-color .25s; }
+    .sort-select:focus { border-color: rgba(79,70,229,.5); }
+    .sort-select option { background: #1a1a2e; }
+
+    .courses-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+
+    /* ── COURSE CARD ── */
+    .course-card {
+      background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 20px;
+      overflow: hidden; cursor: pointer; transition: all .3s; display: flex; flex-direction: column;
+      position: relative;
+    }
+    .course-card:hover { border-color: rgba(79,70,229,.45); transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,.5); }
+    .course-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--grad); border-radius: 3px 0 0 3px; }
+
+    .card-header { padding: 20px 20px 0; display: flex; align-items: flex-start; gap: 14px; }
+    .card-icon { width: 48px; height: 48px; border-radius: 13px; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 4px 14px rgba(79,70,229,.3); }
+    .card-title { font-size: 16px; font-weight: 800; line-height: 1.3; margin-bottom: 4px; }
+    .card-center { font-size: 13px; color: #a5b4fc; font-weight: 600; text-decoration: none; }
+    .card-center:hover { text-decoration: underline; }
+
+    .card-body { padding: 14px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .card-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cchip { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12px; color: rgba(255,255,255,.7); }
+
+    .card-footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); margin-top: auto; gap: 10px; }
+    .card-price { font-size: 18px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card-price.free { background: linear-gradient(135deg,#10b981,#34d399); -webkit-background-clip: text; }
+    .card-btn { padding: 7px 16px; border-radius: 50px; background: var(--grad); color: #fff; font-size: 12px; font-weight: 700; border: none; cursor: pointer; text-decoration: none; transition: all .25s; white-space: nowrap; box-shadow: 0 3px 10px rgba(79,70,229,.3); }
+    .card-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(79,70,229,.5); }
+
+    /* ── CITY CHIP ── */
+    .city-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
+
+    /* ── STATE BOXES ── */
+    .state-box { grid-column: 1/-1; text-align: center; padding: 80px 20px; }
+    .state-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .state-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+    .state-sub { font-size: 14px; color: var(--muted); }
+    .spinner { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(79,70,229,.2); border-top-color: #4f46e5; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── PAGINATION ── */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 48px; flex-wrap: wrap; }
+    .ppage { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+    .ppage:hover { border-color: rgba(79,70,229,.5); color: #fff; }
+    .ppage.active { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 4px 16px rgba(79,70,229,.4); }
+    .pnav { padding: 0 16px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .pnav:hover:not(:disabled) { border-color: rgba(79,70,229,.5); color: #fff; }
+    .pnav:disabled { opacity: .3; cursor: not-allowed; }
+
+    /* ── MOBILE ── */
+    nav.open { display: flex; position: fixed; top: 58px; left: 0; right: 0; background: rgba(5,5,8,.98); backdrop-filter: blur(16px); flex-direction: column; gap: 0; z-index: 999; border-bottom: 1px solid var(--border); padding: 8px 0; }
+    nav.open a { display: block; padding: 14px 24px; border-radius: 0; font-size: 16px; }
+
+    @media (max-width: 900px) {
+      .page-body { grid-template-columns: 1fr; gap: 24px; }
+      .sidebar { position: static; }
+      .courses-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 620px) {
+      header { padding: 12px 16px; }
+      nav:not(.open) { display: none; }
+      .hamburger { display: block; }
+      .btn-ghost { display: none; }
+      .page-hero { padding: 110px 16px 50px; }
+      .courses-grid { grid-template-columns: 1fr; }
+      .hero-search { flex-direction: column; border-radius: 18px; padding: 12px; }
+      .hero-search button { border-radius: 12px; padding: 12px; }
+      .cats-row { padding: 20px 16px 0; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+      .cats-row::-webkit-scrollbar { display: none; }
+      .cpill { flex-shrink: 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <div class="logo-dot"></div>EDUFIND
+      </a>
+      <nav id="mainNav">
+        <a href="index.html">Home</a>
+        <a href="centers.html">Centers</a>
+        <a href="courses.html" class="active">Courses</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="header-right">
+        <a class="btn-ghost" href="partner-login.html">Partner Login</a>
+        <a class="btn-primary" href="partner-signup.html">List Your Center</a>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="hero-badge">📚 Course Catalog</div>
+      <h1>Browse <span class="grad-text">All Courses</span></h1>
+      <p>Find the perfect course across hundreds of verified learning centers — filter by subject, city, and price.</p>
+      <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="Search courses, teachers, subjects…" />
+        <button onclick="applyFilters()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY PILLS -->
+  <div class="cats-row">
+    <div class="cpill active" onclick="selectCat(this,'')">🌐 All</div>
+    <div class="cpill" onclick="selectCat(this,'english')">🇬🇧 English</div>
+    <div class="cpill" onclick="selectCat(this,'ielts')">📝 IELTS</div>
+    <div class="cpill" onclick="selectCat(this,'math')">📐 Math</div>
+    <div class="cpill" onclick="selectCat(this,'sat')">🎓 SAT</div>
+    <div class="cpill" onclick="selectCat(this,'programming')">💻 Programming</div>
+    <div class="cpill" onclick="selectCat(this,'kids')">🧒 Kids</div>
+    <div class="cpill" onclick="selectCat(this,'art')">🎨 Art & Design</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="page-body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">🎛 Filters</div>
+
+      <div class="filter-group">
+        <label class="filter-label">City</label>
+        <select class="filter-select" id="citySelect" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option>Tashkent</option>
+          <option>Samarkand</option>
+          <option>Bukhara</option>
+          <option>Fergana</option>
+          <option>Namangan</option>
+          <option>Andijan</option>
+          <option>Nukus</option>
+          <option>Qarshi</option>
+          <option>Termez</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Max Price (UZS)</label>
+        <select class="filter-select" id="priceSelect" onchange="applyFilters()">
+          <option value="">Any Price</option>
+          <option value="free">Free Only</option>
+          <option value="500000">Under 500,000</option>
+          <option value="1000000">Under 1,000,000</option>
+          <option value="2000000">Under 2,000,000</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Duration</label>
+        <select class="filter-select" id="durationSelect" onchange="applyFilters()">
+          <option value="">Any Duration</option>
+          <option value="4">Up to 1 month</option>
+          <option value="12">Up to 3 months</option>
+          <option value="24">Up to 6 months</option>
+        </select>
+      </div>
+
+      <button class="reset-btn" onclick="resetFilters()">↺ Reset All Filters</button>
+    </aside>
+
+    <!-- COURSES -->
+    <div>
+      <div class="results-header">
+        <div class="results-count" id="resultsCount">Loading courses…</div>
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
+          <option value="az">A → Z</option>
+        </select>
+      </div>
+
+      <div class="courses-grid" id="coursesGrid">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <div class="state-title">Loading courses…</div>
+        </div>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = 'http://localhost:8000';
+
+    let currentPage     = 1;
+    let currentSearch   = '';
+    let currentCity     = '';
+    let currentCategory = '';
+    let currentPrice    = '';
+    let currentDuration = '';
+    let currentSort     = 'newest';
+
+    /* ── URL params ── */
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('search')) {
+      currentSearch = urlParams.get('search');
+      document.getElementById('searchInput').value = currentSearch;
+      // Highlight matching pill
+      document.querySelectorAll('.cpill').forEach(p => {
+        if (p.textContent.toLowerCase().includes(currentSearch.toLowerCase())) {
+          document.querySelectorAll('.cpill').forEach(x => x.classList.remove('active'));
+          p.classList.add('active');
+          currentCategory = currentSearch;
+        }
+      });
+    }
+
+    /* ── Mobile nav ── */
+    function toggleNav() {
+      const nav = document.getElementById('mainNav');
+      const btn = document.getElementById('hamburger');
+      const open = nav.classList.toggle('open');
+      btn.textContent = open ? '✕' : '☰';
+    }
+    document.addEventListener('click', e => {
+      const nav = document.getElementById('mainNav');
+      const btn = document.getElementById('hamburger');
+      if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('open');
+        btn.textContent = '☰';
+      }
+    });
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    /* ── Category pills ── */
+    function selectCat(el, val) {
+      document.querySelectorAll('.cpill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentCategory = val;
+      currentPage = 1;
+      fetchCourses();
+    }
+
+    /* ── Filters ── */
+    function applyFilters() {
+      currentSearch   = document.getElementById('searchInput').value.trim();
+      currentCity     = document.getElementById('citySelect').value;
+      currentPrice    = document.getElementById('priceSelect').value;
+      currentDuration = document.getElementById('durationSelect').value;
+      currentSort     = document.getElementById('sortSelect').value;
+      currentPage = 1;
+      fetchCourses();
+    }
+
+    function resetFilters() {
+      currentSearch = ''; currentCity = ''; currentCategory = '';
+      currentPrice = ''; currentDuration = ''; currentSort = 'newest';
+      document.getElementById('searchInput').value = '';
+      document.getElementById('citySelect').value = '';
+      document.getElementById('priceSelect').value = '';
+      document.getElementById('durationSelect').value = '';
+      document.getElementById('sortSelect').value = 'newest';
+      document.querySelectorAll('.cpill').forEach((p,i) => p.classList.toggle('active', i === 0));
+      currentPage = 1;
+      fetchCourses();
+    }
+
+    /* ── Fetch ── */
+    async function fetchCourses() {
+      const grid = document.getElementById('coursesGrid');
+      const pag  = document.getElementById('pagination');
+      grid.innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title">Loading…</div></div>';
+      pag.innerHTML = '';
+
+      const params = new URLSearchParams({ page: currentPage, per_page: 12 });
+      if (currentSearch)   params.set('search',   currentSearch);
+      if (currentCity)     params.set('city',     currentCity);
+      if (currentCategory) params.set('category', currentCategory);
+      if (currentSort)     params.set('sort',     currentSort);
+
+      try {
+        const res = await fetch(`${API}/public/courses?${params}`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        let items = data.items || [];
+        const total = data.total || items.length;
+        const pages = data.pages || 1;
+
+        /* Client-side price filter */
+        if (currentPrice === 'free') {
+          items = items.filter(c => !c.price || c.price === 0);
+        } else if (currentPrice) {
+          const maxP = parseInt(currentPrice);
+          items = items.filter(c => !c.price || c.price <= maxP);
+        }
+
+        /* Client-side duration filter */
+        if (currentDuration) {
+          const maxW = parseInt(currentDuration);
+          items = items.filter(c => !c.duration_weeks || c.duration_weeks <= maxW);
+        }
+
+        updateCount(items.length, total);
+        renderCourses(items);
+        renderPagination(pages);
+
+      } catch(e) {
+        grid.innerHTML = `
+        <div class="state-box">
+          <div class="state-icon">⚠️</div>
+          <div class="state-title">Could not load courses</div>
+          <div class="state-sub">Make sure the backend is running on port 8000</div>
+        </div>`;
+      }
+    }
+
+    /* ── Helpers ── */
+    function courseEmoji(name) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('english') || n.includes('ielts') || n.includes('toefl')) return '🇬🇧';
+      if (n.includes('math')) return '📐';
+      if (n.includes('python') || n.includes('program') || n.includes('web') || n.includes('code')) return '💻';
+      if (n.includes('russian')) return '🇷🇺';
+      if (n.includes('chinese')) return '🇨🇳';
+      if (n.includes('sat')) return '🎓';
+      if (n.includes('art')) return '🎨';
+      if (n.includes('music')) return '🎵';
+      return '📚';
+    }
+
+    function fmtPrice(price, currency) {
+      if (!price) return 'Free';
+      if (currency === 'USD') return '$' + Number(price).toFixed(0);
+      return Number(price).toLocaleString() + ' UZS';
+    }
+
+    /* ── Render ── */
+    function renderCourses(items) {
+      const grid = document.getElementById('coursesGrid');
+      if (!items.length) {
+        grid.innerHTML = `
+        <div class="state-box">
+          <div class="state-icon">📚</div>
+          <div class="state-title">No courses found</div>
+          <div class="state-sub">Try adjusting your filters or search term</div>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(co => {
+        const isFree = !co.price || co.price === 0;
+        const chips = [
+          co.teacher_name  ? `<div class="cchip">👤 ${co.teacher_name}</div>` : '',
+          co.schedule      ? `<div class="cchip">🕐 ${co.schedule}</div>` : '',
+          co.duration_weeks ? `<div class="cchip">📅 ${co.duration_weeks} weeks</div>` : '',
+          co.max_students  ? `<div class="cchip">👥 ${co.enrolled || 0}/${co.max_students}</div>` : '',
+        ].filter(Boolean).join('');
+
+        return `
+        <div class="course-card" onclick="location.href='center.html?id=${co.center_id}'">
+          <div class="card-header">
+            <div class="card-icon">${courseEmoji(co.name)}</div>
+            <div style="flex:1;min-width:0">
+              <div class="card-title">${co.name}</div>
+              <a class="card-center" href="center.html?id=${co.center_id}" onclick="event.stopPropagation()">
+                🏫 ${co.center_name || 'Unknown Center'}
+              </a>
+            </div>
+          </div>
+
+          <div class="card-body">
+            ${co.center_city ? `<div class="city-chip">📍 ${co.center_city}</div>` : ''}
+            ${co.description ? `<div class="card-desc">${co.description}</div>` : ''}
+            ${chips ? `<div class="card-chips">${chips}</div>` : ''}
+          </div>
+
+          <div class="card-footer">
+            <div class="card-price ${isFree ? 'free' : ''}">${fmtPrice(co.price, co.currency)}</div>
+            <a class="card-btn" href="center.html?id=${co.center_id}" onclick="event.stopPropagation()">
+              View Center →
+            </a>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* ── Count ── */
+    function updateCount(shown, total) {
+      const el = document.getElementById('resultsCount');
+      if (!el) return;
+      const q = currentSearch || currentCategory || currentCity;
+      el.innerHTML = q
+        ? `Showing <strong>${shown}</strong> of <strong>${total}</strong> courses for "<strong>${q}</strong>"`
+        : `Showing <strong>${shown}</strong> of <strong>${total}</strong> courses`;
+    }
+
+    /* ── Pagination ── */
+    function renderPagination(pages) {
+      const pag = document.getElementById('pagination');
+      if (pages <= 1) { pag.innerHTML = ''; return; }
+
+      let html = `<button class="pnav" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>← Prev</button>`;
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || Math.abs(i - currentPage) <= 2) {
+          html += `<button class="ppage ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+        } else if (Math.abs(i - currentPage) === 3) {
+          html += `<span style="color:var(--muted);padding:0 4px">…</span>`;
+        }
+      }
+      html += `<button class="pnav" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>Next →</button>`;
+      pag.innerHTML = html;
+    }
+
+    function goPage(p) {
+      currentPage = p;
+      fetchCourses();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    /* ── Init ── */
+    fetchCourses();
+  </script>
+
+</body>
+</html>

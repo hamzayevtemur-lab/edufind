@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Portal — EduFind</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #07070c;
+            --surface: #0f0f18;
+            --card: #13131f;
+            --card2: #1a1a2a;
+            --border: rgba(255, 255, 255, .07);
+            --border2: rgba(255, 255, 255, .12);
+            --indigo: #4f46e5;
+            --violet: #7c3aed;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --muted: rgba(255, 255, 255, .45);
+            --text: rgba(255, 255, 255, .9);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+            --sidebar: 220px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── TOPBAR (mobile) ─────────────────────────────── */
+        .topbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: .875rem 1.25rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .topbar-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: .95rem;
+            letter-spacing: .18em;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .burger {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 4px;
+        }
+
+        .burger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: .3s;
+        }
+
+        .burger.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .burger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ── SIDEBAR ─────────────────────────────────────── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform .3s ease;
+        }
+
+        .sidebar-head {
+            padding: 1.5rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: .9rem;
+            letter-spacing: .18em;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-biz {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-top: .3rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .plan-chip {
+            margin: 1rem 1.25rem .5rem;
+            background: rgba(79, 70, 229, .15);
+            border: 1px solid rgba(79, 70, 229, .3);
+            border-radius: 20px;
+            padding: .4rem .9rem;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+        }
+
+        .plan-exp {
+            font-size: .65rem;
+            color: rgba(255, 255, 255, .3);
+        }
+
+        .sidebar-section {
+            padding: .75rem 1.25rem .2rem;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .2);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .7rem 1rem;
+            margin: .1rem .75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: .875rem;
+            font-weight: 600;
+            transition: .2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, .05);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(79, 70, 229, .15);
+            color: #a5b4fc;
+            border-color: rgba(79, 70, 229, .3);
+        }
+
+        .nav-icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: .7rem;
+            border-radius: 10px;
+            background: rgba(244, 63, 94, .1);
+            border: 1px solid rgba(244, 63, 94, .2);
+            color: #fb7185;
+            font-weight: 700;
+            font-size: .875rem;
+            cursor: pointer;
+            transition: .2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: var(--rose);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* ── OVERLAY (mobile sidebar) ───────────────────── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(4px);
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* ── MAIN ────────────────────────────────────────── */
+        .main {
+            margin-left: var(--sidebar);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* ── SECTIONS ────────────────────────────────────── */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeUp .3s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sec-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── STATS GRID ──────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            border-left: 3px solid;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(79, 70, 229, .4);
+        }
+
+        .stat-label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .5rem;
+        }
+
+        .stat-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        /* ── CARDS ───────────────────────────────────────── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin-bottom: 1.25rem;
+        }
+
+        /* ── FORMS ───────────────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+        }
+
+        .field.full {
+            grid-column: 1/-1;
+        }
+
+        .field label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            background: var(--surface);
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            color: var(--text);
+            font-size: .9rem;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: .2s;
+            width: 100%;
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: rgba(255, 255, 255, .2);
+        }
+
+        .field select option {
+            background: var(--card2);
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: rgba(79, 70, 229, .6);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .1);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* ── BUTTONS ─────────────────────────────────────── */
+        .btn {
+            padding: .7rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: .875rem;
+            cursor: pointer;
+            border: none;
+            transition: .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--grad);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, .3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, .45);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border2);
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            color: var(--text);
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .btn-del {
+            background: rgba(244, 63, 94, .1);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, .2);
+        }
+
+        .btn-del:hover:not(:disabled) {
+            background: var(--rose);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .btn-amber {
+            background: rgba(245, 158, 11, .15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .3);
+        }
+
+        .btn-amber:hover:not(:disabled) {
+            background: var(--amber);
+            color: #000;
+            border-color: transparent;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: .75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── CENTER CARDS (my centers) ───────────────────── */
+        .centers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin-top: .5rem;
+        }
+
+        .center-card {
+            background: var(--card2);
+            border: 1px solid var(--border2);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: .25s;
+            cursor: pointer;
+        }
+
+        .center-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(79, 70, 229, .4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+        }
+
+        .center-card-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: var(--surface);
+        }
+
+        .center-card-img-ph {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, .15), rgba(124, 58, 237, .1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .center-card-body {
+            padding: 1.25rem;
+        }
+
+        .center-card-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: .4rem;
+        }
+
+        .center-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .75rem;
+        }
+
+        .meta-chip {
+            font-size: .72rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .center-card-actions {
+            display: flex;
+            gap: .5rem;
+        }
+
+        /* ── BADGES ──────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: .25rem .7rem;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+        }
+
+        .badge-approved {
+            background: rgba(16, 185, 129, .12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, .25);
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, .12);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .25);
+        }
+
+        .badge-rejected {
+            background: rgba(244, 63, 94, .12);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, .25);
+        }
+
+        /* ── COURSE LIST ─────────────────────────────────── */
+        .course-item {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: .75rem;
+            transition: .2s;
+        }
+
+        .course-item:hover {
+            border-color: rgba(79, 70, 229, .3);
+        }
+
+        .course-name {
+            font-weight: 700;
+            font-size: .9rem;
+            margin-bottom: .25rem;
+        }
+
+        .course-meta {
+            font-size: .78rem;
+            color: var(--muted);
+        }
+
+        .course-actions {
+            display: flex;
+            gap: .4rem;
+            flex-shrink: 0;
+        }
+
+        /* ── REVIEW CARDS ────────────────────────────────── */
+        .review-card {
+            background: var(--surface);
+            border-left: 3px solid var(--indigo);
+            border-radius: 0 12px 12px 0;
+            padding: 1.1rem 1.25rem;
+            margin-bottom: .75rem;
+        }
+
+        .review-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: .4rem;
+            gap: 1rem;
+        }
+
+        .review-name {
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .stars {
+            color: #fcd34d;
+            font-size: .9rem;
+            letter-spacing: .1em;
+        }
+
+        .review-comment {
+            font-size: .85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .review-date {
+            font-size: .72rem;
+            color: rgba(255, 255, 255, .25);
+            margin-top: .4rem;
+        }
+
+        /* ── MAP ─────────────────────────────────────────── */
+        #portal-map {
+            height: 340px;
+            border-radius: 12px;
+            margin-top: .75rem;
+            border: 1px solid var(--border2);
+        }
+
+        /* ── EMPTY ───────────────────────────────────────── */
+        .empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            opacity: .3;
+            margin-bottom: .75rem;
+        }
+
+        /* ── ALERT TOAST ─────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 999;
+            background: var(--card2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: .875rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+            max-width: 340px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: .3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.ok {
+            border-color: rgba(16, 185, 129, .4);
+            color: #34d399;
+        }
+
+        .toast.err {
+            border-color: rgba(244, 63, 94, .4);
+            color: #fb7185;
+        }
+
+        .toast.info {
+            border-color: rgba(79, 70, 229, .4);
+            color: #a5b4fc;
+        }
+
+        /* ── MODAL ───────────────────────────────────────── */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0, 0, 0, .75);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--card);
+            z-index: 10;
+        }
+
+        .modal-head h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: .25rem;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-foot {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+        }
+
+        /* ── CENTER DETAIL PANEL ─────────────────────────── */
+        .detail-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .detail-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        /* ── INFO GRID ───────────────────────────────────── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-cell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: .875rem 1rem;
+        }
+
+        .info-lbl {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .3rem;
+        }
+
+        .info-val {
+            font-size: .9rem;
+            font-weight: 600;
+        }
+
+        /* ── PLAN BANNER ─────────────────────────────────── */
+        .plan-banner {
+            background: linear-gradient(135deg, rgba(79, 70, 229, .2), rgba(124, 58, 237, .15));
+            border: 1px solid rgba(79, 70, 229, .3);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-banner-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .plan-banner-sub {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-top: .2rem;
+        }
+
+        .plan-badge {
+            background: var(--grad);
+            color: #fff;
+            padding: .5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────── */
+        @media(max-width:768px) {
+            .topbar {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 4.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .centers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .course-item {
+                flex-direction: column;
+                gap: .75rem;
+            }
+
+            .course-actions {
+                flex-direction: row;
+            }
+
+            .review-head {
+                flex-direction: column;
+                gap: .25rem;
+            }
+
+            .plan-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .modal-box {
+                max-height: 95vh;
+            }
+
+            .toast {
+                left: 1rem;
+                right: 1rem;
+                bottom: 1rem;
+            }
+        }
+
+        @media(max-width:400px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- MOBILE TOPBAR -->
+    <div class="topbar">
+        <div class="topbar-logo">EDUFIND</div>
+        <button class="burger" id="burger" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-head">
+            <div class="sidebar-logo">EDUFIND</div>
+            <div class="sidebar-biz" id="sb-biz">Loading…</div>
+        </div>
+
+        <div class="plan-chip">
+            <span id="sb-plan">— Plan</span>
+            <span class="plan-exp" id="sb-exp"></span>
+        </div>
+
+        <div class="sidebar-section">Overview</div>
+        <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+
+        <div class="sidebar-section">My Centers</div>
+        <div class="nav-item" onclick="nav('centers',this)"><span class="nav-icon">🏫</span>My Centers</div>
+        <div class="nav-item" onclick="nav('add-center',this)"><span class="nav-icon">➕</span>Add Center</div>
+
+        <div class="sidebar-section">Content</div>
+        <div class="nav-item" onclick="nav('courses',this)"><span class="nav-icon">📚</span>Courses</div>
+        <div class="nav-item" onclick="nav('reviews',this)"><span class="nav-icon">⭐</span>Reviews</div>
+
+        <div class="sidebar-section">Account</div>
+        <div class="nav-item" onclick="nav('profile',this)"><span class="nav-icon">👤</span>Profile</div>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="logout()">🚪 Log Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- ── DASHBOARD ───────────────────────────────── -->
+        <div class="section active" id="section-dashboard">
+            <div class="sec-title">Welcome back 👋</div>
+
+            <div class="plan-banner">
+                <div>
+                    <div class="plan-banner-title" id="dash-biz">—</div>
+                    <div class="plan-banner-sub" id="dash-plan-info">—</div>
+                </div>
+                <div class="plan-badge" id="dash-plan-badge">—</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" style="border-left-color:#4f46e5"
+                    onclick="nav('centers',document.querySelectorAll('.nav-item')[1])">
+                    <div class="stat-label">My Centers</div>
+                    <div class="stat-val" id="s-centers">—</div>
+                </div>
+                <div class="stat-card" style="border-left-color:#10b981"
+                    onclick="nav('courses',document.querySelectorAll('.nav-item')[3])">
+                    <div class="stat-label">Active Courses</div>
+                    <div class="stat-val" id="s-courses">—</div>
+                </div>
+                <div class="stat-card" style="border-left-color:#f59e0b"
+                    onclick="nav('reviews',document.querySelectorAll('.nav-item')[4])">
+                    <div class="stat-label">Total Reviews</div>
+                    <div class="stat-val" id="s-reviews">—</div>
+                </div>
+                <div class="stat-card" style="border-left-color:#f43f5e">
+                    <div class="stat-label">Avg Rating</div>
+                    <div class="stat-val" id="s-rating">—</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🏫 My Centers</div>
+                <div class="centers-grid" id="dash-centers">
+                    <div class="empty">
+                        <div class="empty-icon">🏫</div>Loading…
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MY CENTERS ─────────────────────────────── -->
+        <div class="section" id="section-centers">
+            <div
+                style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+                <div class="sec-title" style="margin:0">My Centers</div>
+                <button class="btn btn-primary" onclick="nav('add-center',document.querySelectorAll('.nav-item')[2])">➕
+                    Add Center</button>
+            </div>
+            <div class="centers-grid" id="centers-list">
+                <div class="empty">
+                    <div class="empty-icon">🏫</div>Loading…
+                </div>
+            </div>
+
+            <!-- Center detail panel -->
+            <div class="detail-panel" id="center-detail" style="display:none;margin-top:1.5rem">
+                <div class="detail-head">
+                    <div class="detail-title" id="detail-name">Center Details</div>
+                    <button class="modal-close"
+                        onclick="document.getElementById('center-detail').style.display='none'">×</button>
+                </div>
+                <div id="detail-body" style="padding:1.5rem"></div>
+            </div>
+        </div>
+
+        <!-- ── ADD / EDIT CENTER ──────────────────────── -->
+        <div class="section" id="section-add-center">
+            <div class="sec-title" id="center-form-title">Add New Center</div>
+            <div class="card">
+                <div class="card-title">Center Information</div>
+                <div class="form-grid">
+                    <div class="field"><label>Center Name *</label><input id="f-name"
+                            placeholder="Bright Future Academy" required></div>
+                    <div class="field"><label>City *</label><input id="f-city" placeholder="Tashkent" required></div>
+                    <div class="field"><label>Phone</label><input id="f-phone" placeholder="+998 90 123 4567"
+                            type="tel"></div>
+                    <div class="field"><label>Email</label><input id="f-email" placeholder="info@center.uz"
+                            type="email"></div>
+                    <div class="field"><label>Website</label><input id="f-website" placeholder="https://center.uz"
+                            type="url"></div>
+                    <div class="field"><label>Logo / Image URL</label><input id="f-logo" placeholder="https://…"
+                            oninput="previewLogo(this.value)"></div>
+                    <div class="field full"><label>Address</label><input id="f-address" placeholder="Street, City">
+                    </div>
+                    <div class="field full"><label>Description</label><textarea id="f-desc"
+                            placeholder="Describe your center, what you offer…"></textarea></div>
+                    <div class="field"><label>Latitude</label><input id="f-lat" type="number" step="any"
+                            placeholder="41.2995"></div>
+                    <div class="field"><label>Longitude</label><input id="f-lng" type="number" step="any"
+                            placeholder="69.2401"></div>
+                </div>
+
+                <div style="margin-top:1rem">
+                    <label
+                        style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Click
+                        map to set location</label>
+                    <div id="portal-map"></div>
+                </div>
+
+                <img id="logo-preview"
+                    style="width:120px;height:80px;object-fit:cover;border-radius:10px;margin-top:1rem;display:none;border:1px solid var(--border2)"
+                    alt="preview">
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveCenter()">💾 Save Center</button>
+                    <button class="btn btn-ghost" onclick="resetCenterForm()">↺ Reset</button>
+                    <button class="btn btn-del" id="del-center-btn" style="display:none"
+                        onclick="deleteCurrentCenter()">🗑 Delete Center</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── COURSES ────────────────────────────────── -->
+        <div class="section" id="section-courses">
+            <div class="sec-title">Courses</div>
+
+            <!-- Add course form -->
+            <div class="card">
+                <div class="card-title" id="course-form-title">Add New Course</div>
+                <div style="margin-bottom:1rem">
+                    <label
+                        style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Select
+                        Center</label>
+                    <select id="course-center-sel"
+                        style="background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;width:100%;max-width:400px;"
+                        onchange="loadCoursesForCenter(this.value)">
+                        <option value="">— Choose a center —</option>
+                    </select>
+                </div>
+                <div class="form-grid">
+                    <div class="field"><label>Course Name *</label><input id="co-name" placeholder="IELTS Preparation"
+                            required></div>
+                    <div class="field"><label>Category</label>
+                        <select id="co-category">
+                            <option value="english">🇬🇧 English</option>
+                            <option value="ielts">📝 IELTS</option>
+                            <option value="math">📐 Math</option>
+                            <option value="sat">🎓 SAT</option>
+                            <option value="programming">💻 Programming</option>
+                            <option value="kids">🧒 Kids</option>
+                            <option value="art">🎨 Art & Design</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Teacher</label><input id="co-teacher" placeholder="Mr. Alisher"></div>
+                    <div class="field"><label>Price (UZS)</label><input id="co-price" type="number" step="any"
+                            placeholder="500000"></div>
+                    <div class="field"><label>Currency</label>
+                        <select id="co-currency">
+                            <option value="UZS">UZS</option>
+                            <option value="USD">USD</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Duration (weeks)</label><input id="co-weeks" type="number"
+                            placeholder="12"></div>
+                    <div class="field"><label>Max Students</label><input id="co-max" type="number" placeholder="20">
+                    </div>
+                    <div class="field"><label>Schedule</label><input id="co-schedule"
+                            placeholder="Mon/Wed/Fri 10:00-12:00"></div>
+                    <div class="field"><label>Status</label>
+                        <select id="co-status">
+                            <option value="active">Active</option>
+                            <option value="coming_soon">Coming Soon</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="field full"><label>Description</label><textarea id="co-desc"
+                            placeholder="What students will learn…"></textarea></div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveCourse()">💾 Save Course</button>
+                    <button class="btn btn-ghost" id="co-cancel" style="display:none" onclick="cancelCourseEdit()">✕
+                        Cancel</button>
+                </div>
+            </div>
+
+            <!-- Courses list -->
+            <div class="card">
+                <div class="card-title">All Courses</div>
+                <div id="courses-list">
+                    <div class="empty">
+                        <div class="empty-icon">📚</div>Select a center above first
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── REVIEWS ────────────────────────────────── -->
+        <div class="section" id="section-reviews">
+            <div class="sec-title">Reviews</div>
+            <div style="margin-bottom:1.25rem">
+                <select id="rev-center-sel"
+                    style="background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;width:100%;max-width:400px;"
+                    onchange="loadReviews(this.value)">
+                    <option value="">— Choose a center —</option>
+                </select>
+            </div>
+            <div id="reviews-list">
+                <div class="empty">
+                    <div class="empty-icon">⭐</div>Select a center to see its reviews
+                </div>
+            </div>
+        </div>
+
+        <!-- ── PROFILE ────────────────────────────────── -->
+        <div class="section" id="section-profile">
+            <div class="sec-title">My Profile</div>
+            <div class="card">
+                <div class="card-title">Account Information</div>
+                <div class="info-grid" id="profile-grid">
+                    <div class="empty">Loading…</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Subscription Plan</div>
+                <div id="plan-info-block"></div>
+            </div>
+        </div>
+
+    </div><!-- /main -->
+
+    <!-- COURSE EDIT MODAL (for inline edit) -->
+    <div class="modal" id="courseModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Course</h3><button class="modal-close" onclick="closeModal('courseModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="field"><label>Course Name *</label><input id="mco-name" required></div>
+                    <div class="field"><label>Teacher</label><input id="mco-teacher"></div>
+                    <div class="field"><label>Price</label><input id="mco-price" type="number" step="any"></div>
+                    <div class="field"><label>Currency</label>
+                        <select id="mco-currency">
+                            <option value="UZS">UZS</option>
+                            <option value="USD">USD</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Duration (weeks)</label><input id="mco-weeks" type="number"></div>
+                    <div class="field"><label>Max Students</label><input id="mco-max" type="number"></div>
+                    <div class="field"><label>Schedule</label><input id="mco-schedule"></div>
+                    <div class="field"><label>Status</label>
+                        <select id="mco-status">
+                            <option value="active">Active</option>
+                            <option value="coming_soon">Coming Soon</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="field full"><label>Description</label><textarea id="mco-desc"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal('courseModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateCourse()">💾 Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT CENTER MODAL -->
+    <div class="modal" id="editCenterModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Center Info</h3><button class="modal-close" onclick="closeModal('editCenterModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="field"><label>Name *</label><input id="ec-name"></div>
+                    <div class="field"><label>City *</label><input id="ec-city"></div>
+                    <div class="field"><label>Phone</label><input id="ec-phone"></div>
+                    <div class="field"><label>Email</label><input id="ec-email"></div>
+                    <div class="field"><label>Website</label><input id="ec-website"></div>
+                    <div class="field"><label>Logo URL</label><input id="ec-logo"></div>
+                    <div class="field full"><label>Address</label><input id="ec-address"></div>
+                    <div class="field full"><label>Description</label><textarea id="ec-desc"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal('editCenterModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCenterEdit()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = 'http://localhost:8000';
+
+        // State
+        let partnerId = null;
+        let partnerData = null;
+        let myCenters = [];
+        let editingCenterId = null;
+        let editingCourseId = null;
+        let mapInstance = null;
+        let mapMarker = null;
+
+        // ── INIT ──────────────────────────────────────────────
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('edufind_partner');
+            if (!stored) { window.location.href = 'partner-login.html'; return; }
+
+            try { partnerData = JSON.parse(stored); partnerId = partnerData.partner_id; }
+            catch (e) { window.location.href = 'partner-login.html'; return; }
+
+            initSidebar();
+            initMap();
+            loadDashboard();
+        });
+
+        function initSidebar() {
+            document.getElementById('sb-biz').textContent = partnerData.business_name;
+            document.getElementById('dash-biz').textContent = partnerData.business_name;
+
+            const planLabel = { '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' };
+            const plan = partnerData.plan;
+            const lbl = planLabel[plan] || plan;
+
+            document.getElementById('sb-plan').textContent = lbl + ' Plan';
+            document.getElementById('dash-plan-badge').textContent = lbl + ' Plan';
+
+            if (partnerData.expires_at) {
+                const d = new Date(partnerData.expires_at);
+                const days = Math.ceil((d - Date.now()) / 86400000);
+                document.getElementById('sb-exp').textContent = days > 0 ? days + 'd left' : 'Expired';
+                document.getElementById('dash-plan-info').textContent = `Active until ${d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} · ${days > 0 ? days + ' days remaining' : '⚠️ Expired'}`;
+            }
+        }
+
+        // ── MOBILE SIDEBAR ────────────────────────────────────
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const burger = document.getElementById('burger');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('open');
+            burger.classList.toggle('open');
+            ov.classList.toggle('show');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('burger').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // ── NAV ───────────────────────────────────────────────
+
+        function nav(name, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + name).classList.add('active');
+            if (el) el.classList.add('active');
+            closeSidebar();
+
+            const loaders = {
+                dashboard: loadDashboard,
+                centers: loadMyCenters,
+                courses: loadCoursesSection,
+                reviews: loadReviewsSection,
+                profile: loadProfile,
+            };
+            loaders[name]?.();
+
+            // Resize map if going to add-center
+            if (name === 'add-center') setTimeout(() => mapInstance?.invalidateSize(), 200);
+        }
+
+        // ── API HELPER ────────────────────────────────────────
+
+        async function api(path, opts = {}) {
+            const headers = { 'Content-Type': 'application/json', 'X-Partner-Id': String(partnerId), ...(opts.headers || {}) };
+            const res = await fetch(API + path, { ...opts, headers });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Request failed');
+            return data;
+        }
+
+        // ── TOAST ─────────────────────────────────────────────
+
+        function toast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // ── MODAL ─────────────────────────────────────────────
+
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        // ── LOGOUT ────────────────────────────────────────────
+
+        function logout() {
+            if (!confirm('Log out?')) return;
+            localStorage.removeItem('edufind_partner');
+            window.location.href = 'partner-login.html';
+        }
+
+        // ── UTILS ─────────────────────────────────────────────
+
+        const fmtDate = s => s ? new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+        const fmtPrice = (p, cur) => p ? (cur || 'UZS') + ' ' + Number(p).toLocaleString() : 'Free';
+        const planLabel = p => ({ '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' }[p] || p);
+        const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+        function infoCell(label, value) {
+            return `<div class="info-cell"><div class="info-lbl">${label}</div><div class="info-val">${value || '—'}</div></div>`;
+        }
+
+        // ── MAP ───────────────────────────────────────────────
+
+        function initMap() {
+            mapInstance = L.map('portal-map').setView([41.2995, 69.2401], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(mapInstance);
+
+            mapInstance.on('click', e => {
+                setMapMarker(e.latlng.lat, e.latlng.lng);
+                document.getElementById('f-lat').value = e.latlng.lat.toFixed(6);
+                document.getElementById('f-lng').value = e.latlng.lng.toFixed(6);
+            });
+        }
+
+        function setMapMarker(lat, lng) {
+            if (mapMarker) mapInstance.removeLayer(mapMarker);
+            mapMarker = L.marker([lat, lng]).addTo(mapInstance);
+            mapInstance.setView([lat, lng], 14);
+        }
+
+        function previewLogo(url) {
+            const img = document.getElementById('logo-preview');
+            if (url) { img.src = url; img.style.display = 'block'; }
+            else img.style.display = 'none';
+        }
+
+        // ── DASHBOARD ─────────────────────────────────────────
+
+        async function loadDashboard() {
+            try {
+                const stats = await api('/portal/stats');
+                document.getElementById('s-centers').textContent = stats.total_centers;
+                document.getElementById('s-courses').textContent = stats.total_courses;
+                document.getElementById('s-reviews').textContent = stats.total_reviews;
+                document.getElementById('s-rating').textContent = stats.avg_rating ? '★ ' + stats.avg_rating : '—';
+            } catch (e) { }
+
+            try {
+                const centers = await api('/portal/centers');
+                myCenters = centers;
+                populateCenterSelects();
+                const el = document.getElementById('dash-centers');
+                el.innerHTML = centers.length ? centers.map(centerCard).join('') :
+                    `<div class="empty"><div class="empty-icon">🏫</div><div>No centers yet</div><button class="btn btn-primary" style="margin-top:1rem" onclick="nav('add-center',document.querySelectorAll('.nav-item')[2])">➕ Add your first center</button></div>`;
+            } catch (e) { }
+        }
+
+        // ── CENTERS ───────────────────────────────────────────
+
+        function centerCard(c) {
+            const statusBadge = `<span class="badge badge-${c.status}">${c.status}</span>`;
+            return `
+  <div class="center-card" onclick="showCenterDetail(${c.id})">
+    ${c.logo_url
+                    ? `<img class="center-card-img" src="${c.logo_url}" onerror="this.style.display='none'" alt="">`
+                    : `<div class="center-card-img-ph">🏫</div>`}
+    <div class="center-card-body">
+      <div class="center-card-name">${c.name}</div>
+      <div class="center-card-meta">
+        <span class="meta-chip">📍 ${c.city || '—'}</span>
+        <span class="meta-chip">📚 ${c.course_count || 0} courses</span>
+        <span class="meta-chip">★ ${c.avg_rating || '—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        ${statusBadge}
+        <div class="center-card-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-ghost" style="padding:.4rem .8rem;font-size:.78rem" onclick="openEditCenter(${c.id})">✏️ Edit</button>
+          <button class="btn btn-del" style="padding:.4rem .8rem;font-size:.78rem" onclick="confirmDeleteCenter(${c.id},'${c.name.replace(/'/g, "\\'")}')">🗑</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+        }
+
+        async function loadMyCenters() {
+            const el = document.getElementById('centers-list');
+            el.innerHTML = `<div class="empty"><div class="empty-icon">🏫</div>Loading…</div>`;
+            try {
+                const centers = await api('/portal/centers');
+                myCenters = centers;
+                populateCenterSelects();
+                el.innerHTML = centers.length ? centers.map(centerCard).join('') :
+                    `<div class="empty"><div class="empty-icon">🏫</div><div>No centers yet. Add your first one!</div></div>`;
+            } catch (e) {
+                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        async function showCenterDetail(id) {
+            const panel = document.getElementById('center-detail');
+            const body = document.getElementById('detail-body');
+            panel.style.display = 'block';
+            body.innerHTML = `<div class="empty">Loading…</div>`;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            try {
+                const c = await api(`/portal/centers/${id}`);
+                document.getElementById('detail-name').textContent = c.name;
+
+                const courseRows = c.courses?.length
+                    ? c.courses.map(co => `
+        <div class="course-item">
+          <div style="flex:1">
+            <div class="course-name">${co.name}</div>
+            <div class="course-meta">
+              ${co.teacher_name ? '👤 ' + co.teacher_name + ' · ' : ''}
+              ${co.price ? fmtPrice(co.price, co.currency) : 'Free'}
+              ${co.schedule ? ' · 🕐 ' + co.schedule : ''}
+            </div>
+            <div style="margin-top:.4rem"><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></div>
+          </div>
+        </div>`).join('')
+                    : `<div class="empty" style="padding:1.5rem"><div class="empty-icon">📚</div>No courses yet</div>`;
+
+                const reviewRows = c.reviews?.length
+                    ? c.reviews.map(r => `
+        <div class="review-card">
+          <div class="review-head">
+            <div class="review-name">${r.student_name}</div>
+            <div class="stars">${stars(r.rating)}</div>
+          </div>
+          <div class="review-comment">${r.comment || 'No comment'}</div>
+          <div class="review-date">${fmtDate(r.created_at)}</div>
+        </div>`).join('')
+                    : `<div class="empty" style="padding:1.5rem"><div class="empty-icon">⭐</div>No approved reviews yet</div>`;
+
+                body.innerHTML = `
+      <div class="info-grid" style="margin-bottom:1.5rem">
+        ${infoCell('City', c.city)}
+        ${infoCell('Phone', c.phone)}
+        ${infoCell('Email', c.email)}
+        ${infoCell('Status', `<span class="badge badge-${c.status}">${c.status}</span>`)}
+        ${infoCell('Rating', c.avg_rating ? '★ ' + c.avg_rating : '—')}
+        ${infoCell('Reviews', c.review_count || 0)}
+        ${infoCell('Courses', c.course_count || 0)}
+        ${infoCell('Likes', '❤️ ' + (c.likes_count || 0))}
+      </div>
+      ${c.description ? `<div style="margin-bottom:1.5rem;font-size:.875rem;line-height:1.7;color:var(--muted)">${c.description}</div>` : ''}
+      <div style="margin-bottom:.75rem;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">📚 Courses</div>
+      ${courseRows}
+      <div style="margin:1.25rem 0 .75rem;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">⭐ Recent Reviews</div>
+      ${reviewRows}
+    `;
+            } catch (e) {
+                body.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        // ── ADD / EDIT CENTER FORM ─────────────────────────────
+
+        let editingCenterIdForm = null;
+
+        function resetCenterForm() {
+            editingCenterIdForm = null;
+            ['f-name', 'f-city', 'f-phone', 'f-email', 'f-website', 'f-logo', 'f-address', 'f-desc', 'f-lat', 'f-lng']
+                .forEach(id => document.getElementById(id).value = '');
+            document.getElementById('logo-preview').style.display = 'none';
+            document.getElementById('center-form-title').textContent = 'Add New Center';
+            document.getElementById('del-center-btn').style.display = 'none';
+        }
+
+        function openEditCenter(id) {
+            const c = myCenters.find(x => x.id === id);
+            if (!c) return;
+
+            editingCenterIdForm = id;
+            document.getElementById('f-name').value = c.name || '';
+            document.getElementById('f-city').value = c.city || '';
+            document.getElementById('f-phone').value = c.phone || '';
+            document.getElementById('f-email').value = c.email || '';
+            document.getElementById('f-website').value = c.website || '';
+            document.getElementById('f-logo').value = c.logo_url || '';
+            document.getElementById('f-address').value = c.address || '';
+            document.getElementById('f-desc').value = c.description || '';
+            document.getElementById('f-lat').value = c.latitude || '';
+            document.getElementById('f-lng').value = c.longitude || '';
+            document.getElementById('center-form-title').textContent = 'Edit Center';
+            document.getElementById('del-center-btn').style.display = 'inline-flex';
+            previewLogo(c.logo_url || '');
+
+            if (c.latitude && c.longitude) {
+                setMapMarker(c.latitude, c.longitude);
+            }
+
+            nav('add-center', document.querySelectorAll('.nav-item')[2]);
+        }
+
+        async function saveCenter() {
+            const name = document.getElementById('f-name').value.trim();
+            const city = document.getElementById('f-city').value.trim();
+            if (!name || !city) { toast('Name and city are required', 'err'); return; }
+
+            const body = {
+                name, city,
+                phone: document.getElementById('f-phone').value.trim() || null,
+                email: document.getElementById('f-email').value.trim() || null,
+                website: document.getElementById('f-website').value.trim() || null,
+                logo_url: document.getElementById('f-logo').value.trim() || null,
+                address: document.getElementById('f-address').value.trim() || null,
+                description: document.getElementById('f-desc').value.trim() || null,
+                latitude: parseFloat(document.getElementById('f-lat').value) || null,
+                longitude: parseFloat(document.getElementById('f-lng').value) || null,
+            };
+
+            try {
+                if (editingCenterIdForm) {
+                    await api(`/portal/centers/${editingCenterIdForm}`, { method: 'PATCH', body: JSON.stringify(body) });
+                    toast('✅ Center updated!');
+                } else {
+                    await api('/portal/centers', { method: 'POST', body: JSON.stringify(body) });
+                    toast('✅ Center created! Pending admin approval.');
+                }
+                resetCenterForm();
+                nav('centers', document.querySelectorAll('.nav-item')[1]);
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        async function deleteCurrentCenter() {
+            if (!editingCenterIdForm) return;
+            const name = document.getElementById('f-name').value;
+            if (!confirm(`Delete "${name}"?`)) return;
+            await confirmDeleteCenter(editingCenterIdForm, name);
+            resetCenterForm();
+        }
+
+        async function confirmDeleteCenter(id, name) {
+            if (!confirm(`Delete "${name}"? This will also delete all its courses and reviews.`)) return;
+            try {
+                await api(`/portal/centers/${id}`, { method: 'DELETE' });
+                toast(`🗑 "${name}" deleted`);
+                loadMyCenters();
+                document.getElementById('center-detail').style.display = 'none';
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        // ── EDIT CENTER MODAL (inline from card) ──────────────
+
+        let editingCenterModalId = null;
+
+        function openEditCenterModal(id) {
+            const c = myCenters.find(x => x.id === id);
+            if (!c) return;
+            editingCenterModalId = id;
+            document.getElementById('ec-name').value = c.name || '';
+            document.getElementById('ec-city').value = c.city || '';
+            document.getElementById('ec-phone').value = c.phone || '';
+            document.getElementById('ec-email').value = c.email || '';
+            document.getElementById('ec-website').value = c.website || '';
+            document.getElementById('ec-logo').value = c.logo_url || '';
+            document.getElementById('ec-address').value = c.address || '';
+            document.getElementById('ec-desc').value = c.description || '';
+            openModal('editCenterModal');
+        }
+
+        async function submitCenterEdit() {
+            if (!editingCenterModalId) return;
+            const name = document.getElementById('ec-name').value.trim();
+            const city = document.getElementById('ec-city').value.trim();
+            if (!name || !city) { toast('Name and city required', 'err'); return; }
+
+            try {
+                await api(`/portal/centers/${editingCenterModalId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        name, city,
+                        phone: document.getElementById('ec-phone').value.trim() || null,
+                        email: document.getElementById('ec-email').value.trim() || null,
+                        website: document.getElementById('ec-website').value.trim() || null,
+                        logo_url: document.getElementById('ec-logo').value.trim() || null,
+                        address: document.getElementById('ec-address').value.trim() || null,
+                        description: document.getElementById('ec-desc').value.trim() || null,
+                    })
+                });
+                closeModal('editCenterModal');
+                toast('✅ Center updated!');
+                loadMyCenters();
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        // ── POPULATE CENTER SELECTS ───────────────────────────
+
+        function populateCenterSelects() {
+            const opts = myCenters.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.getElementById('course-center-sel').innerHTML = `<option value="">— Choose a center —</option>${opts}`;
+            document.getElementById('rev-center-sel').innerHTML = `<option value="">— Choose a center —</option>${opts}`;
+        }
+
+        // ── COURSES SECTION ───────────────────────────────────
+
+        let editingCourseModalId = null;
+
+        async function loadCoursesSection() {
+            if (!myCenters.length) {
+                try {
+                    myCenters = await api('/portal/centers');
+                    populateCenterSelects();
+                } catch (e) { }
+            }
+        }
+
+        async function loadCoursesForCenter(centerId) {
+            const el = document.getElementById('courses-list');
+            if (!centerId) { el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>Select a center above</div>`; return; }
+            el.innerHTML = `<div class="empty">Loading…</div>`;
+            try {
+                const courses = await api(`/portal/centers/${centerId}/courses`);
+                if (!courses.length) {
+                    el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>No courses yet. Add one above!</div>`;
+                    return;
+                }
+                el.innerHTML = courses.map(co => `
+      <div class="course-item">
+        <div style="flex:1">
+          <div class="course-name">${co.name}</div>
+          <div class="course-meta">
+            ${co.teacher_name ? '👤 ' + co.teacher_name + ' · ' : ''}
+            ${fmtPrice(co.price, co.currency)}
+            ${co.schedule ? ' · 🕐 ' + co.schedule : ''}
+            ${co.duration_weeks ? ' · ⏱ ' + co.duration_weeks + 'w' : ''}
+            ${co.max_students ? ' · 👥 ' + co.enrolled + '/' + co.max_students : ''}
+          </div>
+          ${co.description ? `<div style="font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.5">${co.description}</div>` : ''}
+          <div style="margin-top:.5rem"><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></div>
+        </div>
+        <div class="course-actions">
+          <button class="btn btn-amber" style="padding:.4rem .8rem;font-size:.78rem" onclick="openCourseEdit(${JSON.stringify(co).replace(/"/g, '&quot;')})">✏️ Edit</button>
+          <button class="btn btn-del"   style="padding:.4rem .8rem;font-size:.78rem" onclick="deleteCourse(${co.id},${centerId})">🗑</button>
+        </div>
+      </div>`).join('');
+            } catch (e) {
+                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        async function saveCourse() {
+            const centerId = document.getElementById('course-center-sel').value;
+            const name = document.getElementById('co-name').value.trim();
+            if (!centerId) { toast('Select a center first', 'err'); return; }
+            if (!name) { toast('Course name is required', 'err'); return; }
+
+            const body = {
+                name,
+                category: document.getElementById('co-category').value || 'other',
+                description: document.getElementById('co-desc').value.trim() || null,
+                teacher_name: document.getElementById('co-teacher').value.trim() || null,
+                price: parseFloat(document.getElementById('co-price').value) || null,
+                currency: document.getElementById('co-currency').value,
+                duration_weeks: parseInt(document.getElementById('co-weeks').value) || null,
+                schedule: document.getElementById('co-schedule').value.trim() || null,
+                max_students: parseInt(document.getElementById('co-max').value) || null,
+                status: document.getElementById('co-status').value,
+            };
+
+            try {
+                await api(`/portal/centers/${centerId}/courses`, { method: 'POST', body: JSON.stringify(body) });
+                toast('✅ Course added!');
+                // Reset form
+                ['co-name', 'co-teacher', 'co-price', 'co-weeks', 'co-max', 'co-schedule', 'co-desc'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('co-status').value = 'active';
+                loadCoursesForCenter(centerId);
+                loadDashboard();
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        function openCourseEdit(co) {
+            editingCourseModalId = co.id;
+            document.getElementById('mco-name').value = co.name || '';
+            document.getElementById('mco-teacher').value = co.teacher_name || '';
+            document.getElementById('mco-price').value = co.price || '';
+            document.getElementById('mco-currency').value = co.currency || 'UZS';
+            document.getElementById('mco-weeks').value = co.duration_weeks || '';
+            document.getElementById('mco-max').value = co.max_students || '';
+            document.getElementById('mco-schedule').value = co.schedule || '';
+            document.getElementById('mco-status').value = co.status || 'active';
+            document.getElementById('mco-desc').value = co.description || '';
+            openModal('courseModal');
+        }
+
+        async function updateCourse() {
+            if (!editingCourseModalId) return;
+            const body = {
+                name: document.getElementById('mco-name').value.trim(),
+                description: document.getElementById('mco-desc').value.trim() || null,
+                teacher_name: document.getElementById('mco-teacher').value.trim() || null,
+                price: parseFloat(document.getElementById('mco-price').value) || null,
+                currency: document.getElementById('mco-currency').value,
+                duration_weeks: parseInt(document.getElementById('mco-weeks').value) || null,
+                schedule: document.getElementById('mco-schedule').value.trim() || null,
+                max_students: parseInt(document.getElementById('mco-max').value) || null,
+                status: document.getElementById('mco-status').value,
+            };
+            try {
+                await api(`/portal/courses/${editingCourseModalId}`, { method: 'PATCH', body: JSON.stringify(body) });
+                closeModal('courseModal');
+                toast('✅ Course updated!');
+                const centerId = document.getElementById('course-center-sel').value;
+                if (centerId) loadCoursesForCenter(centerId);
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        function cancelCourseEdit() {
+            editingCourseModalId = null;
+            document.getElementById('course-form-title').textContent = 'Add New Course';
+            ['co-name','co-teacher','co-price','co-weeks','co-max','co-schedule','co-desc']
+                .forEach(id => document.getElementById(id).value = '');
+            document.getElementById('co-status').value = 'active';
+            document.getElementById('co-cancel').style.display = 'none';
+        }
+
+        async function deleteCourse(courseId, centerId) {
+            if (!confirm('Delete this course?')) return;
+            try {
+                await api(`/portal/courses/${courseId}`, { method: 'DELETE' });
+                toast('🗑 Course deleted');
+                loadCoursesForCenter(centerId);
+                loadDashboard();
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        // ── REVIEWS ───────────────────────────────────────────
+
+        async function loadReviewsSection() {
+            if (!myCenters.length) {
+                try { myCenters = await api('/portal/centers'); populateCenterSelects(); } catch (e) { }
+            }
+        }
+
+        async function loadReviews(centerId) {
+            const el = document.getElementById('reviews-list');
+            if (!centerId) { el.innerHTML = `<div class="empty"><div class="empty-icon">⭐</div>Select a center above</div>`; return; }
+            el.innerHTML = `<div class="empty">Loading…</div>`;
+            try {
+                const reviews = await api(`/portal/centers/${centerId}/reviews`);
+                if (!reviews.length) {
+                    el.innerHTML = `<div class="empty"><div class="empty-icon">⭐</div>No approved reviews yet. They'll appear once admin approves them.</div>`;
+                    return;
+                }
+                // avg
+                const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+                el.innerHTML = `
+      <div style="background:rgba(79,70,229,.1);border:1px solid rgba(79,70,229,.25);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Average Rating</div><div style="font-size:1.75rem;font-weight:800;color:#fcd34d">★ ${avg}</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Total Reviews</div><div style="font-size:1.75rem;font-weight:800">${reviews.length}</div></div>
+      </div>
+      ${reviews.map(r => `
+        <div class="review-card">
+          <div class="review-head">
+            <div class="review-name">${r.student_name}</div>
+            <div class="stars">${stars(r.rating)}</div>
+          </div>
+          <div class="review-comment">${r.comment || 'No comment'}</div>
+          <div class="review-date">${fmtDate(r.created_at)}</div>
+        </div>`).join('')}
+    `;
+            } catch (e) {
+                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        // ── PROFILE ───────────────────────────────────────────
+
+        function loadProfile() {
+            const p = partnerData;
+            const planLabel = { '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' };
+
+            document.getElementById('profile-grid').innerHTML = `
+    ${infoCell('Business Name', p.business_name)}
+    ${infoCell('Contact Person', p.contact_person)}
+    ${infoCell('Email', p.email)}
+    ${infoCell('Phone', p.phone)}
+  `;
+
+            const expires = p.expires_at ? new Date(p.expires_at) : null;
+            const days = expires ? Math.ceil((expires - Date.now()) / 86400000) : null;
+
+            document.getElementById('plan-info-block').innerHTML = `
+    <div class="plan-banner" style="margin:0">
+      <div>
+        <div class="plan-banner-title">${planLabel[p.plan] || p.plan} Plan</div>
+        <div class="plan-banner-sub">
+          ${expires ? `Expires ${fmtDate(p.expires_at)} · <strong style="color:${days > 0 ? '#34d399' : '#fb7185'}">${days > 0 ? days + ' days remaining' : '⚠️ Expired'}</strong>` : 'Active'}
+        </div>
+      </div>
+      <div class="plan-badge">${planLabel[p.plan] || p.plan}</div>
+    </div>
+    <p style="margin-top:1rem;font-size:.85rem;color:var(--muted)">To renew or upgrade your plan, contact EduFind support.</p>
+  `;
+        }
+    </script>
+</body>
+
+</html>

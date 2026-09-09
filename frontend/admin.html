@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFind Admin Panel</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #07070c;
+            --surface: #0f0f18;
+            --card: #13131f;
+            --card2: #1a1a2a;
+            --border: rgba(255, 255, 255, .07);
+            --border2: rgba(255, 255, 255, .12);
+            --indigo: #4f46e5;
+            --violet: #7c3aed;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --muted: rgba(255, 255, 255, .45);
+            --text: rgba(255, 255, 255, .88);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 50;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 1.75rem 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            letter-spacing: .18em;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-section {
+            padding: .875rem 1rem .25rem;
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .25);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .75rem 1.25rem;
+            margin: .1rem .75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: .875rem;
+            font-weight: 600;
+            transition: .2s;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, .05);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(79, 70, 229, .15);
+            color: #a5b4fc;
+            border-color: rgba(79, 70, 229, .3);
+        }
+
+        .nav-badge {
+            background: var(--rose);
+            color: #fff;
+            font-size: .7rem;
+            font-weight: 800;
+            padding: .15rem .55rem;
+            border-radius: 20px;
+            min-width: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .nav-badge.show {
+            display: block;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+            background: var(--black);
+        }
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .topbar-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .admin-chip {
+            background: rgba(79, 70, 229, .2);
+            border: 1px solid rgba(79, 70, 229, .35);
+            color: #a5b4fc;
+            padding: .35rem 1rem;
+            border-radius: 20px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+            padding: 2rem;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem 1.5rem;
+            border-left: 3px solid;
+            transition: .2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .5rem;
+        }
+
+        .stat-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        /* TABLE CARD */
+        .tcard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .tcard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tcard-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .tcard-sub {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: var(--surface);
+            padding: .875rem 1.25rem;
+            text-align: left;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td {
+            padding: .875rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: .875rem;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .center-row {
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: .25rem .75rem;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, .12);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .25);
+        }
+
+        .badge-approved {
+            background: rgba(16, 185, 129, .12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, .25);
+        }
+
+        .badge-rejected {
+            background: rgba(244, 63, 94, .12);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, .25);
+        }
+
+        .badge-active {
+            background: rgba(79, 70, 229, .15);
+            color: #a5b4fc;
+            border: 1px solid rgba(79, 70, 229, .3);
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: .6rem 1.1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .82rem;
+            cursor: pointer;
+            border: none;
+            transition: .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-approve {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, .3);
+        }
+
+        .btn-approve:hover {
+            background: var(--emerald);
+            color: #fff;
+        }
+
+        .btn-reject {
+            background: rgba(244, 63, 94, .1);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, .25);
+        }
+
+        .btn-reject:hover {
+            background: var(--rose);
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: var(--grad);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, .3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, .45);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border2);
+        }
+
+        .btn-ghost:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .btn-del {
+            background: rgba(244, 63, 94, .1);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, .2);
+            padding: .35rem .7rem;
+            font-size: .75rem;
+        }
+
+        .btn-del:hover {
+            background: var(--rose);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        /* REQUEST CARDS */
+        .req-card {
+            background: var(--card2);
+            border: 1px solid var(--border2);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--amber);
+        }
+
+        .req-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .req-info {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .req-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: .35rem;
+        }
+
+        .req-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6rem;
+            margin-bottom: .6rem;
+        }
+
+        .req-meta span {
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        .req-meta strong {
+            color: var(--text);
+        }
+
+        .req-desc {
+            font-size: .84rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .req-actions {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            align-items: flex-end;
+        }
+
+        .req-plan {
+            background: rgba(79, 70, 229, .18);
+            border: 1px solid rgba(79, 70, 229, .3);
+            color: #a5b4fc;
+            padding: .28rem .9rem;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: .4;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, .75);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--card);
+            z-index: 10;
+        }
+
+        .modal-head h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-foot {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+        }
+
+        /* FORM FIELDS */
+        .field {
+            margin-bottom: 1.25rem;
+        }
+
+        .field label {
+            display: block;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .5rem;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            padding: .75rem 1rem;
+            color: var(--text);
+            font-size: .9rem;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: .2s;
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: rgba(255, 255, 255, .2);
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: rgba(79, 70, 229, .6);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .1);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* PAGINATION */
+        .pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: .84rem;
+            color: var(--muted);
+        }
+
+        .pager-btns {
+            display: flex;
+            gap: .5rem;
+        }
+
+        /* SECTION HEADER */
+        .sec-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sec-head h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .sec-head p {
+            font-size: .85rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .sec-head-right {
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* FILTER SELECT */
+        .filter-sel {
+            background: var(--card);
+            border: 1px solid var(--border2);
+            color: var(--text);
+            padding: .6rem 1rem;
+            border-radius: 8px;
+            font-size: .875rem;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* CREDENTIALS BOX */
+        .cred-box {
+            background: var(--surface);
+            border: 2px dashed rgba(79, 70, 229, .4);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .7rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .875rem;
+        }
+
+        .cred-row:last-child {
+            border: none;
+        }
+
+        .cred-lbl {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .cred-val {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #a5b4fc;
+            font-size: .95rem;
+            letter-spacing: .04em;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 500;
+            background: var(--card2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: .875rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: .3s ease;
+            max-width: 360px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.err {
+            border-color: rgba(244, 63, 94, .4);
+            color: #fb7185;
+        }
+
+        .toast.ok {
+            border-color: rgba(16, 185, 129, .4);
+            color: #34d399;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-240px);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .grid2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── ENTRY SCREEN (login gate) ── */
+        .entry-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .entry-screen::before,
+        .entry-screen::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+        }
+
+        .entry-screen::before {
+            width: 500px;
+            height: 500px;
+            background: rgba(79, 70, 229, .14);
+            top: -120px;
+            right: -120px;
+        }
+
+        .entry-screen::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(124, 58, 237, .1);
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .entry-card {
+            background: var(--card, #13131f);
+            border: 1px solid var(--border2, rgba(255, 255, 255, .14));
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            animation: entryFadeUp .4s ease;
+        }
+
+        @keyframes entryFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .entry-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .entry-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .25);
+            border-radius: 50px;
+            padding: .45rem 1.1rem;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #fca5a5;
+            margin: 0 auto 1.5rem;
+            width: fit-content;
+        }
+
+        .entry-card h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: .4rem;
+        }
+
+        .entry-card .entry-sub {
+            color: var(--text2, rgba(255, 255, 255, .45));
+            font-size: .875rem;
+            margin-bottom: 2rem;
+        }
+
+        .entry-field {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .entry-field label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--text2, rgba(255, 255, 255, .45));
+            margin-bottom: .45rem;
+        }
+
+        .entry-field input {
+            width: 100%;
+            background: #0f0f18;
+            border: 1.5px solid rgba(255, 255, 255, .14);
+            border-radius: 12px;
+            padding: .875rem 1rem;
+            color: #fff;
+            font-size: .95rem;
+            font-family: inherit;
+            outline: none;
+            transition: .2s;
+        }
+
+        .entry-field input::placeholder {
+            color: rgba(255, 255, 255, .2);
+        }
+
+        .entry-field input:focus {
+            border-color: rgba(79, 70, 229, .6);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+        }
+
+        .entry-btn {
+            width: 100%;
+            padding: .9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-family: inherit;
+            box-shadow: 0 4px 18px rgba(79, 70, 229, .35);
+            transition: .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .entry-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(79, 70, 229, .5);
+        }
+
+        .entry-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .entry-err {
+            background: rgba(244, 63, 94, .1);
+            border: 1px solid rgba(244, 63, 94, .3);
+            border-radius: 10px;
+            padding: .875rem;
+            color: #fb7185;
+            font-size: .875rem;
+            margin-bottom: 1.25rem;
+            display: none;
+            text-align: left;
+        }
+
+        .entry-err.show {
+            display: block;
+            animation: entryShake .4s ease;
+        }
+
+        @keyframes entryShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        .entry-spinner {
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255, 255, 255, .3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: entrySpin .7s linear infinite;
+        }
+
+        @keyframes entrySpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .entry-back {
+            display: block;
+            margin-top: 1.25rem;
+            font-size: .82rem;
+            color: var(--text2, rgba(255, 255, 255, .45));
+        }
+
+        .entry-back:hover {
+            color: #a5b4fc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════
+     ENTRY SCREEN — shown first
+═══════════════════════════════════════ -->
+    <div id="entry-screen" class="entry-screen">
+        <div class="entry-card">
+            <div class="entry-icon">🔐</div>
+            <div class="entry-badge">🛡 Admin Access Only</div>
+            <h1>Admin Panel</h1>
+            <p class="entry-sub">Enter your admin token to continue</p>
+
+            <div class="entry-err" id="entry-err"></div>
+
+            <div class="entry-field">
+                <label>Admin Token</label>
+                <input type="password" id="e-token" placeholder="••••••••••••••••" autofocus
+                    onkeydown="if(event.key==='Enter')entryLogin()">
+            </div>
+
+            <button class="entry-btn" id="entry-btn" onclick="entryLogin()">
+                <span id="entry-btn-txt">Access Admin Panel →</span>
+            </button>
+
+            <a href="index.html" class="entry-back">← Back to EduFind</a>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+     ADMIN PANEL — shown after auth
+═══════════════════════════════════════ -->
+    <div id="admin-panel" style="display:none">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">EDUFIND</div>
+
+            <div class="sidebar-section">Overview</div>
+            <div class="nav-item active" onclick="navigateTo('dashboard')">📊 Dashboard</div>
+
+            <div class="sidebar-section">Partners</div>
+            <div class="nav-item" onclick="navigateTo('requests')">
+                📬 Signup Requests
+                <span class="nav-badge" id="badge-req"></span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('partners')">🤝 Active Partners</div>
+
+            <div class="sidebar-section">Content</div>
+            <div class="nav-item" onclick="navigateTo('centers')">🏫 Centers</div>
+            <div class="nav-item" onclick="navigateTo('courses')">📚 Courses</div>
+            <div class="nav-item" onclick="navigateTo('reviews')">
+                💬 Reviews
+                <span class="nav-badge" id="badge-rev"></span>
+            </div>
+
+            <div class="sidebar-section">Session</div>
+            <div class="nav-item" onclick="adminLogout()">🚪 Logout</div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main">
+            <div class="topbar">
+                <div class="topbar-title" id="topbar-title">Dashboard</div>
+                <div><span class="admin-chip">⚡ Admin</span></div>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="section active" id="section-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-left-color:#4f46e5">
+                        <div class="stat-label">Centers</div>
+                        <div class="stat-val" id="s-centers">0</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:#10b981">
+                        <div class="stat-label">Active Partners</div>
+                        <div class="stat-val" id="s-partners">0</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:#f59e0b">
+                        <div class="stat-label">Pending Requests</div>
+                        <div class="stat-val" id="s-pending">0</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:#f43f5e">
+                        <div class="stat-label">Pending Reviews</div>
+                        <div class="stat-val" id="s-prev">0</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:#8b5cf6">
+                        <div class="stat-label">Total Courses</div>
+                        <div class="stat-val" id="s-courses">0</div>
+                    </div>
+                </div>
+
+                <div class="tcard">
+                    <div class="tcard-header">
+                        <div>
+                            <div class="tcard-title">📬 Pending Partner Requests</div>
+                            <div class="tcard-sub">Tap Approve to generate credentials and send them by email</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="navigateTo('requests')">View All →</button>
+                    </div>
+                    <div id="dash-reqs" style="padding:1rem">
+                        <div class="empty-state">
+                            <div>Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUESTS -->
+            <div class="section" id="section-requests">
+                <div class="sec-head">
+                    <div>
+                        <h2>Partner Signup Requests</h2>
+                        <p>Tap Approve → auto-generates login/password → emails credentials to partner</p>
+                    </div>
+                    <div class="sec-head-right">
+                        <select class="filter-sel" id="req-filter" onchange="loadRequests()">
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="all">All</option>
+                        </select>
+                        <button class="btn btn-ghost" onclick="loadRequests()">↻ Refresh</button>
+                    </div>
+                </div>
+                <div id="req-container">
+                    <div class="empty-state">
+                        <div>Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARTNERS -->
+            <div class="section" id="section-partners">
+                <div class="sec-head">
+                    <div>
+                        <h2>Active Partners</h2>
+                        <p>All approved partner accounts</p>
+                    </div>
+                    <button class="btn btn-ghost" onclick="loadPartners()">↻ Refresh</button>
+                </div>
+                <div class="tcard">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Center Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Plan</th>
+                                <th>Paid</th>
+                                <th>Expires</th>
+                                <th>Active</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partners-tbody">
+                            <tr>
+                                <td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CENTERS -->
+            <div class="section" id="section-centers">
+                <div class="sec-head">
+                    <div>
+                        <h2>Learning Centers</h2>
+                        <p>Click any row to view full details</p>
+                    </div>
+                    <div class="sec-head-right">
+                        <select class="filter-sel" id="center-status-filter" onchange="loadCenters()">
+                            <option value="all">All Status</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <button class="btn btn-ghost" onclick="loadCenters()">↻ Refresh</button>
+                        <button class="btn btn-primary" onclick="openModal('centerModal')">+ Add Center</button>
+                    </div>
+                </div>
+                <div class="tcard">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>City</th>
+                                <th>Phone</th>
+                                <th>Courses</th>
+                                <th>Reviews</th>
+                                <th>Rating</th>
+                                <th>Likes</th>
+                                <th>Status</th>
+                                <th>Partner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="centers-tbody">
+                            <tr>
+                                <td colspan="11" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pager">
+                        <span id="center-info">—</span>
+                        <div class="pager-btns">
+                            <button class="btn btn-ghost" id="center-prev" onclick="changeCenterPage(-1)" disabled>←
+                                Prev</button>
+                            <button class="btn btn-ghost" id="center-next" onclick="changeCenterPage(1)">Next →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CENTER DETAIL PANEL -->
+                <div class="tcard" id="center-detail-panel" style="display:none;margin-top:1.5rem">
+                    <div
+                        style="display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)">
+                        <div class="tcard-title" id="center-detail-title">Center Details</div>
+                        <button onclick="closeCenterDetail()"
+                            style="background:none;border:none;color:var(--muted);font-size:1.75rem;cursor:pointer">×</button>
+                    </div>
+                    <div id="center-detail-content" style="padding:1.5rem"></div>
+                </div>
+            </div>
+
+            <!-- COURSES -->
+            <div class="section" id="section-courses">
+                <div class="sec-head">
+                    <div>
+                        <h2>Courses</h2>
+                        <p>All courses across all centers</p>
+                    </div>
+
+                    <div class="sec-head-right">
+                        <!-- ✅ Add Category Filter -->
+                        <select class="filter-sel" id="course-category-filter" onchange="loadCourses()">
+                            <option value="all">All Categories</option>
+                            <option value="math">📐 Math</option>
+                            <option value="english">🇬🇧 English</option>
+                            <option value="ielts">📝 IELTS</option>
+                            <option value="programming">💻 Programming</option>
+                            <option value="sat">🎓 SAT</option>
+                            <option value="kids">🧒 Kids</option>
+                            <option value="art">🎨 Art</option>
+                            <option value="other">📦 Other</option>
+                        </select>
+
+                        <select class="filter-sel" id="course-status-filter" onchange="loadCourses()">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="coming_soon">Coming Soon</option>
+                            <option value="closed">Closed</option>
+                        </select>
+
+                        <button class="btn btn-ghost" onclick="loadCourses()">↻ Refresh</button>
+                    </div>
+
+                </div>
+                <div class="tcard">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Course Name</th>
+                                <th>Center</th>
+                                <th>Teacher</th>
+                                <th>Price</th>
+                                <th>Enrolled</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-tbody">
+                            <tr>
+                                <td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- REVIEWS -->
+            <div class="section" id="section-reviews">
+                <div class="sec-head">
+                    <div>
+                        <h2>Reviews</h2>
+                        <p>Approve or reject student reviews</p>
+                    </div>
+                    <div class="sec-head-right">
+                        <select class="filter-sel" id="rev-filter" onchange="loadReviews()">
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="all">All</option>
+                        </select>
+                        <button class="btn btn-ghost" onclick="loadReviews()">↻ Refresh</button>
+                    </div>
+                </div>
+                <div id="rev-container">
+                    <div class="empty-state">
+                        <div>Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODALS -->
+
+        <!-- Credentials Modal -->
+        <div class="modal" id="credModal">
+            <div class="modal-box">
+                <div class="modal-head">
+                    <h3>🎉 Partner Approved!</h3>
+                    <button class="modal-close" onclick="closeModal('credModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem">Credentials emailed to partner.
+                        Copy
+                        for your records:</p>
+                    <div class="cred-box" id="cred-content"></div>
+                    <div
+                        style="margin-top:1rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:.875rem;font-size:.8rem;color:#fcd34d;">
+                        ⚠️ Password shown <strong>once only</strong>. Partner has received it by email.
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button class="btn btn-primary" onclick="closeModal('credModal')">Got it ✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Modal -->
+        <div class="modal" id="rejectModal">
+            <div class="modal-box">
+                <div class="modal-head">
+                    <h3>❌ Reject Application</h3>
+                    <button class="modal-close" onclick="closeModal('rejectModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:var(--muted);font-size:.875rem;margin-bottom:1.25rem">Reject <strong
+                            id="reject-biz-name"></strong>'s application?</p>
+                    <div class="field">
+                        <label>Reason (optional)</label>
+                        <textarea id="reject-reason" placeholder="e.g. Incomplete info…"></textarea>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button class="btn btn-ghost" onclick="closeModal('rejectModal')">Cancel</button>
+                    <button class="btn btn-reject" onclick="confirmReject()">Confirm Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Center Modal -->
+        <div class="modal" id="centerModal">
+            <div class="modal-box">
+                <div class="modal-head">
+                    <h3>Add Learning Center</h3>
+                    <button class="modal-close" onclick="closeModal('centerModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="grid2">
+                        <div class="field">
+                            <label>Center Name *</label>
+                            <input type="text" id="c-name" placeholder="Bright Future Academy">
+                        </div>
+                        <div class="field">
+                            <label>City *</label>
+                            <input type="text" id="c-city" placeholder="Tashkent">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Description</label>
+                        <textarea id="c-desc" placeholder="About this center…"></textarea>
+                    </div>
+                    <div class="grid2">
+                        <div class="field">
+                            <label>Phone</label>
+                            <input type="text" id="c-phone" placeholder="+998 90 123 4567">
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" id="c-email" placeholder="info@center.uz">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Address</label>
+                        <input type="text" id="c-address" placeholder="Street, City">
+                    </div>
+                    <div class="grid2">
+                        <div class="field">
+                            <label>Latitude</label>
+                            <input type="number" id="c-lat" step="any" placeholder="41.2995">
+                        </div>
+                        <div class="field">
+                            <label>Longitude</label>
+                            <input type="number" id="c-lng" step="any" placeholder="69.2401">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Status</label>
+                        <select id="c-status">
+                            <option value="approved">Approved (visible)</option>
+                            <option value="pending">Pending (hidden)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button class="btn btn-ghost" onclick="closeModal('centerModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveCenter()">Save Center</button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /admin-panel -->
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = 'http://localhost:8000';
+
+        // ── Auth: token starts null, set after successful entry login ──
+        let TOKEN = sessionStorage.getItem('edufind_admin_token') || null;
+        let H = { 'Content-Type': 'application/json', 'X-Admin-Token': TOKEN };
+
+        function adminLogout() {
+            sessionStorage.removeItem('edufind_admin_token');
+            TOKEN = null;
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('entry-screen').style.display = 'flex';
+            document.getElementById('e-token').value = '';
+            document.getElementById('e-token').focus();
+        }
+
+        async function entryLogin() {
+            const token = document.getElementById('e-token').value.trim();
+            const btn = document.getElementById('entry-btn');
+            const txt = document.getElementById('entry-btn-txt');
+            const err = document.getElementById('entry-err');
+
+            if (!token) { showEntryErr('Please enter your admin token.'); return; }
+
+            btn.disabled = true;
+            txt.innerHTML = '<div class="entry-spinner"></div>';
+            err.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API}/admin/stats`, {
+                    headers: { 'X-Admin-Token': token }
+                });
+                if (res.status === 403 || res.status === 401) throw new Error('Invalid admin token.');
+                if (!res.ok) throw new Error('Could not reach server. Is it running?');
+
+                TOKEN = token;
+                H = { 'Content-Type': 'application/json', 'X-Admin-Token': TOKEN };
+                sessionStorage.setItem('edufind_admin_token', TOKEN);
+
+                document.getElementById('entry-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadDashboard();
+
+            } catch (e) {
+                showEntryErr(e.message);
+            } finally {
+                btn.disabled = false;
+                txt.textContent = 'Access Admin Panel →';
+            }
+        }
+
+        function showEntryErr(msg) {
+            const el = document.getElementById('entry-err');
+            el.textContent = '⚠️ ' + msg;
+            el.classList.add('show');
+        }
+
+        let rejectingId = null;
+        let centersAll = [];
+        let centersPage = 1;
+        const PER = 10;
+        let selectedCenterId = null;
+
+        // ════════════════════════════════════════════════════════
+        // UTILS
+        // ════════════════════════════════════════════════════════
+
+        function toast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+
+        function navigateTo(name) {
+            // Update sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${name}`).classList.add('active');
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update topbar title
+            const titles = {
+                dashboard: 'Dashboard',
+                requests: 'Partner Signup Requests',
+                partners: 'Active Partners',
+                centers: 'Learning Centers',
+                courses: 'Courses',
+                reviews: 'Reviews'
+            };
+            document.getElementById('topbar-title').textContent = titles[name] || name;
+
+            // Load data
+            const loaders = {
+                dashboard: loadDashboard,
+                requests: loadRequests,
+                partners: loadPartners,
+                centers: loadCenters,
+                courses: loadCourses,
+                reviews: loadReviews
+            };
+
+            if (loaders[name]) loaders[name]();
+        }
+
+        async function api(path, opts = {}) {
+            try {
+                const res = await fetch(API + path, opts);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Request failed');
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        function planLabel(p) {
+            const plans = {
+                '1month': '1 Month — $49',
+                '3months': '3 Months — $129',
+                '6months': '6 Months — $239',
+                '1year': '1 Year — $449'
+            };
+            return plans[p] || p;
+        }
+
+        function typeLabel(t) {
+            const types = {
+                'language': '🇬🇧 Language',
+                'it': '💻 IT',
+                'math': '📐 Math',
+                'kids': '🧒 Kids',
+                'university_prep': '🎓 Uni Prep',
+                'art_music': '🎨 Art/Music',
+                'other': '📦 Other'
+            };
+            return types[t] || t;
+        }
+
+        function fmtDate(s) {
+            if (!s) return '—';
+            return new Date(s).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // DASHBOARD
+        // ════════════════════════════════════════════════════════
+
+        async function loadDashboard() {
+            try {
+                const stats = await api(`/admin/stats?admin_token=${TOKEN}`);
+
+                document.getElementById('s-centers').textContent = stats.total_centers || 0;
+                document.getElementById('s-partners').textContent = stats.total_partners || 0;
+                document.getElementById('s-pending').textContent = stats.pending_requests || 0;
+                document.getElementById('s-prev').textContent = stats.pending_reviews || 0;
+                document.getElementById('s-courses').textContent = stats.total_courses || 0;
+
+                // Update badges
+                const reqBadge = document.getElementById('badge-req');
+                if (stats.pending_requests > 0) {
+                    reqBadge.textContent = stats.pending_requests;
+                    reqBadge.classList.add('show');
+                } else {
+                    reqBadge.classList.remove('show');
+                }
+
+                const revBadge = document.getElementById('badge-rev');
+                if (stats.pending_reviews > 0) {
+                    revBadge.textContent = stats.pending_reviews;
+                    revBadge.classList.add('show');
+                } else {
+                    revBadge.classList.remove('show');
+                }
+            } catch (e) {
+                console.error('Dashboard stats error:', e);
+            }
+
+            // Load recent pending requests
+            try {
+                const reqs = await api(`/api/admin/partner-requests?status=pending&admin_token=${TOKEN}`);
+                const el = document.getElementById('dash-reqs');
+
+                if (!reqs || reqs.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div>No pending requests</div></div>`;
+                } else {
+                    el.innerHTML = reqs.slice(0, 3).map(r => reqCard(r)).join('');
+                }
+            } catch (e) {
+                console.error('Dashboard requests error:', e);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // REQUESTS
+        // ════════════════════════════════════════════════════════
+
+        function reqCard(r) {
+            const isPending = r.status === 'pending';
+            const safeName = String(r.business_name || '').replace(/'/g, "\\'");
+
+            return `
+                <div class="req-card" id="req-${r.id}">
+                    <div class="req-top">
+                        <div class="req-info">
+                            <div class="req-name">${r.business_name}</div>
+                            <div class="req-meta">
+                                <span>👤 <strong>${r.contact_person}</strong></span>
+                                <span>✉️ <strong>${r.email}</strong></span>
+                                <span>📞 <strong>${r.phone}</strong></span>
+                                <span>🏷 <strong>${typeLabel(r.business_type)}</strong></span>
+                                <span>🗓 <strong>${fmtDate(r.created_at)}</strong></span>
+                            </div>
+                            ${r.description ? `<div class="req-desc">"${r.description}"</div>` : ''}
+                        </div>
+                        <div class="req-actions">
+                            <div class="req-plan">${planLabel(r.plan)}</div>
+                            <span class="badge badge-${r.status}">${r.status}</span>
+                            ${isPending ? `
+                                <button class="btn btn-approve" onclick="doApprove(${r.id},'${safeName}')">✅ Approve</button>
+                                <button class="btn btn-reject" onclick="openReject(${r.id},'${safeName}')">❌ Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadRequests() {
+            const status = document.getElementById('req-filter')?.value || 'pending';
+            const el = document.getElementById('req-container');
+            el.innerHTML = `<div class="empty-state"><div>Loading…</div></div>`;
+
+            try {
+                const data = await api(`/api/admin/partner-requests?status=${status}&admin_token=${TOKEN}`);
+
+                if (!data || data.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>No ${status} requests</div></div>`;
+                } else {
+                    el.innerHTML = data.map(r => reqCard(r)).join('');
+                }
+            } catch (e) {
+                el.innerHTML = `<div class="empty-state" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        async function doApprove(id, name) {
+            const btn = document.querySelector(`#req-${id} .btn-approve`);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳…';
+            }
+
+            try {
+                const data = await api(`/admin/partner-requests/${id}/approve`, {
+                    method: 'POST',
+                    headers: H,
+                    body: JSON.stringify({ admin_token: TOKEN })
+                });
+
+                document.getElementById('cred-content').innerHTML = `
+                    <div class="cred-row">
+                        <span class="cred-lbl">Business</span>
+                        <span class="cred-val">${name}</span>
+                    </div>
+                    <div class="cred-row">
+                        <span class="cred-lbl">Email / Login</span>
+                        <span class="cred-val">${data.email}</span>
+                    </div>
+                    <div class="cred-row">
+                        <span class="cred-lbl">Password</span>
+                        <span class="cred-val">${data.password}</span>
+                    </div>
+                    <div class="cred-row">
+                        <span class="cred-lbl">Plan</span>
+                        <span class="cred-val">${planLabel(data.plan?.value || data.plan)}</span>
+                    </div>
+                    <div class="cred-row">
+                        <span class="cred-lbl">Expires</span>
+                        <span class="cred-val">${fmtDate(data.expires_at)}</span>
+                    </div>
+                `;
+
+                openModal('credModal');
+                toast(`✅ ${name} approved — credentials emailed!`);
+                loadRequests();
+                loadDashboard();
+            } catch (e) {
+                toast(e.message, 'err');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '✅ Approve';
+                }
+            }
+        }
+
+        function openReject(id, name) {
+            rejectingId = id;
+            document.getElementById('reject-biz-name').textContent = name;
+            document.getElementById('reject-reason').value = '';
+            openModal('rejectModal');
+        }
+
+        async function confirmReject() {
+            if (!rejectingId) return;
+
+            try {
+                await api(`/admin/partner-requests/${rejectingId}/reject`, {
+                    method: 'POST',
+                    headers: H,
+                    body: JSON.stringify({ admin_token: TOKEN })
+                });
+
+                closeModal('rejectModal');
+                toast('Request rejected.');
+                loadRequests();
+                loadDashboard();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+
+            rejectingId = null;
+        }
+
+        // ════════════════════════════════════════════════════════
+        // PARTNERS
+        // ════════════════════════════════════════════════════════
+
+        async function loadPartners() {
+            const tbody = document.getElementById('partners-tbody');
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td></tr>`;
+
+            try {
+                const data = await api(`/admin/partners?admin_token=${TOKEN}`);
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">No approved partners yet</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td style="color:var(--muted)">#${p.id}</td>
+                        <td><strong>${p.business_name}</strong></td>
+                        <td>${p.contact_person}</td>
+                        <td style="color:#a5b4fc">${p.email}</td>
+                        <td><span class="badge badge-active">${planLabel(p.plan)}</span></td>
+                        <td style="color:#34d399">$${p.amount_paid}</td>
+                        <td style="color:var(--muted)">${fmtDate(p.plan_expires_at)}</td>
+                        <td>
+                            <span class="badge ${p.is_active ? 'badge-approved' : 'badge-rejected'}">
+                                ${p.is_active ? 'Active' : 'Suspended'}
+                            </span>
+                            <button class="btn btn-ghost" style="margin-left:.5rem;padding:.3rem .7rem;font-size:.75rem" onclick="togglePartner(${p.id})">Toggle</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--rose)">${e.message}</td></tr>`;
+            }
+        }
+
+        async function togglePartner(id) {
+            try {
+                await api(`/admin/partners/${id}/toggle-active`, {
+                    method: 'PATCH',
+                    headers: H
+                });
+                toast('Partner status updated.');
+                loadPartners();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // CENTERS
+        // ════════════════════════════════════════════════════════
+
+        async function loadCenters() {
+            const status = document.getElementById('center-status-filter')?.value || 'all';
+            const tbody = document.getElementById('centers-tbody');
+            tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td></tr>`;
+            closeCenterDetail();
+
+            try {
+                const param = status === 'all' ? '' : `&status=${status}`;
+                const data = await api(`/admin/centers?limit=200${param}&admin_token=${TOKEN}`);
+                centersAll = Array.isArray(data) ? data : (data.centers || []);
+                centersPage = 1;
+                renderCenters();
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--rose)">${e.message}</td></tr>`;
+            }
+        }
+
+        function renderCenters() {
+            const start = (centersPage - 1) * PER;
+            const page = centersAll.slice(start, start + PER);
+            const tbody = document.getElementById('centers-tbody');
+
+            if (!page || page.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:2rem;color:var(--muted)">No centers found</td></tr>`;
+            } else {
+                tbody.innerHTML = page.map(c => {
+                    const isSelected = c.id === selectedCenterId;
+                    const safeName = String(c.name || '').replace(/'/g, "\\'");
+
+                    return `
+                        <tr onclick="viewCenterDetail(${c.id})" style="cursor:pointer;${isSelected ? 'background:rgba(79,70,229,.1);' : ''}" class="center-row" data-id="${c.id}">
+                            <td style="color:var(--muted)">#${c.id}</td>
+                            <td><strong>${c.name}</strong><br><span style="font-size:.75rem;color:var(--muted)">${c.email || ''}</span></td>
+                            <td>${c.city || '—'}</td>
+                            <td style="font-size:.8rem">${c.phone || '—'}</td>
+                            <td style="text-align:center">${c.course_count || 0}</td>
+                            <td style="text-align:center">${c.review_count || 0}</td>
+                            <td style="color:#fcd34d">${c.avg_rating ? '★ ' + Number(c.avg_rating).toFixed(1) : '—'}</td>
+                            <td style="text-align:center">❤️ ${c.likes_count || 0}</td>
+                            <td><span class="badge badge-${c.status === 'approved' ? 'approved' : c.status === 'pending' ? 'pending' : 'rejected'}">${c.status}</span></td>
+                            <td>${c.partner_id ? '<span class="badge badge-active">⭐ Partner</span>' : '<span style="color:var(--muted);font-size:.8rem">—</span>'}</td>
+                            <td onclick="event.stopPropagation()">
+                                <button class="btn btn-del" onclick="deleteCenter(${c.id},'${safeName}')">🗑</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update pagination
+            const total = centersAll.length;
+            const pages = Math.ceil(total / PER) || 1;
+            document.getElementById('center-info').textContent = total ? `${start + 1}–${Math.min(start + PER, total)} of ${total}` : '0 centers';
+            document.getElementById('center-prev').disabled = centersPage <= 1;
+            document.getElementById('center-next').disabled = centersPage >= pages;
+        }
+
+        function changeCenterPage(direction) {
+            const pages = Math.ceil(centersAll.length / PER) || 1;
+            const newPage = centersPage + direction;
+
+            if (newPage >= 1 && newPage <= pages) {
+                centersPage = newPage;
+                renderCenters();
+            }
+        }
+
+        async function viewCenterDetail(id) {
+            selectedCenterId = id;
+
+            // Highlight row
+            document.querySelectorAll('.center-row').forEach(r => {
+                r.style.background = r.dataset.id == id ? 'rgba(79,70,229,.1)' : '';
+            });
+
+            const panel = document.getElementById('center-detail-panel');
+            const content = document.getElementById('center-detail-content');
+            const title = document.getElementById('center-detail-title');
+
+            panel.style.display = 'block';
+            content.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--muted)">Loading details…</div>`;
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            try {
+                const c = await api(`/admin/centers/${id}?admin_token=${TOKEN}`);
+                title.textContent = c.name;
+
+                content.innerHTML = `
+                    <div style="display:grid;grid-template-columns:280px 1fr;gap:2rem">
+                        <div>
+                            <img src="${c.logo_url || 'https://via.placeholder.com/280x180?text=No+Image'}"
+                                 style="width:100%;height:180px;object-fit:cover;border-radius:12px;border:1px solid var(--border2)"
+                                 onerror="this.src='https://via.placeholder.com/280x180?text=No+Image'">
+
+                            <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.5rem">
+                                <button class="btn btn-approve" style="width:100%" onclick="updateCenterStatus(${c.id},'approved')">✅ Set Approved</button>
+                                <button class="btn btn-reject" style="width:100%" onclick="updateCenterStatus(${c.id},'pending')">⏸ Set Pending</button>
+                                <button class="btn btn-del" style="width:100%;padding:.6rem" onclick="deleteCenter(${c.id},'${String(c.name).replace(/'/g, "\\'")}')">🗑 Delete Center</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem">
+                                ${detailField('Center Name', c.name)}
+                                ${detailField('City', c.city)}
+                                ${detailField('Phone', c.phone)}
+                                ${detailField('Email', c.email)}
+                                ${detailField('Status', '<span class="badge badge-' + (c.status === 'approved' ? 'approved' : 'pending') + '">' + c.status + '</span>')}
+                                ${detailField('Rating', c.avg_rating ? '★ ' + Number(c.avg_rating).toFixed(2) + ' / 5.0' : 'No ratings yet')}
+                                ${detailField('Reviews', (c.review_count || 0) + ' total')}
+                                ${detailField('Courses', (c.course_count || 0) + ' total')}
+                                ${detailField('Likes', '❤️ ' + (c.likes_count || 0))}
+                                ${detailField('Created', fmtDate(c.created_at))}
+                            </div>
+
+                            ${c.address ? `<div style="margin-bottom:1.25rem">${detailField('Address', '📍 ' + c.address)}</div>` : ''}
+                            ${c.description ? `
+                                <div style="margin-bottom:1.5rem">
+                                    <div style="font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem">Description</div>
+                                    <div style="font-size:.875rem;line-height:1.7;color:var(--text);background:var(--surface);padding:1rem;border-radius:10px;border:1px solid var(--border)">${c.description}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${c.courses && c.courses.length ? `
+                        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+                            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:1rem">📚 Courses (${c.courses.length})</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem">
+                                ${c.courses.map(co => `
+                                    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:1rem">
+                                        <div style="font-weight:700;margin-bottom:.4rem;font-size:.9rem">${co.name}</div>
+                                        <div style="font-size:.78rem;color:var(--muted);line-height:1.7">
+                                            ${co.teacher_name ? '👤 ' + co.teacher_name + '<br>' : ''}
+                                            ${co.price ? '💰 ' + (co.currency || '') + ' ' + Number(co.price).toLocaleString() + '<br>' : 'Free<br>'}
+                                            ${co.schedule ? '🕐 ' + co.schedule + '<br>' : ''}
+                                            👥 ${co.enrolled || 0}${co.max_students ? '/' + co.max_students : ''} students
+                                        </div>
+                                        <div style="margin-top:.5rem">
+                                            <span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}" style="font-size:.7rem">${co.status}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+            } catch (e) {
+                content.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        function detailField(label, value) {
+            if (!value || value === 'null' || value === 'undefined') {
+                value = '<span style="color:rgba(255,255,255,.2)">—</span>';
+            }
+            return `
+                <div>
+                    <div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem">${label}</div>
+                    <div style="font-size:.9rem;font-weight:600">${value}</div>
+                </div>
+            `;
+        }
+
+        function closeCenterDetail() {
+            document.getElementById('center-detail-panel').style.display = 'none';
+            selectedCenterId = null;
+            document.querySelectorAll('.center-row').forEach(r => r.style.background = '');
+        }
+
+        async function updateCenterStatus(id, status) {
+            try {
+                await api(`/admin/centers/${id}`, {
+                    method: 'PATCH',
+                    headers: H,
+                    body: JSON.stringify({ status })
+                });
+                toast(`Status updated to ${status}`);
+                loadCenters();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        async function deleteCenter(id, name) {
+            if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+            try {
+                await api(`/admin/centers/${id}`, {
+                    method: 'DELETE',
+                    headers: H
+                });
+                toast(`🗑 Deleted "${name}"`);
+                closeCenterDetail();
+                loadCenters();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        async function saveCenter() {
+            const name = document.getElementById('c-name').value.trim();
+            const city = document.getElementById('c-city').value.trim();
+
+            if (!name || !city) {
+                toast('Name and city are required', 'err');
+                return;
+            }
+
+            try {
+                await api('/admin/centers', {
+                    method: 'POST',
+                    headers: H,
+                    body: JSON.stringify({
+                        name,
+                        city,
+                        description: document.getElementById('c-desc').value.trim() || null,
+                        phone: document.getElementById('c-phone').value.trim() || null,
+                        email: document.getElementById('c-email').value.trim() || null,
+                        address: document.getElementById('c-address').value.trim() || null,
+                        latitude: parseFloat(document.getElementById('c-lat').value) || null,
+                        longitude: parseFloat(document.getElementById('c-lng').value) || null,
+                        status: document.getElementById('c-status').value,
+                    })
+                });
+
+                closeModal('centerModal');
+                toast('✅ Center created!');
+                loadCenters();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // COURSES
+        // ════════════════════════════════════════════════════════
+
+        async function loadCourses() {
+            const status = document.getElementById('course-status-filter')?.value || 'all';
+            const category = document.getElementById('course-category-filter')?.value || 'all';
+            const tbody = document.getElementById('courses-tbody');
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td></tr>`;
+
+            try {
+                // ✅ BUILD QUERY STRING PROPERLY
+                let params = [];
+
+                // Always add admin token
+                params.push(`admin_token=${TOKEN}`);
+
+                // Add status if not 'all'
+                if (status && status !== 'all') {
+                    params.push(`status=${status}`);
+                }
+
+                // Add category if not 'all'
+                if (category && category !== 'all') {
+                    params.push(`category=${category}`);
+                }
+
+                const queryString = params.join('&');
+                const url = `/admin/courses?${queryString}`;
+
+                // ✅ DEBUG: Log the URL being called
+                console.log('🔗 API URL:', API + url);
+                console.log('📊 Filters - Status:', status, 'Category:', category);
+
+                const data = await api(url);
+
+                console.log('📚 Courses received:', data.length, data);
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">
+                No courses found for category "${category}" and status "${status}".<br>
+                <span style="font-size:.75rem;margin-top:.5rem;display:block">Try selecting "All Categories" or "All Status"</span>
+            </td></tr>`;
+                    return;
+                }
+
+                // ✅ RENDER TABLE
+                tbody.innerHTML = data.map(co => {
+                    const safeName = String(co.name || '').replace(/'/g, "\\'");
+
+                    const categoryIcon = {
+                        'math': '📐',
+                        'english': '🇬🇧',
+                        'ielts': '📝',
+                        'programming': '💻',
+                        'sat': '🎓',
+                        'kids': '🧒',
+                        'art': '🎨',
+                        'other': '📦'
+                    }[co.category] || '📚';
+
+                    return `
+                <tr>
+                    <td style="color:var(--muted)">#${co.id}</td>
+                    <td>
+                        <strong>${co.name}</strong><br>
+                        <span style="font-size:.75rem;color:var(--muted)">${categoryIcon} ${co.category || 'other'}</span>
+                    </td>
+                    <td style="color:var(--muted)">${co.center_name || '—'}</td>
+                    <td>${co.teacher_name || '—'}</td>
+                    <td>${co.price ? (co.currency || 'UZS') + ' ' + Number(co.price).toLocaleString() : 'Free'}</td>
+                    <td>${co.enrolled || 0}${co.max_students ? '/' + co.max_students : ''}</td>
+                    <td><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></td>
+                    <td><button class="btn btn-del" onclick="deleteCourse(${co.id},'${safeName}')">🗑</button></td>
+                </tr>
+            `;
+                }).join('');
+            } catch (e) {
+                console.error('❌ Load courses error:', e);
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--rose)">Error: ${e.message}</td></tr>`;
+            }
+        }
+
+        async function deleteCourse(id, name) {
+            if (!confirm(`Delete course "${name}"?`)) return;
+
+            try {
+                await api(`/admin/courses/${id}`, {
+                    method: 'DELETE',
+                    headers: H
+                });
+                toast(`🗑 Course deleted`);
+                loadCourses();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // REVIEWS
+        // ════════════════════════════════════════════════════════
+
+        async function loadReviews() {
+            const status = document.getElementById('rev-filter')?.value || 'pending';
+            const el = document.getElementById('rev-container');
+            el.innerHTML = `<div class="empty-state"><div>Loading…</div></div>`;
+
+            try {
+                const data = await api(`/admin/reviews?status=${status}&admin_token=${TOKEN}`);
+
+                if (!data || data.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><div>No ${status} reviews</div></div>`;
+                    return;
+                }
+
+                el.innerHTML = data.map(r => `
+                    <div class="req-card" style="border-left-color:${r.status === 'pending' ? 'var(--amber)' : r.status === 'approved' ? 'var(--emerald)' : 'var(--rose)'}">
+                        <div class="req-top">
+                            <div class="req-info">
+                                <div class="req-name" style="font-size:.95rem">${r.student_name}</div>
+                                <div class="req-meta">
+                                    <span>🏫 <strong>${r.center_name || '—'}</strong></span>
+                                    <span style="color:#fcd34d">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                                    <span>🗓 ${fmtDate(r.created_at)}</span>
+                                </div>
+                                ${r.comment ? `<div class="req-desc">"${r.comment}"</div>` : ''}
+                            </div>
+                            <div class="req-actions">
+                                <span class="badge badge-${r.status}">${r.status}</span>
+                                ${r.status === 'pending' ? `
+                                    <button class="btn btn-approve" onclick="reviewAction(${r.id},'approved')">✅ Approve</button>
+                                    <button class="btn btn-reject" onclick="reviewAction(${r.id},'rejected')">❌ Reject</button>
+                                ` : ''}
+                                <button class="btn btn-del" onclick="deleteReview(${r.id})">🗑</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                el.innerHTML = `<div class="empty-state" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        async function reviewAction(id, status) {
+            try {
+                await api(`/admin/reviews/${id}`, {
+                    method: 'PATCH',
+                    headers: H,
+                    body: JSON.stringify({ status })
+                });
+                toast(status === 'approved' ? '✅ Review approved' : '❌ Review rejected');
+                loadReviews();
+                loadDashboard();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        async function deleteReview(id) {
+            if (!confirm('Delete this review?')) return;
+
+            try {
+                await api(`/admin/reviews/${id}`, {
+                    method: 'DELETE',
+                    headers: H
+                });
+                toast('🗑 Review deleted');
+                loadReviews();
+            } catch (e) {
+                toast(e.message, 'err');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // INITIALIZE
+        // ════════════════════════════════════════════════════════
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (TOKEN) {
+                document.getElementById('entry-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadDashboard();
+            }
+        });
+    </script>
+</body>
+
+</html>

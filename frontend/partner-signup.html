@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Sign Up — EduFind</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #07070c;
+            --surface: #0f0f18;
+            --card: #13131f;
+            --border: rgba(255, 255, 255, .09);
+            --border2: rgba(255, 255, 255, .14);
+            --indigo: #4f46e5;
+            --violet: #7c3aed;
+            --amber: #f59e0b;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --muted: rgba(255, 255, 255, .5);
+            --text: rgba(255, 255, 255, .9);
+            --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+            opacity: .4;
+        }
+
+        /* HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 7, 12, .92);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+        }
+
+        .hdr {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            letter-spacing: .18em;
+            text-decoration: none;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: .875rem;
+            font-weight: 600;
+            letter-spacing: .03em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: .2s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 6rem 2rem 10rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, .38) 0%, transparent 70%), radial-gradient(ellipse 40% 30% at 80% 60%, rgba(124, 58, 237, .18) 0%, transparent 60%);
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 100% at 50% 0%, black 40%, transparent 100%);
+        }
+
+        .hero-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(79, 70, 229, .15);
+            border: 1px solid rgba(79, 70, 229, .35);
+            color: #a5b4fc;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .4rem 1.1rem;
+            border-radius: 50px;
+            margin-bottom: 1.75rem;
+        }
+
+        .eyebrow-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #818cf8;
+            box-shadow: 0 0 8px #818cf8;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -.03em;
+            margin-bottom: 1.25rem;
+        }
+
+        h1 em {
+            font-style: normal;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
+            color: var(--muted);
+            margin-bottom: 3.5rem;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-lbl {
+            font-size: .78rem;
+            color: var(--muted);
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        /* MAIN CARD */
+        .wrap {
+            max-width: 880px;
+            margin: -5.5rem auto 6rem;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .04);
+        }
+
+        /* TRACKER */
+        .tracker {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 2.5rem;
+        }
+
+        .trk {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .trk:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: calc(50% + 24px);
+            right: calc(-50% + 24px);
+            top: 19px;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .trk.done:not(:last-child)::after {
+            background: var(--emerald);
+        }
+
+        .trk-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border2);
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .85rem;
+            color: var(--muted);
+            z-index: 1;
+            transition: all .3s;
+            flex-shrink: 0;
+        }
+
+        .trk.active .trk-circle {
+            background: var(--grad);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(79, 70, 229, .5);
+        }
+
+        .trk.done .trk-circle {
+            background: var(--emerald);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .trk-lbl {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: .04em;
+            transition: .3s;
+        }
+
+        .trk.active .trk-lbl {
+            color: #a5b4fc;
+        }
+
+        .trk.done .trk-lbl {
+            color: var(--emerald);
+        }
+
+        /* PANELS */
+        .panel {
+            display: none;
+            padding: 2.75rem 2.5rem;
+            animation: slideUp .3s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .panel-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin-bottom: .4rem;
+        }
+
+        .panel-sub {
+            color: var(--muted);
+            font-size: .95rem;
+            margin-bottom: 2.25rem;
+        }
+
+        /* FORM */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .span2 {
+            grid-column: 1/-1;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .req {
+            color: var(--rose);
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            background: var(--surface);
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            padding: .85rem 1.1rem;
+            color: #fff;
+            font-size: .95rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: .2s;
+            outline: none;
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: rgba(255, 255, 255, .22);
+        }
+
+        .field select option {
+            background: #1a1a2e;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: rgba(79, 70, 229, .7);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 88px;
+        }
+
+        /* PLANS */
+        .plans {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan {
+            border: 1.5px solid var(--border2);
+            border-radius: 16px;
+            padding: 1.75rem 1.5rem;
+            cursor: pointer;
+            transition: all .25s;
+            position: relative;
+            background: var(--surface);
+            text-align: center;
+        }
+
+        .plan:hover {
+            border-color: rgba(79, 70, 229, .5);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(79, 70, 229, .2);
+        }
+
+        .plan.sel {
+            border-color: #4f46e5;
+            background: rgba(79, 70, 229, .1);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .18), 0 16px 40px rgba(79, 70, 229, .22);
+        }
+
+        .plan.hot {
+            border-color: rgba(245, 158, 11, .4);
+        }
+
+        .plan.hot.sel {
+            border-color: #4f46e5;
+        }
+
+        .hot-badge {
+            position: absolute;
+            top: -11px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            padding: .3rem 1.1rem;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .plan-dur {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            margin-bottom: .8rem;
+        }
+
+        .plan-price {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: .3rem;
+        }
+
+        .plan-price sub {
+            font-size: .9rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .plan-save {
+            display: inline-block;
+            background: rgba(16, 185, 129, .18);
+            border: 1px solid rgba(16, 185, 129, .3);
+            color: #34d399;
+            padding: .2rem .9rem;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 700;
+            margin: .6rem 0 1.1rem;
+        }
+
+        .plan-feats {
+            list-style: none;
+            text-align: left;
+        }
+
+        .plan-feats li {
+            font-size: .84rem;
+            padding: .4rem 0;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: rgba(255, 255, 255, .7);
+        }
+
+        .plan-feats li::before {
+            content: '✓';
+            color: var(--emerald);
+            font-weight: 900;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .plan.sel .plan-feats li {
+            color: rgba(255, 255, 255, .9);
+        }
+
+        /* SUMMARY */
+        .summary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .s-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .65rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .9rem;
+        }
+
+        .s-row:last-child {
+            border: none;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border2);
+            margin-top: .5rem;
+        }
+
+        .s-row:last-child span:last-child {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .s-row span:first-child {
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* CALLOUT */
+        .callout {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: rgba(79, 70, 229, .08);
+            border: 1px solid rgba(79, 70, 229, .22);
+            border-radius: 12px;
+            padding: 1.1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .callout-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-text {
+            font-size: .875rem;
+            color: rgba(255, 255, 255, .7);
+            line-height: 1.65;
+        }
+
+        .callout-text strong {
+            color: #fff;
+        }
+
+        /* PENDING */
+        .pending-screen {
+            text-align: center;
+            padding: 2rem 1.5rem 1.5rem;
+        }
+
+        .pend-icon {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .pend-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            margin-bottom: .75rem;
+        }
+
+        .pend-sub {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: .875rem;
+            max-width: 520px;
+            margin: 0 auto 2.5rem;
+            text-align: left;
+        }
+
+        .wh {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.1rem 1.25rem;
+        }
+
+        .wh-n {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--grad);
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .wh-t {
+            font-size: .875rem;
+            color: rgba(255, 255, 255, .7);
+            line-height: 1.6;
+        }
+
+        .wh-t strong {
+            display: block;
+            color: #fff;
+            font-size: .95rem;
+            margin-bottom: 2px;
+        }
+
+        /* BUTTONS */
+        .btn-row {
+            display: flex;
+            gap: .875rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: .85rem 1.75rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: .95rem;
+            cursor: pointer;
+            border: none;
+            transition: all .25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1.5px solid var(--border2);
+        }
+
+        .btn-ghost:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .btn-main {
+            background: var(--grad);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, .4);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(79, 70, 229, .55);
+        }
+
+        .btn-main:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .err-box {
+            display: none;
+            background: rgba(244, 63, 94, .08);
+            border: 1px solid rgba(244, 63, 94, .3);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            font-size: .875rem;
+            color: #fca5a5;
+            margin-top: 1rem;
+        }
+
+        @media (max-width:640px) {
+
+            .plans,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tracker {
+                flex-direction: column;
+                gap: .875rem;
+            }
+
+            .trk:not(:last-child)::after {
+                display: none;
+            }
+
+            .panel {
+                padding: 1.75rem 1.25rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .stats {
+                gap: 2rem;
+            }
+
+            .btn-row {
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="hdr">
+            <a class="logo" href="index.html">EDUFIND</a>
+            <a class="back-btn" href="index.html">← Back to Home</a>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-inner">
+            <div class="eyebrow"><span class="eyebrow-dot"></span>Partner Program</div>
+            <h1>List Your Center<br>on <em>EduFind</em></h1>
+            <p class="hero-sub">Reach thousands of students across Uzbekistan every month.<br>Our team reviews every
+                application personally.</p>
+            <div class="stats">
+                <div>
+                    <div class="stat-num">500+</div>
+                    <div class="stat-lbl">Active Partners</div>
+                </div>
+                <div>
+                    <div class="stat-num">50K+</div>
+                    <div class="stat-lbl">Monthly Visitors</div>
+                </div>
+                <div>
+                    <div class="stat-num">95%</div>
+                    <div class="stat-lbl">Satisfaction Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CARD -->
+    <div class="wrap">
+        <div class="card">
+
+            <!-- Tracker -->
+            <div class="tracker">
+                <div class="trk active" id="t1">
+                    <div class="trk-circle">1</div>
+                    <div class="trk-lbl">Your Info</div>
+                </div>
+                <div class="trk" id="t2">
+                    <div class="trk-circle">2</div>
+                    <div class="trk-lbl">Choose Plan</div>
+                </div>
+                <div class="trk" id="t3">
+                    <div class="trk-circle">3</div>
+                    <div class="trk-lbl">Submit</div>
+                </div>
+            </div>
+
+            <!-- ── STEP 1 ── -->
+            <div class="panel active" id="p1">
+                <div class="panel-title">Tell us about your center</div>
+                <div class="panel-sub">We review every application — usually within 24 hours</div>
+                <form id="form1">
+                    <div class="grid">
+                        <div class="field span2">
+                            <label>Business Type <span class="req">*</span></label>
+                            <select id="btype" required>
+                                <option value="">Select a type…</option>
+                                <option value="language">🇬🇧 Language School</option>
+                                <option value="it">💻 IT Academy</option>
+                                <option value="math">📐 Math &amp; Science</option>
+                                <option value="kids">🧒 Kids Education</option>
+                                <option value="university_prep">🎓 University Prep</option>
+                                <option value="art_music">🎨 Art &amp; Music</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Center Name <span class="req">*</span></label>
+                            <input type="text" id="bname" placeholder="Bright Future Academy" required>
+                        </div>
+                        <div class="field">
+                            <label>Contact Person <span class="req">*</span></label>
+                            <input type="text" id="cperson" placeholder="Your full name" required>
+                        </div>
+                        <div class="field">
+                            <label>Email Address <span class="req">*</span></label>
+                            <input type="email" id="bemail" placeholder="info@yourcenter.uz" required>
+                        </div>
+                        <div class="field">
+                            <label>Phone Number <span class="req">*</span></label>
+                            <input type="tel" id="bphone" placeholder="+998 90 123 4567" required>
+                        </div>
+                        <div class="field span2">
+                            <label>City / Address</label>
+                            <input type="text" id="baddress" placeholder="e.g. Navoiy st 12, Tashkent">
+                        </div>
+                        <div class="field span2">
+                            <label>About Your Center <span
+                                    style="text-transform:none;font-weight:400;opacity:.7">(optional)</span></label>
+                            <textarea id="bdesc"
+                                placeholder="What makes your center special? What courses do you offer?"></textarea>
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <a href="index.html" class="btn btn-ghost">Cancel</a>
+                        <button type="submit" class="btn btn-main">Next: Choose Plan →</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ── STEP 2 ── -->
+            <div class="panel" id="p2">
+                <div class="panel-title">Choose a plan</div>
+                <div class="panel-sub">All plans include full dashboard access &amp; unlimited course listings. No
+                    payment until we approve your application.</div>
+
+                <div class="plans">
+                    <div class="plan" id="pc-1month" onclick="pickPlan('1month',49,this)">
+                        <div class="plan-dur">1 Month</div>
+                        <div class="plan-price">$49<sub>/mo</sub></div>
+                        <ul class="plan-feats">
+                            <li>Full dashboard access</li>
+                            <li>Unlimited course listings</li>
+                            <li>Basic analytics</li>
+                            <li>Email support</li>
+                        </ul>
+                    </div>
+                    <div class="plan hot" id="pc-3months" onclick="pickPlan('3months',129,this)">
+                        <span class="hot-badge">Most Popular</span>
+                        <div class="plan-dur">3 Months</div>
+                        <div class="plan-price">$129<sub>/3mo</sub></div>
+                        <div class="plan-save">Save $18</div>
+                        <ul class="plan-feats">
+                            <li>Everything in 1 Month</li>
+                            <li>Advanced analytics</li>
+                            <li>Priority support</li>
+                            <li>Featured listing</li>
+                        </ul>
+                    </div>
+                    <div class="plan" id="pc-6months" onclick="pickPlan('6months',239,this)">
+                        <div class="plan-dur">6 Months</div>
+                        <div class="plan-price">$239<sub>/6mo</sub></div>
+                        <div class="plan-save">Save $55</div>
+                        <ul class="plan-feats">
+                            <li>Everything in 3 Months</li>
+                            <li>Premium placement</li>
+                            <li>24/7 support</li>
+                            <li>Marketing campaigns</li>
+                        </ul>
+                    </div>
+                    <div class="plan" id="pc-1year" onclick="pickPlan('1year',449,this)">
+                        <div class="plan-dur">1 Year</div>
+                        <div class="plan-price">$449<sub>/yr</sub></div>
+                        <div class="plan-save">Save $139 — Best Value!</div>
+                        <ul class="plan-feats">
+                            <li>Everything in 6 Months</li>
+                            <li>Dedicated account manager</li>
+                            <li>Priority placement</li>
+                            <li>Exclusive promotions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-text">
+                        <strong>No payment now.</strong> Select a plan and submit your application. Once our team
+                        approves, we'll arrange payment via Click or Payme.
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+                    <button class="btn btn-main" id="planNext" onclick="goTo(3)" disabled>Review &amp; Submit →</button>
+                </div>
+            </div>
+
+            <!-- ── STEP 3 ── -->
+            <div class="panel" id="p3">
+                <div class="panel-title">Review your application</div>
+                <div class="panel-sub">Everything look right? Hit submit and our team will be in touch within 24 hours.
+                </div>
+
+                <div class="summary">
+                    <h4>📋 Application Summary</h4>
+                    <div class="s-row"><span>Center Name</span> <span id="r-name">—</span></div>
+                    <div class="s-row"><span>Business Type</span> <span id="r-type">—</span></div>
+                    <div class="s-row"><span>Contact Person</span> <span id="r-person">—</span></div>
+                    <div class="s-row"><span>Email</span> <span id="r-email">—</span></div>
+                    <div class="s-row"><span>Phone</span> <span id="r-phone">—</span></div>
+                    <div class="s-row"><span>Selected Plan</span> <span id="r-plan">—</span></div>
+                    <div class="s-row"><span>Amount (on approval)</span> <span id="r-amount">—</span></div>
+                </div>
+
+                <div class="callout">
+                    <span class="callout-icon">🔒</span>
+                    <div class="callout-text">
+                        After submitting, our team reviews your application. Once approved you'll receive your
+                        <strong>login credentials by email</strong>. Payment is only arranged after approval.
+                    </div>
+                </div>
+
+                <div class="err-box" id="errBox"></div>
+
+                <div class="btn-row">
+                    <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+                    <button class="btn btn-main" id="submitBtn" onclick="doSubmit()">✅ Submit Application</button>
+                </div>
+            </div>
+
+            <!-- ── PENDING ── -->
+            <div class="panel" id="pPending">
+                <div class="pending-screen">
+                    <span class="pend-icon">📬</span>
+                    <div class="pend-title">Application Submitted!</div>
+                    <div class="pend-sub">
+                        We've received your application for <strong id="pend-name"></strong>.<br>
+                        We'll be in touch at <strong id="pend-email"></strong> within 24 hours.
+                    </div>
+                    <div class="steps">
+                        <div class="wh">
+                            <div class="wh-n">1</div>
+                            <div class="wh-t"><strong>Application Under Review</strong>Our team reviews your center and
+                                verifies details — usually within 24 hours.</div>
+                        </div>
+                        <div class="wh">
+                            <div class="wh-n">2</div>
+                            <div class="wh-t"><strong>You Receive Your Credentials</strong>Once approved, you'll receive
+                                an email with your login and password for the partner dashboard.</div>
+                        </div>
+                        <div class="wh">
+                            <div class="wh-n">3</div>
+                            <div class="wh-t"><strong>Payment via Click or Payme</strong>We'll arrange payment for your
+                                chosen plan — no charges until you're approved.</div>
+                        </div>
+                        <div class="wh">
+                            <div class="wh-n">4</div>
+                            <div class="wh-t"><strong>Go Live!</strong>Your center appears on EduFind and students start
+                                finding you immediately.</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;padding-bottom:.5rem">
+                        <a href="index.html" class="btn btn-main">← Back to EduFind</a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /card -->
+    </div><!-- /wrap -->
+
+    <script>
+        const API = 'http://localhost:8000';
+        let curStep = 1, plan = null, price = 0;
+        const fd = {};
+
+        const TYPE_LABELS = {
+            language: '🇬🇧 Language School', it: '💻 IT Academy', math: '📐 Math & Science',
+            kids: '🧒 Kids Education', university_prep: '🎓 University Prep',
+            art_music: '🎨 Art & Music', other: '📦 Other',
+        };
+        const PLAN_LABELS = {
+            '1month': '1 Month — $49', '3months': '3 Months — $129',
+            '6months': '6 Months — $239', '1year': '1 Year — $449',
+        };
+
+        function goTo(n) {
+            document.getElementById(`p${curStep}`)?.classList.remove('active');
+            const old = document.getElementById(`t${curStep}`);
+            if (old) { old.classList.remove('active'); n > curStep ? old.classList.add('done') : old.classList.remove('done'); }
+            curStep = n;
+            document.getElementById(`p${curStep}`)?.classList.add('active');
+            const nw = document.getElementById(`t${curStep}`);
+            if (nw) { nw.classList.add('active'); nw.classList.remove('done'); }
+            if (n === 3) fillReview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function pickPlan(p, pr, el) {
+            document.querySelectorAll('.plan').forEach(c => c.classList.remove('sel'));
+            el.classList.add('sel');
+            plan = p; price = pr;
+            document.getElementById('planNext').disabled = false;
+        }
+
+        function fillReview() {
+            document.getElementById('r-name').textContent = fd.bname || '—';
+            document.getElementById('r-type').textContent = TYPE_LABELS[fd.btype] || fd.btype || '—';
+            document.getElementById('r-person').textContent = fd.cperson || '—';
+            document.getElementById('r-email').textContent = fd.bemail || '—';
+            document.getElementById('r-phone').textContent = fd.bphone || '—';
+            document.getElementById('r-plan').textContent = PLAN_LABELS[plan] || '—';
+            document.getElementById('r-amount').textContent = `$${price}`;
+        }
+
+        document.getElementById('form1').addEventListener('submit', e => {
+            e.preventDefault();
+            fd.btype = document.getElementById('btype').value;
+            fd.bname = document.getElementById('bname').value.trim();
+            fd.cperson = document.getElementById('cperson').value.trim();
+            fd.bemail = document.getElementById('bemail').value.trim();
+            fd.bphone = document.getElementById('bphone').value.trim();
+            fd.baddress = document.getElementById('baddress').value.trim();
+            fd.bdesc = document.getElementById('bdesc').value.trim();
+            goTo(2);
+        });
+
+        async function doSubmit() {
+            const btn = document.getElementById('submitBtn');
+            const err = document.getElementById('errBox');
+            err.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Submitting…';
+
+            try {
+                const res = await fetch(`${API}/api/partner-signup`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        business_type: fd.btype,
+                        business_name: fd.bname,
+                        contact_person: fd.cperson,
+                        email: fd.bemail,
+                        phone: fd.bphone,
+                        address: fd.baddress || null,
+                        description: fd.bdesc || null,
+                        plan: plan,
+                        amount: price,
+                    }),
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById(`p${curStep}`).classList.remove('active');
+                    document.querySelectorAll('.trk').forEach(t => { t.classList.remove('active'); t.classList.add('done'); });
+                    document.getElementById('pPending').classList.add('active');
+                    document.getElementById('pend-name').textContent = fd.bname;
+                    document.getElementById('pend-email').textContent = fd.bemail;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    err.textContent = data.detail || 'Something went wrong. Please try again.';
+                    err.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '✅ Submit Application';
+                }
+            } catch (_) {
+                err.textContent = 'Cannot connect to server. Make sure uvicorn is running on port 8000.';
+                err.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '✅ Submit Application';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Centers — EduFind</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ==================== GLOBAL ==================== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #050508;
+      --ink: #0c0c14;
+      --indigo: #4f46e5;
+      --purple: #7c3aed;
+      --orange: #f97316;
+      --muted: rgba(255, 255, 255, 0.55);
+      --border: rgba(255, 255, 255, 0.10);
+      --card: rgba(255, 255, 255, 0.04);
+      --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--black);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ==================== HEADER ==================== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 16px 24px;
+      background: rgba(5, 5, 8, .97);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 17px;
+      letter-spacing: 3px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .logo-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--grad);
+      box-shadow: 0 0 12px rgba(79, 70, 229, .7);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all .25s;
+    }
+
+    nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    nav a.active {
+      color: #fff;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-ghost {
+      padding: 9px 20px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .25s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255, 255, 255, .3);
+      color: #fff;
+    }
+
+    .btn-primary {
+      padding: 9px 22px;
+      border-radius: 24px;
+      background: var(--grad);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      box-shadow: 0 4px 18px rgba(79, 70, 229, .4);
+      transition: all .25s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(79, 70, 229, .55);
+    }
+
+    .hamburger {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    /* ==================== HERO ==================== */
+    .page-hero {
+      padding: 130px 24px 60px;
+      background:
+        linear-gradient(to bottom, rgba(5, 5, 8, .4) 0%, rgba(5, 5, 8, .85) 70%, rgba(5, 5, 8, 1) 100%),
+        radial-gradient(ellipse at 30% 50%, rgba(79, 70, 229, .2) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(124, 58, 237, .15) 0%, transparent 55%),
+        var(--ink);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid overlay */
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 52px 52px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79, 70, 229, .14);
+      border: 1px solid rgba(79, 70, 229, .32);
+      border-radius: 50px;
+      padding: 7px 18px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      margin-bottom: 22px;
+    }
+
+    .page-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .grad-text {
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-hero p {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 32px;
+      line-height: 1.75;
+    }
+
+    /* Search bar in hero */
+    .hero-search {
+      display: flex;
+      gap: 10px;
+      max-width: 540px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 50px;
+      padding: 8px 8px 8px 22px;
+      backdrop-filter: blur(10px);
+      transition: border-color .25s;
+    }
+
+    .hero-search:focus-within {
+      border-color: rgba(79, 70, 229, .6);
+    }
+
+    .hero-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .hero-search input::placeholder {
+      color: var(--muted);
+    }
+
+    .hero-search button {
+      padding: 11px 26px;
+      border-radius: 40px;
+      background: var(--grad);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all .25s;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, .4);
+    }
+
+    .hero-search button:hover {
+      box-shadow: 0 6px 22px rgba(79, 70, 229, .6);
+    }
+
+    /* ==================== MAIN LAYOUT ==================== */
+    .page-body {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 100px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    /* ==================== SIDEBAR FILTERS ==================== */
+    .sidebar {
+      position: sticky;
+      top: 90px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 22px;
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #818cf8;
+      margin-bottom: 22px;
+    }
+
+    .filter-group {
+      margin-bottom: 28px;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255, 255, 255, .4);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color .25s;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .filter-select:focus {
+      border-color: rgba(79, 70, 229, .5);
+    }
+
+    .filter-select option {
+      background: #1a1a2e;
+    }
+
+    /* Subject pill grid */
+    .subject-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .spill {
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .spill:hover {
+      border-color: rgba(79, 70, 229, .5);
+      color: #fff;
+    }
+
+    .spill.active {
+      background: rgba(79, 70, 229, .2);
+      border-color: rgba(79, 70, 229, .6);
+      color: #a5b4fc;
+    }
+
+    /* Sort */
+    .reset-btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: transparent;
+      color: rgba(255, 255, 255, .5);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .25s;
+      margin-top: 6px;
+    }
+
+    .reset-btn:hover {
+      border-color: rgba(249, 115, 22, .4);
+      color: var(--orange);
+    }
+
+    /* ==================== CENTERS GRID ==================== */
+    .centers-main {}
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .results-count {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .results-count strong {
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .sort-select {
+      padding: 9px 14px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .25s;
+    }
+
+    .sort-select:focus {
+      border-color: rgba(79, 70, 229, .5);
+    }
+
+    .sort-select option {
+      background: #1a1a2e;
+    }
+
+    .centers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* ── Center card ── */
+    .center-card {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all .3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .center-card:hover {
+      border-color: rgba(79, 70, 229, .45);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, .5);
+    }
+
+    .card-cover {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .card-cover-initials {
+      font-size: 3rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, .12);
+      font-family: Arial;
+      z-index: 1;
+    }
+
+    .card-status-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 50px;
+      z-index: 2;
+    }
+
+    .badge-approved {
+      background: rgba(16, 185, 129, .2);
+      border: 1px solid rgba(16, 185, 129, .4);
+      color: #34d399;
+    }
+
+    .badge-pending {
+      background: rgba(245, 158, 11, .2);
+      border: 1px solid rgba(245, 158, 11, .4);
+      color: #fbbf24;
+    }
+
+    .badge-rejected {
+      background: rgba(239, 68, 68, .2);
+      border: 1px solid rgba(239, 68, 68, .4);
+      color: #f87171;
+    }
+
+    .card-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-name {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .card-city {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .card-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stars {
+      display: flex;
+      gap: 1px;
+    }
+
+    .star-filled {
+      color: #f59e0b;
+      font-size: 13px;
+    }
+
+    .star-empty {
+      color: rgba(255, 255, 255, .18);
+      font-size: 13px;
+    }
+
+    .rating-text {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .ctag {
+      background: rgba(79, 70, 229, .18);
+      border: 1px solid rgba(79, 70, 229, .32);
+      color: #a5b4fc;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .card-courses {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .card-btn {
+      padding: 7px 18px;
+      border-radius: 50px;
+      background: var(--grad);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all .25s;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, .35);
+    }
+
+    .card-btn:hover {
+      box-shadow: 0 6px 20px rgba(79, 70, 229, .55);
+      transform: translateY(-1px);
+    }
+
+    /* ==================== EMPTY / LOADING / ERROR ==================== */
+    .state-box {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .state-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+
+    .state-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .state-sub {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 3px solid rgba(79, 70, 229, .2);
+      border-top-color: #4f46e5;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ==================== PAGINATION ==================== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .ppage {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ppage:hover {
+      border-color: rgba(79, 70, 229, .5);
+      color: #fff;
+    }
+
+    .ppage.active {
+      background: var(--grad);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, .4);
+    }
+
+    .ppage:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+
+    .pnav {
+      padding: 0 16px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .pnav:hover:not(:disabled) {
+      border-color: rgba(79, 70, 229, .5);
+      color: #fff;
+    }
+
+    .pnav:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+
+    /* ==================== MOBILE NAV ==================== */
+    nav.open {
+      display: flex;
+      position: fixed;
+      top: 58px;
+      left: 0;
+      right: 0;
+      background: rgba(5, 5, 8, .98);
+      backdrop-filter: blur(16px);
+      flex-direction: column;
+      gap: 0;
+      z-index: 999;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 0;
+    }
+
+    nav.open a {
+      display: block;
+      padding: 14px 24px;
+      border-radius: 0;
+      font-size: 16px;
+    }
+
+    /* ==================== MOBILE ==================== */
+    @media (max-width: 900px) {
+      .page-body {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-top: 32px;
+      }
+
+      .sidebar {
+        position: static;
+        border-radius: 16px;
+      }
+
+      /* Collapse sidebar into horizontal scrollable pills on mobile */
+      .filter-group {
+        margin-bottom: 20px;
+      }
+
+      .centers-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      header {
+        padding: 12px 16px;
+      }
+
+      nav:not(.open) {
+        display: none;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .btn-ghost {
+        display: none;
+      }
+
+      .page-hero {
+        padding: 110px 16px 50px;
+      }
+
+      .centers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-search {
+        flex-direction: column;
+        border-radius: 18px;
+        padding: 12px;
+      }
+
+      .hero-search input {
+        padding: 6px 4px;
+      }
+
+      .hero-search button {
+        border-radius: 12px;
+        padding: 12px;
+      }
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .vtog {
+      flex: 1;
+      padding: 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .vtog.active {
+      background: var(--grad);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    #mapView {
+      display: none;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      height: 560px;
+    }
+
+    #mapView.visible {
+      display: block;
+    }
+
+    .leaflet-container {
+      background: #0c0c14;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: #12121f;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 14px;
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .6);
+    }
+
+    .leaflet-popup-tip {
+      background: #12121f;
+    }
+
+    .leaflet-popup-content {
+      margin: 14px 16px;
+    }
+
+    .leaflet-control-zoom a {
+      background: #12121f !important;
+      color: #fff !important;
+      border-color: rgba(255, 255, 255, .15) !important;
+    }
+
+    .leaflet-control-zoom a:hover {
+      background: #1e1e35 !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(5, 5, 8, .8) !important;
+      color: rgba(255, 255, 255, .4) !important;
+    }
+
+    .leaflet-control-attribution a {
+      color: #818cf8 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════ HEADER ════════════ -->
+  <header>
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <div class="logo-dot"></div>
+        EDUFIND
+      </a>
+
+      <nav id="mainNav">
+        <a href="index.html">Home</a>
+        <a href="centers.html" class="active">Centers</a>
+        <a href="courses.html">Courses</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+
+      <div class="header-right">
+        <a class="btn-ghost" href="partner-login.html">Partner Login</a>
+        <a class="btn-primary" href="partner-signup.html">List Your Center</a>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════ PAGE HERO ════════════ -->
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🏫 Learning Centers</div>
+      <h1>Browse <span class="grad-text">All Centers</span></h1>
+      <p>Find and compare verified learning centers across Uzbekistan — filter by city, subject, and more.</p>
+      <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="Search by name, city, or subject…" />
+        <button onclick="applyFilters()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ MAIN CONTENT ════════════ -->
+  <div class="page-body">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-title">🎛 Filters</div>
+
+      <!-- City -->
+      <div class="filter-group">
+        <label class="filter-label">City</label>
+        <select class="filter-select" id="citySelect" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option>Tashkent</option>
+          <option>Samarkand</option>
+          <option>Bukhara</option>
+          <option>Fergana</option>
+          <option>Namangan</option>
+          <option>Andijan</option>
+          <option>Nukus</option>
+          <option>Qarshi</option>
+          <option>Termez</option>
+        </select>
+      </div>
+
+      <!-- Subject -->
+      <div class="filter-group">
+        <label class="filter-label">Subject</label>
+        <div class="subject-pills" id="subjectPills">
+          <div class="spill active" onclick="selectSubject(this,'')">All</div>
+          <div class="spill" onclick="selectSubject(this,'English')">English</div>
+          <div class="spill" onclick="selectSubject(this,'IELTS')">IELTS</div>
+          <div class="spill" onclick="selectSubject(this,'TOEFL')">TOEFL</div>
+          <div class="spill" onclick="selectSubject(this,'Math')">Math</div>
+          <div class="spill" onclick="selectSubject(this,'SAT')">SAT</div>
+          <div class="spill" onclick="selectSubject(this,'Programming')">Programming</div>
+          <div class="spill" onclick="selectSubject(this,'Russian')">Russian</div>
+          <div class="spill" onclick="selectSubject(this,'Chinese')">Chinese</div>
+          <div class="spill" onclick="selectSubject(this,'Art')">Art & Design</div>
+        </div>
+      </div>
+
+      <!-- Min rating -->
+      <div class="filter-group">
+        <label class="filter-label">Min Rating</label>
+        <select class="filter-select" id="ratingSelect" onchange="applyFilters()">
+          <option value="0">Any Rating</option>
+          <option value="3">3+ Stars</option>
+          <option value="4">4+ Stars</option>
+          <option value="5">5 Stars Only</option>
+        </select>
+      </div>
+
+      <button class="reset-btn" onclick="resetFilters()">↺ Reset All Filters</button>
+    </aside>
+
+    <!-- ── Centers ── -->
+    <div class="centers-main">
+      <div class="results-header">
+        <div class="results-count" id="resultsCount">Loading centers…</div>
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="rating">Highest Rated</option>
+          <option value="courses">Most Courses</option>
+          <option value="az">A → Z</option>
+        </select>
+      </div>
+
+      <div class="centers-grid" id="centersGrid">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <div class="state-title">Loading centers…</div>
+        </div>
+      </div>
+
+      <div class="view-toggle">
+        <button class="vtog active" id="togGrid" onclick="setView('grid')">⊞ Grid</button>
+        <button class="vtog" id="togMap" onclick="setView('map')">🗺 Map</button>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+
+      <div id="mapView"></div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ JAVASCRIPT ════════════ -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const API = 'http://localhost:8000';
+
+    let currentPage = 1;
+    let currentSearch = '';
+    let currentCity = '';
+    let currentSubject = '';
+    let currentRating = 0;
+    let currentSort = 'newest';
+
+    /* ── Read URL params on load ── */
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('search')) {
+      currentSearch = urlParams.get('search');
+      document.getElementById('searchInput').value = currentSearch;
+    }
+    if (urlParams.get('city')) {
+      currentCity = urlParams.get('city');
+      document.getElementById('citySelect').value = currentCity;
+    }
+
+    /* ── Mobile nav ── */
+    function toggleNav() {
+      const nav = document.getElementById('mainNav');
+      const btn = document.getElementById('hamburger');
+      const open = nav.classList.toggle('open');
+      btn.textContent = open ? '✕' : '☰';
+    }
+
+    document.addEventListener('click', e => {
+      const nav = document.getElementById('mainNav');
+      const btn = document.getElementById('hamburger');
+      if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('open');
+        btn.textContent = '☰';
+      }
+    });
+
+    /* ── Search on Enter ── */
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    /* ── Subject pills ── */
+    function selectSubject(el, val) {
+      document.querySelectorAll('.spill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentSubject = val;
+      currentPage = 1;
+      fetchCenters();
+    }
+
+    /* ── Gather filters and fetch ── */
+    function applyFilters() {
+      currentSearch = document.getElementById('searchInput').value.trim();
+      currentCity = document.getElementById('citySelect').value;
+      currentRating = parseFloat(document.getElementById('ratingSelect').value) || 0;
+      currentSort = document.getElementById('sortSelect').value;
+      currentPage = 1;
+      fetchCenters();
+    }
+
+    function resetFilters() {
+      currentSearch = ''; currentCity = ''; currentSubject = ''; currentRating = 0; currentSort = 'newest';
+      document.getElementById('searchInput').value = '';
+      document.getElementById('citySelect').value = '';
+      document.getElementById('ratingSelect').value = '0';
+      document.getElementById('sortSelect').value = 'newest';
+      document.querySelectorAll('.spill').forEach((p, i) => p.classList.toggle('active', i === 0));
+      currentPage = 1;
+      fetchCenters();
+    }
+
+    /* ── Fetch from API ── */
+    async function fetchCenters() {
+      const grid = document.getElementById('centersGrid');
+      const pag = document.getElementById('pagination');
+      grid.innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title">Loading…</div></div>';
+      pag.innerHTML = '';
+
+      const params = new URLSearchParams({
+        page: currentPage,
+        per_page: 9,
+      });
+      if (currentSearch) params.set('search', currentSearch);
+      if (currentCity) params.set('city', currentCity);
+      if (currentSubject) params.set('search', currentSubject); // search covers subject in backend
+      if (currentSort) params.set('sort', currentSort);
+
+      try {
+        const res = await fetch(`${API}/public/centers?${params}`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+
+        let items = data.items || data;
+        const total = data.total || items.length;
+        const pages = data.pages || 1;
+
+        /* Client-side rating filter (backend may not support it) */
+        if (currentRating > 0) {
+          items = items.filter(c => (c.avg_rating || 0) >= currentRating);
+        }
+
+        updateCount(items.length, total);
+        renderCenters(items);
+        renderPagination(pages);
+
+      } catch (e) {
+        grid.innerHTML = `
+        <div class="state-box">
+          <div class="state-icon">⚠️</div>
+          <div class="state-title">Could not load centers</div>
+          <div class="state-sub">Make sure the backend is running on port 8000</div>
+        </div>`;
+      }
+    }
+
+    /* ── Render centers grid ── */
+    const gradients = [
+      'linear-gradient(135deg,#1e1b4b,#312e81)',
+      'linear-gradient(135deg,#0c1a3a,#1e3a8a)',
+      'linear-gradient(135deg,#14002e,#4c1d95)',
+      'linear-gradient(135deg,#001a12,#065f46)',
+      'linear-gradient(135deg,#1a0505,#7f1d1d)',
+      'linear-gradient(135deg,#1a0a00,#92400e)',
+      'linear-gradient(135deg,#001a1a,#134e4a)',
+      'linear-gradient(135deg,#0a1a00,#166534)',
+    ];
+
+    function starsHtml(r) {
+      r = Math.round(r || 0);
+      return Array.from({ length: 5 }, (_, i) =>
+        `<span class="${i < r ? 'star-filled' : 'star-empty'}">★</span>`
+      ).join('');
+    }
+
+    function renderCenters(items) {
+      const grid = document.getElementById('centersGrid');
+      if (!items.length) {
+        grid.innerHTML = `
+        <div class="state-box">
+          <div class="state-icon">🏫</div>
+          <div class="state-title">No centers found</div>
+          <div class="state-sub">Try adjusting your filters or search term</div>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map((c, idx) => {
+        const ini = (c.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const bg = gradients[idx % gradients.length];
+
+        return `
+        <div class="center-card" onclick="location.href='center.html?id=${c.id}'">
+          <div class="card-cover" style="background:${bg}">
+            <div class="card-cover-initials">${ini}</div>
+            <div class="card-status-badge badge-approved">✓ Verified</div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-name">${c.name}</div>
+
+            <div class="card-city">
+              <span>📍</span>
+              <span>${c.city || 'Uzbekistan'}</span>
+            </div>
+
+            <div class="card-rating">
+              <div class="stars">${starsHtml(c.avg_rating)}</div>
+              <span class="rating-text">
+                ${c.avg_rating ? `${c.avg_rating} (${c.review_count || 0} reviews)` : 'No reviews yet'}
+              </span>
+            </div>
+
+            ${c.description ? `<div style="font-size:13px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${c.description}</div>` : ''}
+          </div>
+
+          <div class="card-footer">
+            <span class="card-courses">📚 ${c.course_count || 0} courses</span>
+            <button class="card-btn" onclick="event.stopPropagation();location.href='center.html?id=${c.id}'">View Center →</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* ── Results count ── */
+    function updateCount(shown, total) {
+      const el = document.getElementById('resultsCount');
+      if (!el) return;
+      const q = currentSearch || currentSubject || currentCity;
+      el.innerHTML = q
+        ? `Showing <strong>${shown}</strong> of <strong>${total}</strong> centers for "<strong>${q}</strong>"`
+        : `Showing <strong>${shown}</strong> of <strong>${total}</strong> centers`;
+    }
+
+    /* ── Pagination ── */
+    function renderPagination(pages) {
+      const pag = document.getElementById('pagination');
+      if (pages <= 1) { pag.innerHTML = ''; return; }
+
+      let html = `<button class="pnav" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || Math.abs(i - currentPage) <= 2) {
+          html += `<button class="ppage ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+        } else if (Math.abs(i - currentPage) === 3) {
+          html += `<span style="color:var(--muted);padding:0 4px">…</span>`;
+        }
+      }
+
+      html += `<button class="pnav" onclick="goPage(${currentPage + 1})" ${currentPage === pages ? 'disabled' : ''}>Next →</button>`;
+      pag.innerHTML = html;
+    }
+
+    function goPage(p) {
+      currentPage = p;
+      fetchCenters();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    /* ── Init ── */
+    fetchCenters();
+
+    /* MAP STATE */
+
+    let _map = null;
+    let _markers = [];
+    let _userLatLng = null;
+    let _activeView = 'grid';
+    let _allCentersForMap = [];   // cache for map view
+
+    /* Try to get user location immediately */
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => { _userLatLng = [pos.coords.latitude, pos.coords.longitude]; },
+        () => { }
+      );
+    }
+
+    function setView(view) {
+      _activeView = view;
+
+      const grid = document.getElementById('centersGrid');
+      const pag = document.getElementById('pagination');
+      const mapEl = document.getElementById('mapView');
+      const btnG = document.getElementById('togGrid');
+      const btnM = document.getElementById('togMap');
+
+      if (view === 'grid') {
+        grid.style.display = '';
+        pag.style.display = '';
+        mapEl.classList.remove('visible');
+        btnG.classList.add('active');
+        btnM.classList.remove('active');
+      } else {
+        grid.style.display = 'none';
+        pag.style.display = 'none';
+        mapEl.classList.add('visible');
+        btnG.classList.remove('active');
+        btnM.classList.add('active');
+        initMap();
+        loadAllForMap();
+      }
+    }
+
+
+    function initMap() {
+      if (_map) return;
+      _map = L.map('mapView', { zoomControl: true }).setView([41.3, 64.6], 6);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
+        maxZoom: 19,
+      }).addTo(_map);
+    }
+
+    async function loadAllForMap() {
+      if (_allCentersForMap.length > 0) {
+        plotMarkers(_allCentersForMap);
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/public/centers?per_page=100`);
+        const data = await res.json();
+        _allCentersForMap = data.items || [];
+        plotMarkers(_allCentersForMap);
+      } catch (_) {
+        document.getElementById('mapView').innerHTML =
+          '<div class="map-notice">⚠️ Could not load centers. Is the backend running?</div>';
+      }
+    }
+
+    const _pinIcon = L.divIcon({
+      className: '',
+      html: `
+      <div style="
+        width: 36px; height: 36px;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid #fff;
+        box-shadow: 0 4px 16px rgba(79,70,229,.65);
+      "></div>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 36],
+      popupAnchor: [0, -38],
+    });
+
+    const _meIcon = L.divIcon({
+      className: '',
+      html: `
+      <div style="
+        width: 16px; height: 16px;
+        background: #f97316;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 5px rgba(249,115,22,.25);
+      "></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });
+
+
+    function _distKm(lat1, lng1, lat2, lng2) {
+      const R = 6371;
+      const dL = (lat2 - lat1) * Math.PI / 180;
+      const dl = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dL / 2) ** 2
+        + Math.cos(lat1 * Math.PI / 180)
+        * Math.cos(lat2 * Math.PI / 180)
+        * Math.sin(dl / 2) ** 2;
+      return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
+    }
+
+
+    function plotMarkers(centers) {
+      if (!_map) return;
+
+      /* Clear old markers */
+      _markers.forEach(m => m.remove());
+      _markers = [];
+
+      /* User dot */
+      if (_userLatLng) {
+        L.marker(_userLatLng, { icon: _meIcon })
+          .addTo(_map)
+          .bindPopup('<div style="padding:10px;font-weight:800;color:#f97316">📍 You are here</div>');
+      }
+
+      /* Filter to centers that have coordinates */
+      const withCoords = centers.filter(c => c.latitude && c.longitude);
+
+      if (withCoords.length === 0) {
+        document.getElementById('mapView').insertAdjacentHTML('beforeend',
+          '<div class="map-notice" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(12,12,20,.85);padding:12px 24px;border-radius:50px;font-size:13px;color:rgba(255,255,255,.55);pointer-events:none">No center coordinates saved yet</div>'
+        );
+        return;
+      }
+
+      withCoords.forEach(c => {
+        /* Distance line */
+        const distLine = _userLatLng
+          ? `<div style="display:flex;align-items:center;gap:6px;color:#34d399;font-size:13px;font-weight:700;margin-top:6px">
+             📏 ${_distKm(_userLatLng[0], _userLatLng[1], c.latitude, c.longitude)} km away
+           </div>`
+          : '';
+
+        /* Star rating */
+        const r = Math.round(c.avg_rating || 0);
+        const stars = Array.from({ length: 5 }, (_, i) =>
+          `<span style="color:${i < r ? '#f59e0b' : 'rgba(255,255,255,.2)'}">★</span>`
+        ).join('');
+
+        /* Popup HTML — styled like your screenshot */
+        const popupHtml = `
+        <div style="padding:16px 18px;min-width:200px;max-width:240px">
+
+          <div style="font-size:15px;font-weight:800;margin-bottom:4px;line-height:1.3">
+            ${c.name}
+          </div>
+
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px">
+            📍 ${c.city || 'Uzbekistan'}
+          </div>
+
+          ${c.phone ? `
+            <div style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:6px">
+              📞 ${c.phone}
+            </div>` : ''}
+
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <div style="font-size:14px">${stars}</div>
+            ${c.avg_rating
+            ? `<span style="font-size:12px;color:rgba(255,255,255,.55)">${c.avg_rating} · ${c.review_count} reviews</span>`
+            : `<span style="font-size:12px;color:rgba(255,255,255,.35)">No reviews yet</span>`}
+          </div>
+
+          ${distLine}
+
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+            <a href="center.html?id=${c.id}"
+               style="display:block;text-align:center;padding:9px 16px;
+                      background:linear-gradient(135deg,#4f46e5,#7c3aed);
+                      color:#fff;border-radius:50px;font-size:13px;
+                      font-weight:700;text-decoration:none;
+                      box-shadow:0 4px 14px rgba(79,70,229,.4)">
+              View Center →
+            </a>
+          </div>
+
+        </div>`;
+
+        const marker = L.marker([c.latitude, c.longitude], { icon: _pinIcon })
+          .addTo(_map)
+          .bindPopup(popupHtml, { maxWidth: 260, minWidth: 220 });
+
+        _markers.push(marker);
+      });
+
+      /* Fit map to all markers */
+      const group = L.featureGroup(_markers);
+      _map.fitBounds(group.getBounds().pad(0.3));
+    }
+
+  </script>
+
+</body>
+
+</html>
