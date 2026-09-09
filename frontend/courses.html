@@ -482,9 +482,9 @@
 
           <div class="card-footer">
             <div class="card-price ${isFree ? 'free' : ''}">${fmtPrice(co.price, co.currency)}</div>
-            <a class="card-btn" href="center.html?id=${co.center_id}" onclick="event.stopPropagation()">
-              View Center →
-            </a>
+            <button class="card-btn" onclick="event.stopPropagation(); openApplyModal(${co.id}, '${co.name.replace(/'/g, "\\'")}', '${(co.center_name || '').replace(/'/g, "\\'")}')">
+              🚀 Apply Now
+            </button>
           </div>
         </div>`;
       }).join('');
@@ -523,9 +523,107 @@
       window.scrollTo({ top: 300, behavior: 'smooth' });
     }
 
+    /* ── Apply Modal ── */
+    function openApplyModal(courseId, courseName, centerName) {
+      document.getElementById('mCourseId').value = courseId;
+      document.getElementById('mCourseName').textContent = courseName;
+      document.getElementById('mCenterName').textContent = '🏫 ' + (centerName || 'Learning Center');
+      document.getElementById('applyModal').classList.add('open');
+    }
+
+    function closeApplyModal() {
+      document.getElementById('applyModal').classList.remove('open');
+      document.getElementById('applyForm').reset();
+    }
+
+    async function submitCourseApply(e) {
+      e.preventDefault();
+      const courseId = document.getElementById('mCourseId').value;
+      const studentName = document.getElementById('mStudentName').value.trim();
+      const phone = document.getElementById('mStudentPhone').value.trim();
+      const email = document.getElementById('mStudentEmail').value.trim() || null;
+      const notes = document.getElementById('mStudentNotes').value.trim() || null;
+
+      const btn = document.getElementById('mSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      try {
+        const res = await fetch(`${API}/public/courses/${courseId}/apply`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ student_name: studentName, phone, email, notes }),
+        });
+
+        if (!res.ok) throw new Error('Failed to submit application');
+        
+        alert('🎉 Application submitted successfully! The center will contact you shortly.');
+        closeApplyModal();
+      } catch(err) {
+        alert('⚠️ ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+      }
+    }
+
     /* ── Init ── */
     fetchCourses();
   </script>
+
+  <!-- ENROLLMENT MODAL -->
+  <div class="modal-backdrop" id="applyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">🚀 Apply for <span id="mCourseName">Course</span></div>
+          <div class="modal-sub" id="mCenterName">Center Name</div>
+        </div>
+        <button class="modal-close" onclick="closeApplyModal()">✕</button>
+      </div>
+      <form id="applyForm" onsubmit="submitCourseApply(event)">
+        <input type="hidden" id="mCourseId" />
+        <div class="mfield">
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Full Name *</label>
+          <input type="text" id="mStudentName" placeholder="e.g. Jasur Toshmatov" required style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none" />
+        </div>
+        <div class="mfield" style="margin-top:16px">
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Phone Number *</label>
+          <input type="tel" id="mStudentPhone" placeholder="+998 90 123 45 67" required style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none" />
+        </div>
+        <div class="mfield" style="margin-top:16px">
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Email (optional)</label>
+          <input type="email" id="mStudentEmail" placeholder="student@example.com" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none" />
+        </div>
+        <div class="mfield" style="margin-top:16px">
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Notes / Preferred Schedule (optional)</label>
+          <textarea id="mStudentNotes" rows="3" placeholder="e.g. Evening classes preferred…" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;justify:flex-end;gap:12px;margin-top:24px">
+          <button type="button" class="btn-ghost" onclick="closeApplyModal()" style="padding:10px 20px">Cancel</button>
+          <button type="submit" class="btn-primary" id="mSubmitBtn" style="padding:10px 24px">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: #13131f; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+      padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .modal-title { font-size: 1.25rem; font-weight: 800; color: #fff; }
+    .modal-sub { font-size: 0.85rem; color: #a5b4fc; margin-top: 4px; }
+    .modal-close { background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 1.2rem; cursor: pointer; }
+    .modal-close:hover { color: #fff; }
+  </style>
 
 </body>
 </html>

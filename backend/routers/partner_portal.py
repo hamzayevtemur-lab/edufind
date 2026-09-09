@@ -417,3 +417,69 @@ def list_reviews(
         }
         for r in reviews
     ]
+
+
+# ═══════════════════════════════════════════════════════
+#  STUDENT LEADS / APPLICATIONS — partner management
+# ═══════════════════════════════════════════════════════
+
+from models.center import CourseApplication, ApplicationStatus
+
+class AppStatusBody(BaseModel):
+    status: str
+
+
+@router.get("/applications")
+def list_my_applications(
+    partner: Partner = Depends(get_partner),
+    db: Session = Depends(get_db),
+):
+    """Fetch all student inquiries/applications for centers owned by this partner."""
+    my_center_ids = [c.id for c in partner.centers]
+    if not my_center_ids:
+        return []
+
+    apps = (
+        db.query(CourseApplication)
+        .filter(CourseApplication.center_id.in_(my_center_ids))
+        .order_by(CourseApplication.created_at.desc())
+        .all()
+    )
+
+    return [
+        {
+            "id":           a.id,
+            "center_id":    a.center_id,
+            "center_name":  a.center.name if a.center else None,
+            "course_id":    a.course_id,
+            "course_name":  a.course.name if a.course else None,
+            "student_name": a.student_name,
+            "phone":        a.phone,
+            "email":        a.email,
+            "notes":        a.notes,
+            "status":       a.status.value if hasattr(a.status, "value") else a.status,
+            "created_at":   a.created_at,
+        }
+        for a in apps
+    ]
+
+
+@router.patch("/applications/{app_id}/status")
+def update_application_status(
+    app_id: int,
+    body: AppStatusBody,
+    partner: Partner = Depends(get_partner),
+    db: Session = Depends(get_db),
+):
+    app = db.query(CourseApplication).filter(CourseApplication.id == app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+    _owns_center(partner, app.center_id, db)
+
+    try:
+        app.status = ApplicationStatus(body.status)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status: {body.status}")
+
+    db.commit()
+    return {"id": app.id, "status": app.status}

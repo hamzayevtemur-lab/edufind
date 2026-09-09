@@ -988,7 +988,8 @@
         <div class="nav-item" onclick="nav('centers',this)"><span class="nav-icon">🏫</span>My Centers</div>
         <div class="nav-item" onclick="nav('add-center',this)"><span class="nav-icon">➕</span>Add Center</div>
 
-        <div class="sidebar-section">Content</div>
+        <div class="sidebar-section">Content & Leads</div>
+        <div class="nav-item" onclick="nav('leads',this)"><span class="nav-icon">📬</span>Student Leads <span class="badge" id="leads-count-badge" style="display:none;margin-left:auto;background:var(--accent);color:#fff;padding:2px 8px;border-radius:50px;font-size:11px">0</span></div>
         <div class="nav-item" onclick="nav('courses',this)"><span class="nav-icon">📚</span>Courses</div>
         <div class="nav-item" onclick="nav('reviews',this)"><span class="nav-icon">⭐</span>Reviews</div>
 
@@ -1119,7 +1120,23 @@
             </div>
         </div>
 
-        <!-- ── COURSES ────────────────────────────────── -->
+        <!-- ── STUDENT LEADS ─────────────────────────────── -->
+        <div class="section" id="section-leads">
+            <div class="sec-title">Student Leads & Inquiries 📬</div>
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                    <div class="card-title" style="margin:0">Course Applications</div>
+                    <button class="btn btn-ghost" onclick="loadLeadsSection()">↺ Refresh</button>
+                </div>
+                <div id="leads-list">
+                    <div class="empty">
+                        <div class="empty-icon">📭</div>Loading student inquiries…
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── COURSES ─────────────────────────────────── -->
         <div class="section" id="section-courses">
             <div class="sec-title">Courses</div>
 
@@ -1365,6 +1382,7 @@
             const loaders = {
                 dashboard: loadDashboard,
                 centers: loadMyCenters,
+                leads: loadLeadsSection,
                 courses: loadCoursesSection,
                 reviews: loadReviewsSection,
                 profile: loadProfile,
@@ -1876,6 +1894,79 @@
             } catch (e) {
                 el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
             }
+        }
+
+        // ── STUDENT LEADS ──────────────────────────────────────
+
+        async function loadLeadsSection() {
+            const container = document.getElementById('leads-list');
+            if (!container) return;
+            container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>Loading student inquiries…</div>';
+            try {
+                const apps = await api('/portal/applications');
+                const badge = document.getElementById('leads-count-badge');
+                if (badge) {
+                    badge.textContent = apps.length;
+                    badge.style.display = apps.length ? 'inline-block' : 'none';
+                }
+                if (!apps.length) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>No student inquiries submitted yet</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                <table style="width:100%;border-collapse:collapse;margin-top:1rem;font-size:0.88rem">
+                    <thead>
+                        <tr style="text-align:left;border-bottom:1px solid var(--border2);color:var(--muted)">
+                            <th style="padding:10px">Student</th>
+                            <th style="padding:10px">Course & Center</th>
+                            <th style="padding:10px">Phone</th>
+                            <th style="padding:10px">Notes</th>
+                            <th style="padding:10px">Status</th>
+                            <th style="padding:10px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${apps.map(a => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                            <td style="padding:12px 10px;font-weight:700">
+                                ${a.student_name}
+                                ${a.email ? `<div style="font-size:0.75rem;color:var(--muted);font-weight:400">${a.email}</div>` : ''}
+                            </td>
+                            <td style="padding:12px 10px">
+                                <div style="font-weight:700;color:var(--accent)">${a.course_name || 'Course #' + a.course_id}</div>
+                                <div style="font-size:0.75rem;color:var(--muted)">🏫 ${a.center_name || 'Center #' + a.center_id}</div>
+                            </td>
+                            <td style="padding:12px 10px">
+                                <a href="tel:${a.phone}" style="color:#60a5fa;font-weight:700">📞 ${a.phone}</a>
+                            </td>
+                            <td style="padding:12px 10px;color:rgba(255,255,255,0.8)">${a.notes || '—'}</td>
+                            <td style="padding:12px 10px">
+                                <span class="badge badge-${a.status === 'enrolled' ? 'approved' : a.status === 'contacted' ? 'pending' : a.status === 'cancelled' ? 'rejected' : 'pending'}">
+                                    ${a.status}
+                                </span>
+                            </td>
+                            <td style="padding:12px 10px">
+                                <div style="display:flex;gap:6px">
+                                    ${a.status !== 'contacted' ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem" onclick="updateLeadStatus(${a.id}, 'contacted')">📞 Contacted</button>` : ''}
+                                    ${a.status !== 'enrolled' ? `<button class="btn btn-primary" style="padding:4px 8px;font-size:0.75rem" onclick="updateLeadStatus(${a.id}, 'enrolled')">✅ Enrolled</button>` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>`;
+            } catch (e) {
+                container.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
+            }
+        }
+
+        async function updateLeadStatus(appId, status) {
+            try {
+                await api(`/portal/applications/${appId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+                toast(`✅ Lead status updated to ${status}`);
+                loadLeadsSection();
+            } catch(e) { toast(e.message, 'err'); }
         }
 
         // ── PROFILE ───────────────────────────────────────────

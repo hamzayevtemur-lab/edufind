@@ -104,6 +104,7 @@ class LearningCenter(Base):
     courses = relationship("Course",     back_populates="center", cascade="all, delete-orphan")
     reviews = relationship("Review",     back_populates="center", cascade="all, delete-orphan")
     likes   = relationship("CenterLike", back_populates="center", cascade="all, delete-orphan")
+    applications = relationship("CourseApplication", back_populates="center", cascade="all, delete-orphan")
 
     @property
     def avg_rating(self):
@@ -163,6 +164,7 @@ class Course(Base):
     category = Column(String(50), default="other") 
 
     center = relationship("LearningCenter", back_populates="courses")
+    applications = relationship("CourseApplication", back_populates="course", cascade="all, delete-orphan")
 
 
 # ═══════════════════════════════════════════════
@@ -182,6 +184,17 @@ class Review(Base):
     created_at   = Column(DateTime(timezone=True), server_default=func.now())
 
     center = relationship("LearningCenter", back_populates="reviews")
+
+
+# ═══════════════════════════════════════════════
+#  APPLICATION STATUS
+# ═══════════════════════════════════════════════
+
+class ApplicationStatus(str, enum.Enum):
+    pending   = "pending"
+    contacted = "contacted"
+    enrolled  = "enrolled"
+    cancelled = "cancelled"
 
 
 # ═══════════════════════════════════════════════
@@ -216,4 +229,26 @@ class PartnerSignupRequest(Base):
     # FK set when admin approves → links to the created Partner
     partner_id = Column(Integer, ForeignKey("partners.id"), nullable=True)
     partner = relationship("Partner", back_populates="signup_request")
+
+
+# ═══════════════════════════════════════════════
+#  COURSE APPLICATION (STUDENT LEADS)
+# ═══════════════════════════════════════════════
+
+class CourseApplication(Base):
+    """Submitted by students on center.html or courses.html when applying for a course."""
+    __tablename__ = "course_applications"
+
+    id           = Column(Integer, primary_key=True, index=True)
+    center_id    = Column(Integer, ForeignKey("learning_centers.id"), nullable=False)
+    course_id    = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    student_name = Column(String(255), nullable=False)
+    phone        = Column(String(50),  nullable=False)
+    email        = Column(String(255), nullable=True)
+    notes        = Column(Text,        nullable=True)
+    status       = Column(SAEnum(ApplicationStatus, name="app_status"), nullable=False, server_default="pending", index=True)
+    created_at   = Column(DateTime(timezone=True), server_default=func.now())
+
+    center = relationship("LearningCenter", back_populates="applications")
+    course = relationship("Course", back_populates="applications")
     

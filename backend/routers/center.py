@@ -72,3 +72,35 @@ def submit_review(body: ReviewCreate, db: Session = Depends(get_db)):
     ))
     db.commit()
     return {"message": "Review submitted — pending approval"}
+
+
+from pydantic import BaseModel
+from models.center import Course, CourseApplication, ApplicationStatus
+from typing import Optional
+
+class CourseApplyBody(BaseModel):
+    student_name: str
+    phone:        str
+    email:        Optional[str] = None
+    notes:        Optional[str] = None
+
+
+@router.post("/courses/{course_id}/apply", status_code=201)
+def apply_for_course(course_id: int, body: CourseApplyBody, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    app = CourseApplication(
+        center_id    = course.center_id,
+        course_id    = course_id,
+        student_name = body.student_name.strip(),
+        phone        = body.phone.strip(),
+        email        = body.email.strip() if body.email else None,
+        notes        = body.notes.strip() if body.notes else None,
+        status       = ApplicationStatus.pending
+    )
+    db.add(app)
+    db.commit()
+    db.refresh(app)
+    return {"message": "Application submitted successfully!", "application_id": app.id}
