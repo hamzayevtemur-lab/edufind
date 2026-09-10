@@ -32,6 +32,7 @@ class CourseCategory(str, enum.Enum):
 
 
 class PartnerPlan(str, enum.Enum):
+    free_1month = "free_1month"
     month_1 = "1month"
     month_3 = "3months"
     month_6 = "6months"

@@ -897,8 +897,20 @@
                     payment until we approve your application.</div>
 
                 <div class="plans">
+                    <div class="plan hot" id="pc-free_1month" onclick="pickPlan('free_1month',0,this)">
+                        <span class="hot-badge">🚀 Launch Offer</span>
+                        <div class="plan-dur">1 Month FREE</div>
+                        <div class="plan-price">$0<sub>/mo</sub></div>
+                        <div class="plan-save">100% Free Access</div>
+                        <ul class="plan-feats">
+                            <li>1 Month Full Access</li>
+                            <li>Unlimited Course Listings</li>
+                            <li>Direct Student Leads</li>
+                            <li>Monthly Extension Requests</li>
+                        </ul>
+                    </div>
                     <div class="plan" id="pc-1month" onclick="pickPlan('1month',49,this)">
-                        <div class="plan-dur">1 Month</div>
+                        <div class="plan-dur">1 Month Paid</div>
                         <div class="plan-price">$49<sub>/mo</sub></div>
                         <ul class="plan-feats">
                             <li>Full dashboard access</li>
@@ -993,27 +1005,24 @@
             <!-- ── PENDING ── -->
             <div class="panel" id="pPending">
                 <div class="pending-screen">
-                    <span class="pend-icon">📬</span>
-                    <div class="pend-title">Application Submitted!</div>
+                    <span class="pend-icon">✉️</span>
+                    <div class="pend-title">Verification Link Sent!</div>
                     <div class="pend-sub">
-                        We've received your application for <strong id="pend-name"></strong>.<br>
-                        We'll be in touch at <strong id="pend-email"></strong> within 24 hours.
+                        We've sent an email verification link for <strong id="pend-name"></strong> to <strong id="pend-email"></strong>.<br>
+                        Please open your email inbox and click the verification link to activate your <strong>1-Month Free Account</strong>!
                     </div>
                     <div class="steps">
                         <div class="wh">
                             <div class="wh-n">1</div>
-                            <div class="wh-t"><strong>Application Under Review</strong>Our team reviews your center and
-                                verifies details — usually within 24 hours.</div>
+                            <div class="wh-t"><strong>Check Your Email Inbox</strong>Open the email from EduFind and tap the confirmation link.</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">2</div>
-                            <div class="wh-t"><strong>You Receive Your Credentials</strong>Once approved, you'll receive
-                                an email with your login and password for the partner dashboard.</div>
+                            <div class="wh-t"><strong>Instant Account Activation</strong>Your 1-Month Free Partner Account will activate immediately.</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">3</div>
-                            <div class="wh-t"><strong>Payment via Click or Payme</strong>We'll arrange payment for your
-                                chosen plan — no charges until you're approved.</div>
+                            <div class="wh-t"><strong>Receive Credentials & Log In</strong>Your login details will be displayed and emailed to you.</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">4</div>
@@ -1041,6 +1050,7 @@
             art_music: '🎨 Art & Music', other: '📦 Other',
         };
         const PLAN_LABELS = {
+            'free_1month': '1 Month FREE (Launch Offer)',
             '1month': '1 Month — $49', '3months': '3 Months — $129',
             '6months': '6 Months — $239', '1year': '1 Year — $449',
         };

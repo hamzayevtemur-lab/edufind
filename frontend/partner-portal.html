@@ -1008,12 +1008,17 @@
         <div class="section active" id="section-dashboard">
             <div class="sec-title">Welcome back 👋</div>
 
-            <div class="plan-banner">
+            <div class="plan-banner" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
                 <div>
                     <div class="plan-banner-title" id="dash-biz">—</div>
                     <div class="plan-banner-sub" id="dash-plan-info">—</div>
                 </div>
-                <div class="plan-badge" id="dash-plan-badge">—</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="btn btn-ghost" id="ext-plan-btn" style="padding:8px 16px;font-size:0.82rem;background:rgba(255,255,255,0.08);color:#fff;border-radius:10px" onclick="requestPlanExtension()">
+                        🔄 Request Free 1-Month Extension
+                    </button>
+                    <div class="plan-badge" id="dash-plan-badge">—</div>
+                </div>
             </div>
 
             <div class="stats-grid">
@@ -1995,8 +2000,28 @@
       </div>
       <div class="plan-badge">${planLabel[p.plan] || p.plan}</div>
     </div>
-    <p style="margin-top:1rem;font-size:.85rem;color:var(--muted)">To renew or upgrade your plan, contact EduFind support.</p>
+    <p style="margin-top:1rem;font-size:.85rem;color:var(--muted)">To renew or upgrade your plan, click the extension button in dashboard header or contact EduFind support.</p>
   `;
+        }
+
+        async function requestPlanExtension() {
+            const btn = document.getElementById('ext-plan-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Extending…';
+            }
+            try {
+                const res = await api('/portal/request-extension', { method: 'POST' });
+                toast(res.message);
+                loadDashboard();
+            } catch(e) {
+                toast(e.message, 'err');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '🔄 Request Free 1-Month Extension';
+                }
+            }
         }
     </script>
 </body>

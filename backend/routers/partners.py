@@ -15,14 +15,41 @@ from models.center import PartnerSignupRequest, Partner, PartnerRequestStatus
 
 router = APIRouter(prefix="/api", tags=["Partner"])
 
-PLAN_PRICES = {"1month": 49,  "3months": 129, "6months": 239, "1year": 449}
-PLAN_DAYS   = {"1month": 30,  "3months": 90,  "6months": 180, "1year": 365}
-PLAN_LABELS = {"1month": "1 Month", "3months": "3 Months", "6months": "6 Months", "1year": "1 Year"}
+PLAN_PRICES = {"free_1month": 0, "1month": 49,  "3months": 129, "6months": 239, "1year": 449}
+PLAN_DAYS   = {"free_1month": 30, "1month": 30,  "3months": 90,  "6months": 180, "1year": 365}
+PLAN_LABELS = {"free_1month": "1 Month FREE (Launch)", "1month": "1 Month", "3months": "3 Months", "6months": "6 Months", "1year": "1 Year"}
 VALID_PLANS = set(PLAN_PRICES.keys())
 
 BACKEND_URL   = os.getenv("BACKEND_URL",   "http://localhost:8000")
 SMTP_EMAIL    = os.getenv("SMTP_EMAIL",    "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+
+
+def tpl_email_verification(req) -> str:
+    verify_url = f"{BACKEND_URL}/api/verify-email/{req.approve_token}"
+    return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:'Segoe UI',sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px"><tr><td align="center">
+<table width="600" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)">
+<tr><td style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:36px 40px;text-align:center">
+  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUFIND</div>
+  <div style="color:rgba(255,255,255,.8);font-size:15px;margin-top:6px">Verify Your Partner Account ✉️</div>
+</td></tr>
+<tr><td style="padding:36px 40px">
+  <h2 style="margin:0 0 8px;font-size:20px;color:#1e293b">Hi {req.contact_person.strip().split()[0]}! One click to activate your account</h2>
+  <p style="color:#64748b;margin:0 0 24px;font-size:14px;line-height:1.7">
+    Thank you for registering <strong>{req.business_name}</strong> on EduFind. To complete your registration and activate your <strong>1-Month Free Partner Plan</strong>, please confirm your email address.
+  </p>
+  <div style="text-align:center;margin:32px 0">
+    <a href="{verify_url}" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;text-decoration:none;padding:16px 44px;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 4px 16px rgba(79,70,229,.4)">
+      ✅ Confirm Email &amp; Activate Account
+    </a>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:12px;margin:0">If you did not request this, you can safely ignore this email.</p>
+</td></tr>
+<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduFind Partner Program</td></tr>
+</table></td></tr></table>
+</body></html>"""
 
 
 def make_password(contact_person: str, email: str) -> str:
@@ -208,26 +235,38 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(req)
 
-    # Email sent to YOU (admin) with the approve button
-    send_email(
-        to        = SMTP_EMAIL,
-        subject   = f"[EduFind] New Application: {body.business_name}",
-        html = tpl_confirmation(req),
+    # 1. Send Email Verification link to the registrant
+    sent = send_email(
+        to        = email,
+        subject   = "✉️ Verify Your EduFind Partner Email",
+        html      = tpl_email_verification(req),
     )
 
-    return {"message": "Application submitted! We'll be in touch within 24 hours.", "request_id": req.id}
+    # 2. Send notification to admin as well
+    if SMTP_EMAIL:
+        send_email(
+            to        = SMTP_EMAIL,
+            subject   = f"[EduFind] New Application: {body.business_name}",
+            html      = tpl_confirmation(req),
+        )
+
+    return {
+        "message": "Verification link sent! Please check your email inbox to confirm and activate your account.",
+        "request_id": req.id,
+        "email_sent": sent
+    }
 
 
-@router.get("/partner-approve/{token}", response_class=HTMLResponse)
-def approve_via_link(token: str, db: Session = Depends(get_db)):
+@router.get("/verify-email/{token}", response_class=HTMLResponse)
+def verify_email_link(token: str, db: Session = Depends(get_db)):
     req = db.query(PartnerSignupRequest).filter(
         PartnerSignupRequest.approve_token == token
     ).first()
 
     if not req:
-        return _page("❌ Invalid Link", "This approval link is invalid or has already been used.", "#ef4444")
+        return _page("❌ Invalid Link", "This verification link is invalid or has already been used.", "#ef4444")
     if req.status != PartnerRequestStatus.pending:
-        return _page("⚠️ Already Processed", f"This application was already <strong>{req.status}</strong>.", "#f59e0b")
+        return _page("⚠️ Already Activated", f"This application was already <strong>{req.status}</strong>.", "#f59e0b")
 
     pwd      = make_password(req.contact_person, req.email)
     plan_str = req.plan if isinstance(req.plan, str) else req.plan.value
@@ -258,17 +297,18 @@ def approve_via_link(token: str, db: Session = Depends(get_db)):
     sent = send_email(
         to        = req.email,
         subject   = "🎉 Welcome to EduFind — Your Login Details",
-        html = tpl_credentials(partner, pwd),
+        html      = tpl_credentials(partner, pwd),
     )
 
     note = f"Credentials emailed to <strong>{req.email}</strong> ✓" if sent \
-           else f"⚠️ SMTP not configured. Save this password: <code>{pwd}</code>"
+           else f"Save your password: <code>{pwd}</code>"
 
     return _page(
-        "✅ Partner Approved!",
-        f"<strong>{req.business_name}</strong> is now active.<br><br>"
-        f"<strong>Login:</strong> {req.email}<br>"
-        f"<strong>Password:</strong> <code>{pwd}</code><br><br>{note}",
+        "🎉 Email Verified & Account Activated!",
+        f"Welcome to EduFind! <strong>{req.business_name}</strong> is now active with <strong>1 Month Free Access</strong>.<br><br>"
+        f"<strong>Login Email:</strong> {req.email}<br>"
+        f"<strong>Password:</strong> <code>{pwd}</code><br><br>{note}<br><br>"
+        f"<a class='btn' href='/partner-login.html'>Log In to Partner Portal →</a>",
         "#10b981",
     )
 

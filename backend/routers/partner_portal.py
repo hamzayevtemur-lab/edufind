@@ -68,6 +68,30 @@ def portal_login(body: LoginBody, db: Session = Depends(get_db)):
 
 
 # ═══════════════════════════════════════════════════════
+#  PLAN EXTENSION REQUEST
+# ═══════════════════════════════════════════════════════
+
+from datetime import datetime, timedelta
+
+@router.post("/request-extension")
+def request_free_extension(
+    partner: Partner = Depends(get_partner),
+    db: Session = Depends(get_db),
+):
+    """Extends the active partner's free plan by another 30 days."""
+    now = datetime.utcnow()
+    current_exp = partner.plan_expires_at or now
+    base_date = max(now, current_exp)
+    partner.plan_expires_at = base_date + timedelta(days=30)
+    db.commit()
+
+    return {
+        "message": "Free 1-Month Plan extension granted! Thank you for staying with EduFind 🎉",
+        "expires_at": partner.plan_expires_at
+    }
+
+
+# ═══════════════════════════════════════════════════════
 #  DASHBOARD STATS
 # ═══════════════════════════════════════════════════════
 
