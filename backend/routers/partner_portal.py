@@ -64,6 +64,7 @@ def portal_login(body: LoginBody, db: Session = Depends(get_db)):
         "plan":          p.plan.value if hasattr(p.plan, "value") else p.plan,
         "expires_at":    p.plan_expires_at,
         "is_active":     p.is_active,
+        "extension_requested": p.extension_requested or 0,
     }
 
 
@@ -78,16 +79,44 @@ def request_free_extension(
     partner: Partner = Depends(get_partner),
     db: Session = Depends(get_db),
 ):
-    """Extends the active partner's free plan by another 30 days."""
-    now = datetime.utcnow()
-    current_exp = partner.plan_expires_at or now
-    base_date = max(now, current_exp)
-    partner.plan_expires_at = base_date + timedelta(days=30)
+    """Submits a plan extension request for admin approval."""
+    if partner.extension_requested:
+        raise HTTPException(status_code=400, detail="Your extension request is already pending admin review.")
+
+    partner.extension_requested = 1
     db.commit()
 
+    # Notify admin via email
+    try:
+        from routers.partners import send_email, SMTP_EMAIL, BACKEND_URL
+        if SMTP_EMAIL:
+            admin_token = os.getenv("ADMIN_TOKEN", "edufind-admin-2026")
+            approve_url = f"{BACKEND_URL}/api/admin/approve-extension/{partner.id}?admin_token={admin_token}"
+            send_email(
+                to=SMTP_EMAIL,
+                subject=f"[EduFind Extension Request] {partner.business_name}",
+                html=f"""
+                <div style="font-family:sans-serif;background:#f8fafc;padding:30px">
+                  <div style="background:#fff;padding:24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+                    <h3 style="color:#4f46e5;margin:0 0 12px">🔄 Plan Extension Request</h3>
+                    <p style="color:#334155;line-height:1.6">
+                      <strong>{partner.business_name}</strong> ({partner.contact_person}, {partner.email}) has requested a <strong>1-Month Free Plan Extension (+30 days)</strong>.
+                    </p>
+                    <div style="margin:24px 0">
+                      <a href="{approve_url}" style="background:#10b981;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:700">
+                        ✅ Approve Extension (+30 Days)
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                """
+            )
+    except Exception as e:
+        print(f"⚠️ Extension email notification error: {e}")
+
     return {
-        "message": "Free 1-Month Plan extension granted! Thank you for staying with EduFind 🎉",
-        "expires_at": partner.plan_expires_at
+        "message": "⌛ Extension request submitted successfully! Pending admin review.",
+        "extension_requested": 1
     }
 
 
@@ -125,6 +154,7 @@ def partner_stats(
         "avg_rating":     avg_rating,
         "plan":           partner.plan.value if hasattr(partner.plan, "value") else partner.plan,
         "expires_at":     partner.plan_expires_at,
+        "extension_requested": partner.extension_requested or 0,
     }
 
 

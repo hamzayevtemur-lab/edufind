@@ -1357,6 +1357,21 @@
                 document.getElementById('sb-exp').textContent = days > 0 ? days + 'd left' : 'Expired';
                 document.getElementById('dash-plan-info').textContent = `Active until ${d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} · ${days > 0 ? days + ' days remaining' : '⚠️ Expired'}`;
             }
+
+            const extBtn = document.getElementById('ext-plan-btn');
+            if (extBtn) {
+                if (partnerData.extension_requested) {
+                    extBtn.textContent = '⌛ Extension Request Pending Review';
+                    extBtn.disabled = true;
+                    extBtn.style.background = 'rgba(245,158,11,0.2)';
+                    extBtn.style.color = '#fcd34d';
+                } else {
+                    extBtn.textContent = '🔄 Request Free 1-Month Extension';
+                    extBtn.disabled = false;
+                    extBtn.style.background = 'rgba(255,255,255,0.08)';
+                    extBtn.style.color = '#fff';
+                }
+            }
         }
 
         // ── MOBILE SIDEBAR ────────────────────────────────────

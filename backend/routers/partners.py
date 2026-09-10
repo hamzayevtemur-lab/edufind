@@ -313,20 +313,44 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
     )
 
 
-@router.get("/admin/partner-requests")
-def list_requests(status: Optional[str] = "pending", admin_token: str = "", db: Session = Depends(get_db)):
+@router.get("/admin/approve-extension/{partner_id}", response_class=HTMLResponse)
+def approve_extension_via_link(partner_id: int, admin_token: str = "", db: Session = Depends(get_db)):
     if admin_token != os.getenv("ADMIN_TOKEN", "edufind-admin-2026"):
-        raise HTTPException(403, "Invalid admin token")
-    q = db.query(PartnerSignupRequest)
-    if status and status != "all":
-        try:
-            q = q.filter(PartnerSignupRequest.status == PartnerRequestStatus(status))
-        except ValueError:
-            pass
-    rows = q.order_by(PartnerSignupRequest.created_at.desc()).all()
-    return [{"id":r.id,"business_name":r.business_name,"contact_person":r.contact_person,
-             "email":r.email,"phone":r.phone,"plan":r.plan,"amount":r.amount,
-             "status":r.status,"created_at":r.created_at} for r in rows]
+        return _page("❌ Unauthorized", "Invalid or missing admin token.", "#ef4444")
+    p = db.query(Partner).filter(Partner.id == partner_id).first()
+    if not p:
+        return _page("❌ Partner Not Found", f"No partner found with ID #{partner_id}.", "#ef4444")
+
+    now = datetime.utcnow()
+    current_exp = p.plan_expires_at or now
+    base_date = max(now, current_exp)
+    p.plan_expires_at = base_date + timedelta(days=30)
+    p.extension_requested = 0
+    db.commit()
+
+    try:
+        send_email(
+            to=p.email,
+            subject="🎉 Your EduFind 1-Month Free Plan Extension is Approved!",
+            html=f"""
+            <div style="font-family:sans-serif;background:#07070c;padding:40px;color:#fff;border-radius:16px">
+              <h2 style="color:#10b981">🎉 Plan Extension Approved!</h2>
+              <p style="color:rgba(255,255,255,.8);line-height:1.7">
+                Hi <strong>{p.contact_person}</strong>,<br>
+                Your request to extend <strong>{p.business_name}</strong>'s free plan by another 30 days has been approved!
+              </p>
+            </div>
+            """
+        )
+    except Exception:
+        pass
+
+    return _page(
+        "✅ Extension Approved!",
+        f"<strong>{p.business_name}</strong>'s plan has been extended by +30 days.<br><br>"
+        f"<strong>New Expiration:</strong> {p.plan_expires_at.strftime('%Y-%m-%d')}",
+        "#10b981",
+    )
 
 
 class PartnerLoginBody(BaseModel):

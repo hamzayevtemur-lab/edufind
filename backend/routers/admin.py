@@ -594,3 +594,75 @@ def test_email(to: str, db: Session = Depends(get_db)):
         return {"message": f"Test email sent to {to}. Check your inbox!"}
     else:
         raise HTTPException(500, "Email failed — check uvicorn logs for details. Make sure SMTP_EMAIL and SMTP_PASSWORD are set in .env and that you are using a Gmail App Password.")
+
+
+# ═══════════════════════════════════════════════════════
+#  PLAN EXTENSION REQUESTS MODERATION
+# ═══════════════════════════════════════════════════════
+
+@router.get("/extension-requests", dependencies=[Depends(require_admin)])
+def list_extension_requests(db: Session = Depends(get_db)):
+    partners = db.query(Partner).filter(Partner.extension_requested == 1).order_by(Partner.id.desc()).all()
+    return [
+        {
+            "id":              p.id,
+            "business_name":   p.business_name,
+            "contact_person":  p.contact_person,
+            "email":           p.email,
+            "phone":           p.phone,
+            "plan":            p.plan.value if hasattr(p.plan, "value") else p.plan,
+            "plan_expires_at": p.plan_expires_at,
+            "created_at":      p.created_at,
+        }
+        for p in partners
+    ]
+
+
+@router.post("/extension-requests/{partner_id}/approve", dependencies=[Depends(require_admin)])
+def approve_partner_extension(partner_id: int, db: Session = Depends(get_db)):
+    p = db.query(Partner).filter(Partner.id == partner_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Partner not found")
+
+    now = datetime.utcnow()
+    current_exp = p.plan_expires_at or now
+    base_date = max(now, current_exp)
+    p.plan_expires_at = base_date + timedelta(days=30)
+    p.extension_requested = 0
+    db.commit()
+
+    # Notify partner via email
+    try:
+        from .partners import send_email
+        send_email(
+            to=p.email,
+            subject="🎉 Your EduFind 1-Month Free Plan Extension is Approved!",
+            html=f"""
+            <div style="font-family:sans-serif;background:#07070c;padding:40px;color:#fff;border-radius:16px">
+              <h2 style="color:#10b981">🎉 Plan Extension Approved!</h2>
+              <p style="color:rgba(255,255,255,.8);line-height:1.7">
+                Hi <strong>{p.contact_person}</strong>,<br>
+                Your request to extend <strong>{p.business_name}</strong>'s free plan by another 30 days has been approved!
+              </p>
+            </div>
+            """
+        )
+    except Exception as e:
+        print(f"⚠️ Extension approval email error: {e}")
+
+    return {
+        "message": f"Extension approved for {p.business_name}",
+        "partner_id": p.id,
+        "expires_at": p.plan_expires_at,
+    }
+
+
+@router.post("/extension-requests/{partner_id}/reject", dependencies=[Depends(require_admin)])
+def reject_partner_extension(partner_id: int, db: Session = Depends(get_db)):
+    p = db.query(Partner).filter(Partner.id == partner_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Partner not found")
+
+    p.extension_requested = 0
+    db.commit()
+    return {"message": f"Extension request rejected for {p.business_name}"}

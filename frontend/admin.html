@@ -989,6 +989,7 @@
                 <span class="nav-badge" id="badge-req"></span>
             </div>
             <div class="nav-item" onclick="navigateTo('partners')">🤝 Active Partners</div>
+            <div class="nav-item" onclick="navigateTo('extensions')">🔄 Plan Extensions</div>
 
             <div class="sidebar-section">Content</div>
             <div class="nav-item" onclick="navigateTo('centers')">🏫 Centers</div>
@@ -1100,6 +1101,37 @@
                         <tbody id="partners-tbody">
                             <tr>
                                 <td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EXTENSIONS -->
+            <div class="section" id="section-extensions">
+                <div class="sec-head">
+                    <div>
+                        <h2>Monthly Plan Extension Requests</h2>
+                        <p>Partners requesting a 1-Month Free extension (+30 days)</p>
+                    </div>
+                    <button class="btn btn-ghost" onclick="loadExtensions()">↻ Refresh</button>
+                </div>
+                <div class="tcard">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Center Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Current Expiration</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="extensions-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1457,6 +1489,7 @@
                 dashboard: 'Dashboard',
                 requests: 'Partner Signup Requests',
                 partners: 'Active Partners',
+                extensions: 'Plan Extension Requests',
                 centers: 'Learning Centers',
                 courses: 'Courses',
                 reviews: 'Reviews'
@@ -1468,6 +1501,7 @@
                 dashboard: loadDashboard,
                 requests: loadRequests,
                 partners: loadPartners,
+                extensions: loadExtensions,
                 centers: loadCenters,
                 courses: loadCourses,
                 reviews: loadReviews
@@ -1749,6 +1783,61 @@
             } catch (e) {
                 toast(e.message, 'err');
             }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // EXTENSIONS
+        // ════════════════════════════════════════════════════════
+
+        async function loadExtensions() {
+            const tbody = document.getElementById('extensions-tbody');
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Loading…</td></tr>`;
+
+            try {
+                const data = await api(`/admin/extension-requests?admin_token=${TOKEN}`);
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No pending extension requests</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td style="color:var(--muted)">#${p.id}</td>
+                        <td><strong>${p.business_name}</strong></td>
+                        <td>${p.contact_person}</td>
+                        <td style="color:#a5b4fc">${p.email}</td>
+                        <td>${p.phone || '—'}</td>
+                        <td style="color:var(--muted)">${fmtDate(p.plan_expires_at)}</td>
+                        <td>
+                            <div style="display:flex;gap:6px">
+                                <button class="btn btn-approve" style="padding:.35rem .7rem;font-size:.75rem" onclick="approveExtension(${p.id})">✅ Approve (+30d)</button>
+                                <button class="btn btn-del" onclick="rejectExtension(${p.id})">✕ Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--rose)">${e.message}</td></tr>`;
+            }
+        }
+
+        async function approveExtension(id) {
+            try {
+                await api(`/admin/extension-requests/${id}/approve?admin_token=${TOKEN}`, { method: 'POST', headers: H });
+                toast('✅ Plan extension approved (+30 days)');
+                loadExtensions();
+                loadDashboard();
+            } catch(e) { toast(e.message, 'err'); }
+        }
+
+        async function rejectExtension(id) {
+            try {
+                await api(`/admin/extension-requests/${id}/reject?admin_token=${TOKEN}`, { method: 'POST', headers: H });
+                toast('Extension request rejected');
+                loadExtensions();
+                loadDashboard();
+            } catch(e) { toast(e.message, 'err'); }
         }
 
         // ════════════════════════════════════════════════════════

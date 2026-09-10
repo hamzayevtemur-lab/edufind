@@ -67,6 +67,7 @@ class Partner(Base):
     amount_paid     = Column(Float,       nullable=False)
     password_hash   = Column(String(255), nullable=False)
     is_active       = Column(Integer,     server_default="1")
+    extension_requested = Column(Integer, server_default="0")
     plan_expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at      = Column(DateTime(timezone=True), server_default=func.now())
 
