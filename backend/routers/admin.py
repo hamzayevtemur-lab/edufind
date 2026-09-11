@@ -22,7 +22,7 @@ from schemas.admin import (
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
-ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "edufind-admin-2026")
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "Ironman3106)")
 
 
 # ── Auth helper ────────────────────────────────────────────────────

@@ -825,22 +825,31 @@
             <div class="tracker">
                 <div class="trk active" id="t1">
                     <div class="trk-circle">1</div>
-                    <div class="trk-lbl">Your Info</div>
+                    <div class="trk-lbl">Register Center</div>
                 </div>
                 <div class="trk" id="t2">
                     <div class="trk-circle">2</div>
-                    <div class="trk-lbl">Choose Plan</div>
-                </div>
-                <div class="trk" id="t3">
-                    <div class="trk-circle">3</div>
-                    <div class="trk-lbl">Submit</div>
+                    <div class="trk-lbl">Check Email</div>
                 </div>
             </div>
 
-            <!-- ── STEP 1 ── -->
+            <!-- ── STEP 1: REGISTER FORM ── -->
             <div class="panel active" id="p1">
+                <!-- 🚀 Launch Offer Banner -->
+                <div style="background: linear-gradient(135deg, rgba(79,70,229,0.18), rgba(124,58,237,0.18)); border: 1px solid rgba(79,70,229,0.35); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#34d399; font-size:0.75rem; font-weight:800; padding:0.25rem 0.8rem; border-radius:20px; text-transform:uppercase; margin-bottom:0.4rem;">
+                            🚀 Launch Offer — 100% FREE
+                        </div>
+                        <div style="font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:#fff;">1 Month Free Access ($0)</div>
+                        <div style="font-size:0.875rem; color:var(--muted); margin-top:2px;">All registering learning centers receive 30 days full premium access completely free.</div>
+                    </div>
+                    <div style="font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:900; color:#10b981;">$0<span style="font-size:0.9rem; color:var(--muted);">/mo</span></div>
+                </div>
+
                 <div class="panel-title">Tell us about your center</div>
-                <div class="panel-sub">We review every application — usually within 24 hours</div>
+                <div class="panel-sub">We will send a confirmation link to verify your real email account</div>
+                
                 <form id="form1">
                     <div class="grid">
                         <div class="field span2">
@@ -865,7 +874,7 @@
                             <input type="text" id="cperson" placeholder="Your full name" required>
                         </div>
                         <div class="field">
-                            <label>Email Address <span class="req">*</span></label>
+                            <label>Email Address <span class="req">*</span> <span style="font-size:0.75rem; color:#a5b4fc; text-transform:none; font-weight:400; margin-left:4px;">(Verification link sent here)</span></label>
                             <input type="email" id="bemail" placeholder="info@yourcenter.uz" required>
                         </div>
                         <div class="field">
@@ -877,161 +886,50 @@
                             <input type="text" id="baddress" placeholder="e.g. Navoiy st 12, Tashkent">
                         </div>
                         <div class="field span2">
-                            <label>About Your Center <span
-                                    style="text-transform:none;font-weight:400;opacity:.7">(optional)</span></label>
-                            <textarea id="bdesc"
-                                placeholder="What makes your center special? What courses do you offer?"></textarea>
+                            <label>About Your Center <span style="text-transform:none;font-weight:400;opacity:.7">(optional)</span></label>
+                            <textarea id="bdesc" placeholder="What makes your center special? What courses do you offer?"></textarea>
                         </div>
                     </div>
-                    <div class="btn-row">
+
+                    <div class="err-box" id="errBox"></div>
+
+                    <div class="btn-row" style="margin-top:1.5rem;">
                         <a href="index.html" class="btn btn-ghost">Cancel</a>
-                        <button type="submit" class="btn btn-main">Next: Choose Plan →</button>
+                        <button type="submit" id="submitBtn" class="btn btn-main">✉️ Register &amp; Send Verification Link →</button>
                     </div>
                 </form>
             </div>
 
-            <!-- ── STEP 2 ── -->
+            <!-- ── STEP 2: CHECK EMAIL SCREEN ── -->
             <div class="panel" id="p2">
-                <div class="panel-title">Choose a plan</div>
-                <div class="panel-sub">All plans include full dashboard access &amp; unlimited course listings. No
-                    payment until we approve your application.</div>
-
-                <div class="plans">
-                    <div class="plan hot" id="pc-free_1month" onclick="pickPlan('free_1month',0,this)">
-                        <span class="hot-badge">🚀 Launch Offer</span>
-                        <div class="plan-dur">1 Month FREE</div>
-                        <div class="plan-price">$0<sub>/mo</sub></div>
-                        <div class="plan-save">100% Free Access</div>
-                        <ul class="plan-feats">
-                            <li>1 Month Full Access</li>
-                            <li>Unlimited Course Listings</li>
-                            <li>Direct Student Leads</li>
-                            <li>Monthly Extension Requests</li>
-                        </ul>
-                    </div>
-                    <div class="plan" id="pc-1month" onclick="pickPlan('1month',49,this)">
-                        <div class="plan-dur">1 Month Paid</div>
-                        <div class="plan-price">$49<sub>/mo</sub></div>
-                        <ul class="plan-feats">
-                            <li>Full dashboard access</li>
-                            <li>Unlimited course listings</li>
-                            <li>Basic analytics</li>
-                            <li>Email support</li>
-                        </ul>
-                    </div>
-                    <div class="plan hot" id="pc-3months" onclick="pickPlan('3months',129,this)">
-                        <span class="hot-badge">Most Popular</span>
-                        <div class="plan-dur">3 Months</div>
-                        <div class="plan-price">$129<sub>/3mo</sub></div>
-                        <div class="plan-save">Save $18</div>
-                        <ul class="plan-feats">
-                            <li>Everything in 1 Month</li>
-                            <li>Advanced analytics</li>
-                            <li>Priority support</li>
-                            <li>Featured listing</li>
-                        </ul>
-                    </div>
-                    <div class="plan" id="pc-6months" onclick="pickPlan('6months',239,this)">
-                        <div class="plan-dur">6 Months</div>
-                        <div class="plan-price">$239<sub>/6mo</sub></div>
-                        <div class="plan-save">Save $55</div>
-                        <ul class="plan-feats">
-                            <li>Everything in 3 Months</li>
-                            <li>Premium placement</li>
-                            <li>24/7 support</li>
-                            <li>Marketing campaigns</li>
-                        </ul>
-                    </div>
-                    <div class="plan" id="pc-1year" onclick="pickPlan('1year',449,this)">
-                        <div class="plan-dur">1 Year</div>
-                        <div class="plan-price">$449<sub>/yr</sub></div>
-                        <div class="plan-save">Save $139 — Best Value!</div>
-                        <ul class="plan-feats">
-                            <li>Everything in 6 Months</li>
-                            <li>Dedicated account manager</li>
-                            <li>Priority placement</li>
-                            <li>Exclusive promotions</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="callout">
-                    <span class="callout-icon">💡</span>
-                    <div class="callout-text">
-                        <strong>No payment now.</strong> Select a plan and submit your application. Once our team
-                        approves, we'll arrange payment via Click or Payme.
-                    </div>
-                </div>
-
-                <div class="btn-row">
-                    <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
-                    <button class="btn btn-main" id="planNext" onclick="goTo(3)" disabled>Review &amp; Submit →</button>
-                </div>
-            </div>
-
-            <!-- ── STEP 3 ── -->
-            <div class="panel" id="p3">
-                <div class="panel-title">Review your application</div>
-                <div class="panel-sub">Everything look right? Hit submit and our team will be in touch within 24 hours.
-                </div>
-
-                <div class="summary">
-                    <h4>📋 Application Summary</h4>
-                    <div class="s-row"><span>Center Name</span> <span id="r-name">—</span></div>
-                    <div class="s-row"><span>Business Type</span> <span id="r-type">—</span></div>
-                    <div class="s-row"><span>Contact Person</span> <span id="r-person">—</span></div>
-                    <div class="s-row"><span>Email</span> <span id="r-email">—</span></div>
-                    <div class="s-row"><span>Phone</span> <span id="r-phone">—</span></div>
-                    <div class="s-row"><span>Selected Plan</span> <span id="r-plan">—</span></div>
-                    <div class="s-row"><span>Amount (on approval)</span> <span id="r-amount">—</span></div>
-                </div>
-
-                <div class="callout">
-                    <span class="callout-icon">🔒</span>
-                    <div class="callout-text">
-                        After submitting, our team reviews your application. Once approved you'll receive your
-                        <strong>login credentials by email</strong>. Payment is only arranged after approval.
-                    </div>
-                </div>
-
-                <div class="err-box" id="errBox"></div>
-
-                <div class="btn-row">
-                    <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
-                    <button class="btn btn-main" id="submitBtn" onclick="doSubmit()">✅ Submit Application</button>
-                </div>
-            </div>
-
-            <!-- ── PENDING ── -->
-            <div class="panel" id="pPending">
                 <div class="pending-screen">
                     <span class="pend-icon">✉️</span>
-                    <div class="pend-title">Verification Link Sent!</div>
+                    <div class="pend-title">Check Your Email Inbox!</div>
                     <div class="pend-sub">
-                        We've sent an email verification link for <strong id="pend-name"></strong> to <strong id="pend-email"></strong>.<br>
-                        Please open your email inbox and click the verification link to activate your <strong>1-Month Free Account</strong>!
+                        We've sent an email verification link for <strong id="pend-name"></strong> to <strong id="pend-email" style="color:#a5b4fc"></strong>.<br>
+                        Please open your email inbox and click the verification link to confirm your real Google/Email account!
                     </div>
                     <div class="steps">
                         <div class="wh">
                             <div class="wh-n">1</div>
-                            <div class="wh-t"><strong>Check Your Email Inbox</strong>Open the email from EduFind and tap the confirmation link.</div>
+                            <div class="wh-t"><strong>Check Your Email Inbox</strong>Open your email inbox and look for an email from <strong>EduFind</strong>.</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">2</div>
-                            <div class="wh-t"><strong>Instant Account Activation</strong>Your 1-Month Free Partner Account will activate immediately.</div>
+                            <div class="wh-t"><strong>Click Verification Link</strong>Tap the single-click verification link to confirm your Google/real email address.</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">3</div>
-                            <div class="wh-t"><strong>Receive Credentials & Log In</strong>Your login details will be displayed and emailed to you.</div>
+                            <div class="wh-t"><strong>Instant Account Activation</strong>Your 1-Month Free Partner Account will activate immediately!</div>
                         </div>
                         <div class="wh">
                             <div class="wh-n">4</div>
-                            <div class="wh-t"><strong>Go Live!</strong>Your center appears on EduFind and students start
-                                finding you immediately.</div>
+                            <div class="wh-t"><strong>Receive Credentials &amp; Log In</strong>Your login details will be shown on screen and emailed to you to access your Partner Portal.</div>
                         </div>
                     </div>
                     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;padding-bottom:.5rem">
-                        <a href="index.html" class="btn btn-main">← Back to EduFind</a>
+                        <a href="partner-login.html" class="btn btn-main">Go to Partner Login →</a>
+                        <a href="index.html" class="btn btn-ghost">← Back to EduFind</a>
                     </div>
                 </div>
             </div>
@@ -1041,105 +939,69 @@
 
     <script>
         const API = 'http://localhost:8000';
-        let curStep = 1, plan = null, price = 0;
-        const fd = {};
 
-        const TYPE_LABELS = {
-            language: '🇬🇧 Language School', it: '💻 IT Academy', math: '📐 Math & Science',
-            kids: '🧒 Kids Education', university_prep: '🎓 University Prep',
-            art_music: '🎨 Art & Music', other: '📦 Other',
-        };
-        const PLAN_LABELS = {
-            'free_1month': '1 Month FREE (Launch Offer)',
-            '1month': '1 Month — $49', '3months': '3 Months — $129',
-            '6months': '6 Months — $239', '1year': '1 Year — $449',
-        };
-
-        function goTo(n) {
-            document.getElementById(`p${curStep}`)?.classList.remove('active');
-            const old = document.getElementById(`t${curStep}`);
-            if (old) { old.classList.remove('active'); n > curStep ? old.classList.add('done') : old.classList.remove('done'); }
-            curStep = n;
-            document.getElementById(`p${curStep}`)?.classList.add('active');
-            const nw = document.getElementById(`t${curStep}`);
-            if (nw) { nw.classList.add('active'); nw.classList.remove('done'); }
-            if (n === 3) fillReview();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function pickPlan(p, pr, el) {
-            document.querySelectorAll('.plan').forEach(c => c.classList.remove('sel'));
-            el.classList.add('sel');
-            plan = p; price = pr;
-            document.getElementById('planNext').disabled = false;
-        }
-
-        function fillReview() {
-            document.getElementById('r-name').textContent = fd.bname || '—';
-            document.getElementById('r-type').textContent = TYPE_LABELS[fd.btype] || fd.btype || '—';
-            document.getElementById('r-person').textContent = fd.cperson || '—';
-            document.getElementById('r-email').textContent = fd.bemail || '—';
-            document.getElementById('r-phone').textContent = fd.bphone || '—';
-            document.getElementById('r-plan').textContent = PLAN_LABELS[plan] || '—';
-            document.getElementById('r-amount').textContent = `$${price}`;
-        }
-
-        document.getElementById('form1').addEventListener('submit', e => {
+        document.getElementById('form1').addEventListener('submit', async (e) => {
             e.preventDefault();
-            fd.btype = document.getElementById('btype').value;
-            fd.bname = document.getElementById('bname').value.trim();
-            fd.cperson = document.getElementById('cperson').value.trim();
-            fd.bemail = document.getElementById('bemail').value.trim();
-            fd.bphone = document.getElementById('bphone').value.trim();
-            fd.baddress = document.getElementById('baddress').value.trim();
-            fd.bdesc = document.getElementById('bdesc').value.trim();
-            goTo(2);
-        });
 
-        async function doSubmit() {
             const btn = document.getElementById('submitBtn');
             const err = document.getElementById('errBox');
             err.style.display = 'none';
+
+            const btype = document.getElementById('btype').value;
+            const bname = document.getElementById('bname').value.trim();
+            const cperson = document.getElementById('cperson').value.trim();
+            const bemail = document.getElementById('bemail').value.trim();
+            const bphone = document.getElementById('bphone').value.trim();
+            const baddress = document.getElementById('baddress').value.trim();
+            const bdesc = document.getElementById('bdesc').value.trim();
+
             btn.disabled = true;
-            btn.innerHTML = '⏳ Submitting…';
+            btn.innerHTML = '⏳ Sending verification link…';
 
             try {
                 const res = await fetch(`${API}/api/partner-signup`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        business_type: fd.btype,
-                        business_name: fd.bname,
-                        contact_person: fd.cperson,
-                        email: fd.bemail,
-                        phone: fd.bphone,
-                        address: fd.baddress || null,
-                        description: fd.bdesc || null,
-                        plan: plan,
-                        amount: price,
+                        business_type: btype,
+                        business_name: bname,
+                        contact_person: cperson,
+                        email: bemail,
+                        phone: bphone,
+                        address: baddress || null,
+                        description: bdesc || null,
+                        plan: 'free_1month',
+                        amount: 0,
                     }),
                 });
                 const data = await res.json();
 
                 if (res.ok) {
-                    document.getElementById(`p${curStep}`).classList.remove('active');
-                    document.querySelectorAll('.trk').forEach(t => { t.classList.remove('active'); t.classList.add('done'); });
-                    document.getElementById('pPending').classList.add('active');
-                    document.getElementById('pend-name').textContent = fd.bname;
-                    document.getElementById('pend-email').textContent = fd.bemail;
+                    // Update Tracker steps UI
+                    document.getElementById('t1').classList.remove('active');
+                    document.getElementById('t1').classList.add('done');
+                    document.getElementById('t2').classList.add('active');
+
+                    // Switch panels
+                    document.getElementById('p1').classList.remove('active');
+                    document.getElementById('p2').classList.add('active');
+
+                    document.getElementById('pend-name').textContent = bname;
+                    document.getElementById('pend-email').textContent = bemail;
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     err.textContent = data.detail || 'Something went wrong. Please try again.';
                     err.style.display = 'block';
                     btn.disabled = false;
-                    btn.innerHTML = '✅ Submit Application';
+                    btn.innerHTML = '✉️ Register & Send Verification Link →';
                 }
             } catch (_) {
                 err.textContent = 'Cannot connect to server. Make sure uvicorn is running on port 8000.';
                 err.style.display = 'block';
                 btn.disabled = false;
-                btn.innerHTML = '✅ Submit Application';
+                btn.innerHTML = '✉️ Register & Send Verification Link →';
             }
-        }
+        });
     </script>
 </body>
 
