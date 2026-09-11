@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+# Load .env file automatically
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text

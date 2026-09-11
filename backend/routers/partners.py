@@ -63,13 +63,15 @@ def hash_pw(plain: str) -> str:
 
 
 def send_email(to: str, subject: str, html: str) -> bool:
-    if not SMTP_EMAIL or not SMTP_PASSWORD:
+    smtp_email = os.getenv("SMTP_EMAIL", "").strip()
+    smtp_password = os.getenv("SMTP_PASSWORD", "").strip()
+    if not smtp_email or not smtp_password:
         print(f"⚠️  SMTP not configured — add SMTP_EMAIL and SMTP_PASSWORD to .env")
         return False
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg["From"]    = f"EduFind <{SMTP_EMAIL}>"
+        msg["From"]    = f"EduFind <{smtp_email}>"
         msg["To"]      = to
         msg.attach(MIMEText(html, "html", "utf-8"))
         # Try STARTTLS on port 587 (works with Gmail App Passwords)
@@ -78,13 +80,13 @@ def send_email(to: str, subject: str, html: str) -> bool:
                 s.ehlo()
                 s.starttls()
                 s.ehlo()
-                s.login(SMTP_EMAIL, SMTP_PASSWORD)
-                s.sendmail(SMTP_EMAIL, to, msg.as_string())
+                s.login(smtp_email, smtp_password)
+                s.sendmail(smtp_email, to, msg.as_string())
         except Exception:
             # Fallback: SSL on port 465
             with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15) as s:
-                s.login(SMTP_EMAIL, SMTP_PASSWORD)
-                s.sendmail(SMTP_EMAIL, to, msg.as_string())
+                s.login(smtp_email, smtp_password)
+                s.sendmail(smtp_email, to, msg.as_string())
         print(f"✅ Email sent → {to}")
         return True
     except smtplib.SMTPAuthenticationError:
