@@ -225,6 +225,7 @@ class PartnerSignupRequest(Base):
                             nullable=False, server_default="pending", index=True)
     created_at     = Column(DateTime(timezone=True), server_default=func.now())
     reviewed_at    = Column(DateTime(timezone=True), nullable=True)
+    is_email_verified = Column(Integer, server_default="0")
     
     approve_token  = Column(String(128), unique=True, nullable=True)  
 

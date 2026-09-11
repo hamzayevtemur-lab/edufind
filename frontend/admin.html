@@ -1609,10 +1609,11 @@
 
         function reqCard(r) {
             const isPending = r.status === 'pending';
+            const isVerified = r.is_email_verified === 1 || r.is_email_verified === true;
             const safeName = String(r.business_name || '').replace(/'/g, "\\'");
 
             return `
-                <div class="req-card" id="req-${r.id}">
+                <div class="req-card" id="req-${r.id}" style="${isPending && !isVerified ? 'border-left-color:var(--amber)' : ''}">
                     <div class="req-top">
                         <div class="req-info">
                             <div class="req-name">${r.business_name}</div>
@@ -1627,11 +1628,19 @@
                         </div>
                         <div class="req-actions">
                             <div class="req-plan">${planLabel(r.plan)}</div>
-                            <span class="badge badge-${r.status}">${r.status}</span>
-                            ${isPending ? `
-                                <button class="btn btn-approve" onclick="doApprove(${r.id},'${safeName}')">✅ Approve</button>
-                                <button class="btn btn-reject" onclick="openReject(${r.id},'${safeName}')">❌ Reject</button>
-                            ` : ''}
+                            ${isPending ? (
+                                isVerified ? `
+                                    <span class="badge badge-pending">Pending Admin Review</span>
+                                    <button class="btn btn-approve" onclick="doApprove(${r.id},'${safeName}')">✅ Approve</button>
+                                    <button class="btn btn-reject" onclick="openReject(${r.id},'${safeName}')">❌ Reject</button>
+                                ` : `
+                                    <span class="badge" style="background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);padding:.3rem .8rem;border-radius:20px;font-size:.78rem;font-weight:700">⌛ Waiting for email verification</span>
+                                    <button class="btn btn-ghost" style="opacity:.5;cursor:not-allowed" disabled title="Applicant must verify email address first">⌛ Pending Verification</button>
+                                    <button class="btn btn-reject" onclick="openReject(${r.id},'${safeName}')">❌ Reject</button>
+                                `
+                            ) : `
+                                <span class="badge badge-${r.status}">${r.status}</span>
+                            `}
                         </div>
                     </div>
                 </div>

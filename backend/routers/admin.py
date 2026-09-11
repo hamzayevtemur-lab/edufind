@@ -462,6 +462,7 @@ def list_partner_requests(
             "plan": r.plan.value if hasattr(r.plan, "value") else r.plan,
             "amount": r.amount,
             "status": r.status.value if hasattr(r.status, "value") else r.status,
+            "is_email_verified": getattr(r, "is_email_verified", 0),
             "created_at": r.created_at,
         }
         for r in reqs
@@ -478,6 +479,8 @@ def approve_partner_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.status != PartnerRequestStatus.pending:
         raise HTTPException(status_code=400, detail=f"Request is already {req.status.value}")
+    if getattr(req, "is_email_verified", 0) == 0:
+        raise HTTPException(status_code=400, detail="Cannot approve: Waiting for applicant to verify email address first.")
 
     # Check not already approved
     existing = db.query(Partner).filter(Partner.email == req.email.lower()).first()

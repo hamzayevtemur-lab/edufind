@@ -290,10 +290,11 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
     db.add(partner)
     db.flush()
 
-    req.status        = PartnerRequestStatus.approved
-    req.reviewed_at   = datetime.utcnow()
-    req.partner_id    = partner.id
-    req.approve_token = None   # one-time use
+    req.status            = PartnerRequestStatus.approved
+    req.is_email_verified = 1
+    req.reviewed_at       = datetime.utcnow()
+    req.partner_id        = partner.id
+    req.approve_token     = None   # one-time use
     db.commit()
 
     sent = send_email(
