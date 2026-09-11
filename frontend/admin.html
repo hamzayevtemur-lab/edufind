@@ -1673,7 +1673,7 @@
             }
 
             try {
-                const data = await api(`/admin/partner-requests/${id}/approve`, {
+                const data = await api(`/admin/partner-requests/${id}/approve?admin_token=${TOKEN}`, {
                     method: 'POST',
                     headers: H,
                     body: JSON.stringify({ admin_token: TOKEN })
@@ -1726,7 +1726,7 @@
             if (!rejectingId) return;
 
             try {
-                await api(`/admin/partner-requests/${rejectingId}/reject`, {
+                await api(`/admin/partner-requests/${rejectingId}/reject?admin_token=${TOKEN}`, {
                     method: 'POST',
                     headers: H,
                     body: JSON.stringify({ admin_token: TOKEN })
