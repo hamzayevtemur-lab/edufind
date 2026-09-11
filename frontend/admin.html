@@ -1590,7 +1590,7 @@
 
             // Load recent pending requests
             try {
-                const reqs = await api(`/api/admin/partner-requests?status=pending&admin_token=${TOKEN}`);
+                const reqs = await api(`/admin/partner-requests?status=pending&admin_token=${TOKEN}`);
                 const el = document.getElementById('dash-reqs');
 
                 if (!reqs || reqs.length === 0) {
@@ -1644,7 +1644,7 @@
             el.innerHTML = `<div class="empty-state"><div>Loading…</div></div>`;
 
             try {
-                const data = await api(`/api/admin/partner-requests?status=${status}&admin_token=${TOKEN}`);
+                const data = await api(`/admin/partner-requests?status=${status}&admin_token=${TOKEN}`);
 
                 if (!data || data.length === 0) {
                     el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>No ${status} requests</div></div>`;

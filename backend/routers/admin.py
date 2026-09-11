@@ -437,6 +437,37 @@ def _plan_days(plan_val: str) -> int:
     return {"1month": 30, "3months": 90, "6months": 180, "1year": 365}.get(plan_val, 30)
 
 
+@router.get("/partner-requests", dependencies=[Depends(require_admin)])
+def list_partner_requests(
+    status: Optional[str] = "pending",
+    db: Session = Depends(get_db)
+):
+    q = db.query(PartnerSignupRequest)
+    if status and status != "all":
+        try:
+            q = q.filter(PartnerSignupRequest.status == PartnerRequestStatus(status))
+        except ValueError:
+            pass
+    reqs = q.order_by(PartnerSignupRequest.id.desc()).all()
+    return [
+        {
+            "id": r.id,
+            "business_name": r.business_name,
+            "contact_person": r.contact_person,
+            "email": r.email,
+            "phone": r.phone,
+            "address": r.address,
+            "description": r.description,
+            "business_type": r.business_type,
+            "plan": r.plan.value if hasattr(r.plan, "value") else r.plan,
+            "amount": r.amount,
+            "status": r.status.value if hasattr(r.status, "value") else r.status,
+            "created_at": r.created_at,
+        }
+        for r in reqs
+    ]
+
+
 @router.post("/partner-requests/{request_id}/approve", dependencies=[Depends(require_admin)])
 def approve_partner_request(
     request_id: int,
