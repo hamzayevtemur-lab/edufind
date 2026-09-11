@@ -24,12 +24,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(centers.router)
-app.include_router(center.router)
-app.include_router(likes.router)
-app.include_router(partners.router)
-app.include_router(admin.router)
-app.include_router(partner_portal.router)
+app.include_router(centers.router, prefix="/api")
+app.include_router(center.router, prefix="/api")
+app.include_router(likes.router, prefix="/api")
+app.include_router(partners.router)  # router already has prefix="/api" inside partners.py
+app.include_router(admin.router, prefix="/api")
+app.include_router(partner_portal.router, prefix="/api")
 
 @app.get("/api")
 def root():
