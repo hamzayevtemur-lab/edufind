@@ -279,15 +279,15 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
     if req.status != PartnerRequestStatus.pending:
         return _page("⚠️ Already Activated", f"This application was already <strong>{req.status}</strong>.", "#f59e0b")
 
-    # 24-hour expiration check
+    # 15-minute expiration check
     if req.created_at:
         created = req.created_at.replace(tzinfo=None) if hasattr(req.created_at, "tzinfo") else req.created_at
-        if (datetime.utcnow() - created) > timedelta(hours=24):
+        if (datetime.utcnow() - created) > timedelta(minutes=15):
             db.delete(req)
             db.commit()
             return _page(
                 "⌛ Verification Link Expired",
-                "This verification link has expired (links are valid for 24 hours).<br><br>"
+                "This verification link has expired (links are valid for 15 minutes).<br><br>"
                 "Please <a href='/partner-signup.html' style='color:#a5b4fc;font-weight:700'>click here to re-apply</a> and receive a fresh verification link.",
                 "#f59e0b"
             )
