@@ -209,11 +209,18 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
 
     email = body.email.lower().strip()
 
-    if db.query(PartnerSignupRequest).filter(
+    # If an existing pending signup request is UNVERIFIED, remove it so user can re-apply cleanly
+    existing_req = db.query(PartnerSignupRequest).filter(
         PartnerSignupRequest.email  == email,
         PartnerSignupRequest.status == PartnerRequestStatus.pending,
-    ).first():
-        raise HTTPException(409, "A pending application already exists for this email.")
+    ).first()
+
+    if existing_req:
+        if getattr(existing_req, "is_email_verified", 0) == 0:
+            db.delete(existing_req)
+            db.flush()
+        else:
+            raise HTTPException(409, "A pending application already exists for this email.")
 
     if db.query(Partner).filter(Partner.email == email).first():
         raise HTTPException(409, "This email is already a registered partner.")
@@ -231,6 +238,7 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
         plan           = body.plan,
         amount         = body.amount,
         status         = PartnerRequestStatus.pending,
+        is_email_verified = 0,
         approve_token  = token,
     )
     db.add(req)
@@ -245,9 +253,10 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
     )
 
     # 2. Send notification to admin as well
-    if SMTP_EMAIL:
+    smtp_admin = os.getenv("SMTP_EMAIL", "").strip()
+    if smtp_admin:
         send_email(
-            to        = SMTP_EMAIL,
+            to        = smtp_admin,
             subject   = f"[EduFind] New Application: {body.business_name}",
             html      = tpl_confirmation(req),
         )
@@ -269,6 +278,19 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
         return _page("❌ Invalid Link", "This verification link is invalid or has already been used.", "#ef4444")
     if req.status != PartnerRequestStatus.pending:
         return _page("⚠️ Already Activated", f"This application was already <strong>{req.status}</strong>.", "#f59e0b")
+
+    # 24-hour expiration check
+    if req.created_at:
+        created = req.created_at.replace(tzinfo=None) if hasattr(req.created_at, "tzinfo") else req.created_at
+        if (datetime.utcnow() - created) > timedelta(hours=24):
+            db.delete(req)
+            db.commit()
+            return _page(
+                "⌛ Verification Link Expired",
+                "This verification link has expired (links are valid for 24 hours).<br><br>"
+                "Please <a href='/partner-signup.html' style='color:#a5b4fc;font-weight:700'>click here to re-apply</a> and receive a fresh verification link.",
+                "#f59e0b"
+            )
 
     pwd      = make_password(req.contact_person, req.email)
     plan_str = req.plan if isinstance(req.plan, str) else req.plan.value
