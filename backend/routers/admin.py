@@ -9,7 +9,7 @@ from datetime import datetime
 
 from database import get_db
 from models.center import (
-    LearningCenter, Course, Review, CenterLike,
+    LearningCenter, Campus, Course, Review, CenterLike,
     ApprovalStatus, CourseStatus,
     Partner, PartnerSignupRequest, PartnerRequestStatus, PartnerPlan
 )
@@ -507,6 +507,31 @@ def approve_partner_request(
     )
     db.add(partner)
     db.flush()
+
+    # Create Learning Center for this partner
+    center = LearningCenter(
+        name        = partner.business_name,
+        phone       = partner.phone,
+        email       = partner.email,
+        address     = partner.address,
+        description = partner.description,
+        city        = "Tashkent",
+        status      = ApprovalStatus.approved,
+        partner_id  = partner.id,
+    )
+    db.add(center)
+    db.flush()
+
+    # Create Main Campus
+    main_campus = Campus(
+        center_id = center.id,
+        name      = f"{center.name} - Main Campus",
+        address   = center.address or "Main Location",
+        city      = center.city or "Tashkent",
+        phone     = center.phone,
+        is_main   = 1,
+    )
+    db.add(main_campus)
 
     req.status      = PartnerRequestStatus.approved
     req.reviewed_at = datetime.utcnow()

@@ -18,6 +18,7 @@ def get_center_detail(center_id: int, db: Session = Depends(get_db)):
         .options(
             joinedload(LearningCenter.courses),
             joinedload(LearningCenter.reviews),
+            joinedload(LearningCenter.campuses),
         )
         .first()
     )
@@ -25,11 +26,26 @@ def get_center_detail(center_id: int, db: Session = Depends(get_db)):
     if not center:
         raise HTTPException(status_code=404, detail="Center not found")
 
-    # active + coming_soon courses are shown, closed ones are hidden
-    visible_courses = [
-        c for c in center.courses
-        if c.status in (CourseStatus.active, CourseStatus.coming_soon)
-    ]
+    visible_courses = []
+    for c in center.courses:
+        if c.status in (CourseStatus.active, CourseStatus.coming_soon):
+            visible_courses.append({
+                "id":             c.id,
+                "campus_id":      c.campus_id,
+                "campus_name":    c.campus.name if c.campus else None,
+                "name":           c.name,
+                "description":    c.description,
+                "teacher_name":   c.teacher_name,
+                "price":          c.price,
+                "currency":       c.currency,
+                "duration_weeks": c.duration_weeks,
+                "schedule":       c.schedule,
+                "max_students":   c.max_students,
+                "enrolled":       c.enrolled,
+                "starts_at":      c.starts_at,
+                "status":         c.status.value if hasattr(c.status, "value") else c.status,
+            })
+
     approved_reviews = [r for r in center.reviews if r.status == ApprovalStatus.approved]
 
     return CenterDetail(
@@ -49,6 +65,7 @@ def get_center_detail(center_id: int, db: Session = Depends(get_db)):
         latitude     = center.latitude,
         longitude    = center.longitude,
         created_at   = center.created_at,
+        campuses     = center.campuses or [],
         courses      = visible_courses,
         reviews      = approved_reviews,
     )

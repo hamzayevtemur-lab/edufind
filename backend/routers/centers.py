@@ -179,6 +179,8 @@ def browse_courses(
     for co in courses:
         items.append({
             "id":             co.id,
+            "campus_id":      co.campus_id,
+            "campus_name":    co.campus.name if co.campus else None,
             "name":           co.name,
             "category":       co.category,
             "description":    co.description,

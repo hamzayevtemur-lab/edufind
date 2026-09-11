@@ -104,6 +104,7 @@ class LearningCenter(Base):
 
     partner = relationship("Partner",    back_populates="centers")
     courses = relationship("Course",     back_populates="center", cascade="all, delete-orphan")
+    campuses = relationship("Campus",    back_populates="center", cascade="all, delete-orphan")
     reviews = relationship("Review",     back_populates="center", cascade="all, delete-orphan")
     likes   = relationship("CenterLike", back_populates="center", cascade="all, delete-orphan")
     applications = relationship("CourseApplication", back_populates="center", cascade="all, delete-orphan")
@@ -120,6 +121,28 @@ class LearningCenter(Base):
     @property
     def course_count(self):
         return sum(1 for c in self.courses if c.status == CourseStatus.active)
+
+
+# ═══════════════════════════════════════════════
+#  CAMPUS / BRANCH
+# ═══════════════════════════════════════════════
+
+class Campus(Base):
+    __tablename__ = "campuses"
+
+    id         = Column(Integer, primary_key=True, index=True)
+    center_id  = Column(Integer, ForeignKey("learning_centers.id", ondelete="CASCADE"), nullable=False)
+    name       = Column(String(255), nullable=False)
+    address    = Column(Text, nullable=True)
+    city       = Column(String(100), nullable=True)
+    phone      = Column(String(50), nullable=True)
+    latitude   = Column(Float, nullable=True)
+    longitude  = Column(Float, nullable=True)
+    is_main    = Column(Integer, server_default="0")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    center  = relationship("LearningCenter", back_populates="campuses")
+    courses = relationship("Course", back_populates="campus")
 
 
 # ═══════════════════════════════════════════════
@@ -151,6 +174,7 @@ class Course(Base):
 
     id             = Column(Integer, primary_key=True, index=True)
     center_id      = Column(Integer, ForeignKey("learning_centers.id"), nullable=False)
+    campus_id      = Column(Integer, ForeignKey("campuses.id", ondelete="SET NULL"), nullable=True)
     name           = Column(String(255), nullable=False)
     status         = Column(SAEnum(CourseStatus, name="course_status"),
                             nullable=False, server_default="active")
@@ -163,9 +187,10 @@ class Course(Base):
     max_students   = Column(Integer)
     enrolled       = Column(Integer, server_default="0")
     starts_at      = Column(DateTime)
-    category = Column(String(50), default="other") 
+    category       = Column(String(50), default="other") 
 
-    center = relationship("LearningCenter", back_populates="courses")
+    center   = relationship("LearningCenter", back_populates="courses")
+    campus   = relationship("Campus", back_populates="courses")
     applications = relationship("CourseApplication", back_populates="course", cascade="all, delete-orphan")
 
 

@@ -3,8 +3,25 @@ from typing import Optional, List
 from datetime import datetime
 
 
+class CampusOut(BaseModel):
+    id:        int
+    center_id: int
+    name:      str
+    address:   Optional[str]   = None
+    city:      Optional[str]   = None
+    phone:     Optional[str]   = None
+    latitude:  Optional[float] = None
+    longitude: Optional[float] = None
+    is_main:   int             = 0
+    created_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
 class CourseOut(BaseModel):
     id:             int
+    campus_id:      Optional[int]   = None
+    campus_name:    Optional[str]   = None
     name:           str
     description:    Optional[str]   = None
     teacher_name:   Optional[str]   = None
@@ -47,6 +64,7 @@ class CenterDetail(BaseModel):
     latitude:     Optional[float] = None
     longitude:    Optional[float] = None
     created_at:   Optional[datetime] = None
+    campuses:     List[CampusOut]  = []
     courses:      List[CourseOut]  = []
     reviews:      List[ReviewOut]  = []
 

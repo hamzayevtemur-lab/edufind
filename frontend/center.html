@@ -1095,6 +1095,7 @@
             const fillPct = maxS ? Math.round((enrolled / maxS) * 100) : 0;
 
             const chips = [
+                course.campus_name ? `<div class="cc-chip"><span class="ci">📍</span>${course.campus_name}</div>` : '',
                 course.teacher_name ? `<div class="cc-chip"><span class="ci">👤</span>${course.teacher_name}</div>` : '',
                 course.schedule ? `<div class="cc-chip"><span class="ci">🕐</span>${course.schedule}</div>` : '',
                 course.duration_weeks ? `<div class="cc-chip"><span class="ci">📅</span>${course.duration_weeks} weeks</div>` : '',
@@ -1144,10 +1145,30 @@
             window._centerName = c.name;
             window._centerCity = c.city;
             window._centerPhone = c.phone || '';
+            window._campuses = c.campuses || [];
 
             const activeCourses = (c.courses || []).filter(x => x.status === 'active');
             const soonCourses = (c.courses || []).filter(x => x.status === 'coming_soon');
             const allCourses = [...activeCourses, ...soonCourses];
+
+            const campusListHtml = (c.campuses || []).length > 0 ? `
+                <div style="margin-top:28px">
+                    <h4 style="font-size:16px;font-weight:800;margin-bottom:14px;color:#fff">📍 Campuses & Branches (${c.campuses.length})</h4>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:12px">
+                        ${c.campuses.map(cam => `
+                            <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px">
+                                <div style="font-weight:800;font-size:15px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between">
+                                    <span>${cam.name}</span>
+                                    ${cam.is_main ? '<span style="font-size:10px;background:rgba(16,185,129,0.2);color:#34d399;padding:2px 8px;border-radius:10px">Primary</span>' : ''}
+                                </div>
+                                <div style="font-size:13px;color:var(--muted);line-height:1.5">
+                                    ${cam.address || cam.city || ''} ${cam.phone ? '<br>📞 ' + cam.phone : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
 
             document.getElementById('root').innerHTML = `
             <div class="center-hero">
@@ -1195,6 +1216,7 @@
                             ${c.city ? `<div class="info-card"><div class="info-icon">🏙️</div><div><div class="info-label">City</div><div class="info-value">${c.city}</div></div></div>` : ''}
                             <div class="info-card"><div class="info-icon">📅</div><div><div class="info-label">Member Since</div><div class="info-value">${fmtDate(c.created_at)}</div></div></div>
                         </div>
+                        ${campusListHtml}
                     </div>
 
                     <!-- COURSES -->
@@ -1342,11 +1364,21 @@
 
         function initCenterMap() {
             if (centerMap) return;
-            const lat = window._centerLat;
-            const lng = window._centerLng;
-            if (!lat || !lng) return;
+            let lat = window._centerLat;
+            let lng = window._centerLng;
+            
+            const campuses = window._campuses || [];
+            if (!lat || !lng) {
+                const mainCam = campuses.find(c => c.latitude && c.longitude);
+                if (mainCam) {
+                    lat = mainCam.latitude;
+                    lng = mainCam.longitude;
+                } else {
+                    lat = 41.2995; lng = 69.2401; // default Tashkent
+                }
+            }
 
-            centerMap = L.map('center-map').setView([lat, lng], 15);
+            centerMap = L.map('center-map').setView([lat, lng], 13);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
             }).addTo(centerMap);
@@ -1357,11 +1389,26 @@
                 iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -34],
             });
 
-            L.marker([lat, lng], { icon: pinIcon })
-                .addTo(centerMap)
-                .bindPopup(`<strong style="font-size:14px">${window._centerName}</strong><br>
-                        <span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${window._centerCity || ''}</span>`)
-                .openPopup();
+            if (campuses.length > 0) {
+                const bounds = [];
+                campuses.forEach(cam => {
+                    if (cam.latitude && cam.longitude) {
+                        bounds.push([cam.latitude, cam.longitude]);
+                        L.marker([cam.latitude, cam.longitude], { icon: pinIcon })
+                            .addTo(centerMap)
+                            .bindPopup(`<strong style="font-size:14px">${cam.name}</strong><br><span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${cam.address || cam.city || ''}</span>`);
+                    }
+                });
+                if (bounds.length > 1) {
+                    centerMap.fitBounds(bounds, { padding: [30, 30] });
+                }
+            } else {
+                L.marker([lat, lng], { icon: pinIcon })
+                    .addTo(centerMap)
+                    .bindPopup(`<strong style="font-size:14px">${window._centerName}</strong><br>
+                            <span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${window._centerCity || ''}</span>`)
+                    .openPopup();
+            }
 
             if (userPos) {
                 const meIcon = L.divIcon({
@@ -1371,8 +1418,6 @@
                 });
                 L.marker(userPos, { icon: meIcon }).addTo(centerMap)
                     .bindPopup('<strong style="color:#f97316">📍 You are here</strong>');
-                L.polyline([userPos, [lat, lng]], { color: '#4f46e5', weight: 2, dashArray: '6 8', opacity: 0.6 }).addTo(centerMap);
-                centerMap.fitBounds([[lat, lng], userPos], { padding: [40, 40] });
                 const km = distKm(userPos[0], userPos[1], lat, lng);
                 const badge = document.getElementById('distanceBadge');
                 const text = document.getElementById('distText');

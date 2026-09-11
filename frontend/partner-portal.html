@@ -34,7 +34,7 @@
             --muted: rgba(255, 255, 255, .45);
             --text: rgba(255, 255, 255, .9);
             --grad: linear-gradient(135deg, #4f46e5, #7c3aed);
-            --sidebar: 220px;
+            --sidebar: 230px;
         }
 
         html {
@@ -95,17 +95,9 @@
             transition: .3s;
         }
 
-        .burger.open span:nth-child(1) {
-            transform: translateY(7px) rotate(45deg);
-        }
-
-        .burger.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .burger.open span:nth-child(3) {
-            transform: translateY(-7px) rotate(-45deg);
-        }
+        .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .burger.open span:nth-child(2) { opacity: 0; }
+        .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         /* ── SIDEBAR ─────────────────────────────────────── */
         .sidebar {
@@ -237,7 +229,6 @@
             border-color: transparent;
         }
 
-        /* ── OVERLAY (mobile sidebar) ───────────────────── */
         .overlay {
             display: none;
             position: fixed;
@@ -247,9 +238,7 @@
             backdrop-filter: blur(4px);
         }
 
-        .overlay.show {
-            display: block;
-        }
+        .overlay.show { display: block; }
 
         /* ── MAIN ────────────────────────────────────────── */
         .main {
@@ -258,26 +247,12 @@
             padding: 2rem;
         }
 
-        /* ── SECTIONS ────────────────────────────────────── */
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-            animation: fadeUp .3s ease;
-        }
+        .section { display: none; }
+        .section.active { display: block; animation: fadeUp .3s ease; }
 
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .sec-title {
@@ -290,7 +265,7 @@
         /* ── STATS GRID ──────────────────────────────────── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -298,34 +273,18 @@
         .stat-card {
             background: var(--card);
             border: 1px solid var(--border);
+            border-left: 4px solid var(--indigo);
             border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            border-left: 3px solid;
+            padding: 1.25rem;
             cursor: pointer;
             transition: .2s;
         }
 
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(79, 70, 229, .4);
-        }
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+        .stat-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .05em; }
+        .stat-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-top: .4rem; }
 
-        .stat-label {
-            font-size: .72rem;
-            font-weight: 700;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: .5rem;
-        }
-
-        .stat-val {
-            font-family: 'Syne', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-        }
-
-        /* ── CARDS ───────────────────────────────────────── */
+        /* ── CARDS & PANELS ───────────────────────────────── */
         .card {
             background: var(--card);
             border: 1px solid var(--border);
@@ -336,39 +295,126 @@
 
         .card-title {
             font-family: 'Syne', sans-serif;
-            font-size: 1.05rem;
             font-weight: 800;
+            font-size: 1.1rem;
             margin-bottom: 1.25rem;
         }
 
-        /* ── FORMS ───────────────────────────────────────── */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.25rem;
+        /* ── PLAN BANNER ─────────────────────────────────── */
+        .plan-banner {
+            background: linear-gradient(135deg, rgba(79, 70, 229, .2), rgba(124, 58, 237, .1));
+            border: 1px solid rgba(79, 70, 229, .3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .field {
+        .plan-banner-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: .4rem; }
+        .plan-banner-sub { font-size: .875rem; color: var(--muted); }
+
+        /* ── CAMPUSES GRID & CARDS ───────────────────────── */
+        .campuses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .campus-card {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: .45rem;
+            gap: .75rem;
+            position: relative;
+            transition: .2s;
         }
 
-        .field.full {
-            grid-column: 1/-1;
+        .campus-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+        .campus-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .5rem;
         }
 
-        .field label {
-            font-size: .72rem;
+        .campus-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .main-badge {
+            background: rgba(16, 185, 129, .2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, .4);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: .68rem;
             font-weight: 700;
-            letter-spacing: .07em;
-            text-transform: uppercase;
-            color: var(--muted);
         }
 
-        .field input,
-        .field select,
-        .field textarea {
+        .campus-meta {
+            font-size: .82rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .campus-actions {
+            display: flex;
+            gap: .5rem;
+            margin-top: auto;
+            padding-top: .5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── COURSES LIST ────────────────────────────────── */
+        .course-item {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: .75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .course-name { font-weight: 700; font-size: .95rem; }
+        .course-meta { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
+        .course-actions { display: flex; gap: .5rem; }
+
+        .campus-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(79, 70, 229, .15);
+            color: #a5b4fc;
+            border: 1px solid rgba(79, 70, 229, .25);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: .72rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        /* ── FORMS & INPUTS ──────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .field { display: flex; flex-direction: column; gap: .4rem; }
+        .field.full { grid-column: 1 / -1; }
+
+        label { font-size: .75rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .05em; }
+
+        input, select, textarea {
             background: var(--surface);
             border: 1.5px solid var(--border2);
             border-radius: 10px;
@@ -377,596 +423,107 @@
             font-size: .9rem;
             font-family: 'DM Sans', sans-serif;
             outline: none;
-            transition: .2s;
+            transition: border-color .2s;
             width: 100%;
         }
 
-        .field input::placeholder,
-        .field textarea::placeholder {
-            color: rgba(255, 255, 255, .2);
-        }
+        input:focus, select:focus, textarea:focus { border-color: var(--indigo); }
+        textarea { resize: vertical; min-height: 90px; }
 
-        .field select option {
-            background: var(--card2);
-        }
-
-        .field input:focus,
-        .field select:focus,
-        .field textarea:focus {
-            border-color: rgba(79, 70, 229, .6);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, .1);
-        }
-
-        .field textarea {
-            resize: vertical;
-            min-height: 90px;
-        }
+        .form-actions { display: flex; gap: .75rem; margin-top: 1.5rem; flex-wrap: wrap; }
 
         /* ── BUTTONS ─────────────────────────────────────── */
         .btn {
-            padding: .7rem 1.4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            padding: .75rem 1.25rem;
             border-radius: 10px;
-            font-weight: 700;
             font-size: .875rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             transition: .2s;
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
             font-family: 'DM Sans', sans-serif;
+            text-decoration: none;
         }
 
-        .btn:disabled {
-            opacity: .4;
-            cursor: not-allowed;
-        }
+        .btn-primary { background: var(--grad); color: #fff; box-shadow: 0 4px 15px rgba(79, 70, 229, .3); }
+        .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+        .btn-ghost { background: rgba(255, 255, 255, .06); color: var(--text); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: rgba(255, 255, 255, .12); }
+        .btn-del { background: rgba(244, 63, 94, .15); color: #fb7185; border: 1px solid rgba(244, 63, 94, .25); }
+        .btn-del:hover { background: var(--rose); color: #fff; }
+        .btn-amber { background: rgba(245, 158, 11, .15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, .25); }
 
-        .btn-primary {
-            background: var(--grad);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, .3);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, .45);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--muted);
-            border: 1px solid var(--border2);
-        }
-
-        .btn-ghost:hover:not(:disabled) {
-            color: var(--text);
-            background: rgba(255, 255, 255, .05);
-        }
-
-        .btn-del {
-            background: rgba(244, 63, 94, .1);
-            color: #fb7185;
-            border: 1px solid rgba(244, 63, 94, .2);
-        }
-
-        .btn-del:hover:not(:disabled) {
-            background: var(--rose);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        .btn-amber {
-            background: rgba(245, 158, 11, .15);
-            color: #fcd34d;
-            border: 1px solid rgba(245, 158, 11, .3);
-        }
-
-        .btn-amber:hover:not(:disabled) {
-            background: var(--amber);
-            color: #000;
-            border-color: transparent;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: .75rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* ── CENTER CARDS (my centers) ───────────────────── */
-        .centers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.25rem;
-            margin-top: .5rem;
-        }
-
-        .center-card {
-            background: var(--card2);
-            border: 1px solid var(--border2);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: .25s;
-            cursor: pointer;
-        }
-
-        .center-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(79, 70, 229, .4);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
-        }
-
-        .center-card-img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            background: var(--surface);
-        }
-
-        .center-card-img-ph {
-            width: 100%;
-            height: 160px;
-            background: linear-gradient(135deg, rgba(79, 70, 229, .15), rgba(124, 58, 237, .1));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-
-        .center-card-body {
-            padding: 1.25rem;
-        }
-
-        .center-card-name {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            margin-bottom: .4rem;
-        }
-
-        .center-card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .5rem;
-            margin-bottom: .75rem;
-        }
-
-        .meta-chip {
-            font-size: .72rem;
-            color: var(--muted);
-            display: flex;
-            align-items: center;
-            gap: .3rem;
-        }
-
-        .center-card-actions {
-            display: flex;
-            gap: .5rem;
-        }
-
-        /* ── BADGES ──────────────────────────────────────── */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: .25rem .7rem;
-            border-radius: 20px;
-            font-size: .7rem;
-            font-weight: 700;
-        }
-
-        .badge-approved {
-            background: rgba(16, 185, 129, .12);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, .25);
-        }
-
-        .badge-pending {
-            background: rgba(245, 158, 11, .12);
-            color: #fcd34d;
-            border: 1px solid rgba(245, 158, 11, .25);
-        }
-
-        .badge-rejected {
-            background: rgba(244, 63, 94, .12);
-            color: #fb7185;
-            border: 1px solid rgba(244, 63, 94, .25);
-        }
-
-        /* ── COURSE LIST ─────────────────────────────────── */
-        .course-item {
-            background: var(--surface);
-            border: 1px solid var(--border2);
+        /* ── MAP CONTAINERS ──────────────────────────────── */
+        #center-map, #campus-map {
+            height: 220px;
             border-radius: 12px;
-            padding: 1rem 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: .75rem;
-            transition: .2s;
-        }
-
-        .course-item:hover {
-            border-color: rgba(79, 70, 229, .3);
-        }
-
-        .course-name {
-            font-weight: 700;
-            font-size: .9rem;
-            margin-bottom: .25rem;
-        }
-
-        .course-meta {
-            font-size: .78rem;
-            color: var(--muted);
-        }
-
-        .course-actions {
-            display: flex;
-            gap: .4rem;
-            flex-shrink: 0;
-        }
-
-        /* ── REVIEW CARDS ────────────────────────────────── */
-        .review-card {
-            background: var(--surface);
-            border-left: 3px solid var(--indigo);
-            border-radius: 0 12px 12px 0;
-            padding: 1.1rem 1.25rem;
-            margin-bottom: .75rem;
-        }
-
-        .review-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: .4rem;
-            gap: 1rem;
-        }
-
-        .review-name {
-            font-weight: 700;
-            font-size: .9rem;
-        }
-
-        .stars {
-            color: #fcd34d;
-            font-size: .9rem;
-            letter-spacing: .1em;
-        }
-
-        .review-comment {
-            font-size: .85rem;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .review-date {
-            font-size: .72rem;
-            color: rgba(255, 255, 255, .25);
-            margin-top: .4rem;
-        }
-
-        /* ── MAP ─────────────────────────────────────────── */
-        #portal-map {
-            height: 340px;
-            border-radius: 12px;
-            margin-top: .75rem;
             border: 1px solid var(--border2);
+            z-index: 1;
         }
 
-        /* ── EMPTY ───────────────────────────────────────── */
-        .empty {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--muted);
-        }
+        /* ── BADGES & REVIEWS ────────────────────────────── */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; text-transform: uppercase; }
+        .badge-approved { background: rgba(16, 185, 129, .2); color: #34d399; }
+        .badge-pending { background: rgba(245, 158, 11, .2); color: #fcd34d; }
+        .badge-rejected { background: rgba(244, 63, 94, .2); color: #fb7185; }
 
-        .empty-icon {
-            font-size: 3rem;
-            opacity: .3;
-            margin-bottom: .75rem;
-        }
+        .empty { text-align: center; padding: 3rem 1.5rem; color: var(--muted); }
+        .empty-icon { font-size: 2.5rem; margin-bottom: .5rem; }
 
-        /* ── ALERT TOAST ─────────────────────────────────── */
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            z-index: 999;
-            background: var(--card2);
-            border: 1px solid var(--border2);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            font-size: .875rem;
-            font-weight: 600;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
-            max-width: 340px;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: .3s ease;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .toast.ok {
-            border-color: rgba(16, 185, 129, .4);
-            color: #34d399;
-        }
-
-        .toast.err {
-            border-color: rgba(244, 63, 94, .4);
-            color: #fb7185;
-        }
-
-        .toast.info {
-            border-color: rgba(79, 70, 229, .4);
-            color: #a5b4fc;
-        }
-
-        /* ── MODAL ───────────────────────────────────────── */
+        /* ── MODALS ──────────────────────────────────────── */
         .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 300;
-            background: rgba(0, 0, 0, .75);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
+            display: none; position: fixed; inset: 0; z-index: 300;
+            background: rgba(0, 0, 0, .75); backdrop-filter: blur(5px);
+            align-items: center; justify-content: center; padding: 1.5rem;
         }
-
-        .modal.open {
-            display: flex;
-        }
-
+        .modal.open { display: flex; }
         .modal-box {
-            background: var(--card);
-            border: 1px solid var(--border2);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 580px;
-            max-height: 90vh;
-            overflow-y: auto;
+            background: var(--surface); border: 1px solid var(--border2);
+            border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: modalIn .2s ease;
         }
+        @keyframes modalIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-head h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; }
+        .modal-close { background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+        .modal-foot { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: .75rem; }
 
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: var(--card);
-            z-index: 10;
+        /* ── TOAST ───────────────────────────────────────── */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+            background: var(--card2); border: 1px solid var(--border2); color: var(--text);
+            padding: .9rem 1.4rem; border-radius: 12px; font-weight: 600; font-size: .875rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .5); display: flex; align-items: center; gap: .75rem;
+            transform: translateY(100px); opacity: 0; transition: all .3s cubic-bezier(.16, 1, .3, 1);
         }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.err { border-color: rgba(244, 63, 94, .4); color: #fb7185; }
 
-        .modal-head h3 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--muted);
-            font-size: 1.5rem;
-            cursor: pointer;
-            line-height: 1;
-            padding: .25rem;
-        }
-
-        .modal-close:hover {
-            color: var(--text);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .modal-foot {
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: .75rem;
-        }
-
-        /* ── CENTER DETAIL PANEL ─────────────────────────── */
-        .detail-panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .detail-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .detail-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-        }
-
-        /* ── INFO GRID ───────────────────────────────────── */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-cell {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: .875rem 1rem;
-        }
-
-        .info-lbl {
-            font-size: .68rem;
-            font-weight: 700;
-            letter-spacing: .07em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: .3rem;
-        }
-
-        .info-val {
-            font-size: .9rem;
-            font-weight: 600;
-        }
-
-        /* ── PLAN BANNER ─────────────────────────────────── */
-        .plan-banner {
-            background: linear-gradient(135deg, rgba(79, 70, 229, .2), rgba(124, 58, 237, .15));
-            border: 1px solid rgba(79, 70, 229, .3);
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-        }
-
-        .plan-banner-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 800;
-        }
-
-        .plan-banner-sub {
-            font-size: .8rem;
-            color: var(--muted);
-            margin-top: .2rem;
-        }
-
-        .plan-badge {
-            background: var(--grad);
-            color: #fff;
-            padding: .5rem 1.25rem;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: .9rem;
-        }
-
-        /* ── RESPONSIVE ──────────────────────────────────── */
-        @media(max-width:768px) {
-            .topbar {
-                display: flex;
-            }
-
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 1rem;
-                padding-top: 4.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .field.full {
-                grid-column: auto;
-            }
-
-            .centers-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .course-item {
-                flex-direction: column;
-                gap: .75rem;
-            }
-
-            .course-actions {
-                flex-direction: row;
-            }
-
-            .review-head {
-                flex-direction: column;
-                gap: .25rem;
-            }
-
-            .plan-banner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .form-actions .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .modal-box {
-                max-height: 95vh;
-            }
-
-            .toast {
-                left: 1rem;
-                right: 1rem;
-                bottom: 1rem;
-            }
-        }
-
-        @media(max-width:400px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 768px) {
+            .topbar { display: flex; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 5rem 1rem 2rem; }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- MOBILE TOPBAR -->
+    <!-- TOPBAR (Mobile) -->
     <div class="topbar">
         <div class="topbar-logo">EDUFIND</div>
         <button class="burger" id="burger" onclick="toggleSidebar()">
             <span></span><span></span><span></span>
         </button>
     </div>
+
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <!-- SIDEBAR -->
@@ -984,12 +541,12 @@
         <div class="sidebar-section">Overview</div>
         <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
 
-        <div class="sidebar-section">My Centers</div>
-        <div class="nav-item" onclick="nav('centers',this)"><span class="nav-icon">🏫</span>My Centers</div>
-        <div class="nav-item" onclick="nav('add-center',this)"><span class="nav-icon">➕</span>Add Center</div>
+        <div class="sidebar-section">My Center</div>
+        <div class="nav-item" onclick="nav('my-center',this)"><span class="nav-icon">🏫</span>My Center Profile</div>
+        <div class="nav-item" onclick="nav('campuses',this)"><span class="nav-icon">📍</span>Campuses & Branches</div>
 
         <div class="sidebar-section">Content & Leads</div>
-        <div class="nav-item" onclick="nav('leads',this)"><span class="nav-icon">📬</span>Student Leads <span class="badge" id="leads-count-badge" style="display:none;margin-left:auto;background:var(--accent);color:#fff;padding:2px 8px;border-radius:50px;font-size:11px">0</span></div>
+        <div class="nav-item" onclick="nav('leads',this)"><span class="nav-icon">📬</span>Student Leads <span class="badge" id="leads-count-badge" style="display:none;margin-left:auto;background:var(--indigo);color:#fff;padding:2px 8px;border-radius:50px;font-size:11px">0</span></div>
         <div class="nav-item" onclick="nav('courses',this)"><span class="nav-icon">📚</span>Courses</div>
         <div class="nav-item" onclick="nav('reviews',this)"><span class="nav-icon">⭐</span>Reviews</div>
 
@@ -1001,7 +558,7 @@
         </div>
     </aside>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <div class="main">
 
         <!-- ── DASHBOARD ───────────────────────────────── -->
@@ -1022,110 +579,82 @@
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card" style="border-left-color:#4f46e5"
-                    onclick="nav('centers',document.querySelectorAll('.nav-item')[1])">
-                    <div class="stat-label">My Centers</div>
-                    <div class="stat-val" id="s-centers">—</div>
+                <div class="stat-card" style="border-left-color:#4f46e5" onclick="nav('my-center',document.querySelectorAll('.nav-item')[1])">
+                    <div class="stat-label">Learning Center</div>
+                    <div class="stat-val" id="s-center-status">Active</div>
                 </div>
-                <div class="stat-card" style="border-left-color:#10b981"
-                    onclick="nav('courses',document.querySelectorAll('.nav-item')[3])">
+                <div class="stat-card" style="border-left-color:#7c3aed" onclick="nav('campuses',document.querySelectorAll('.nav-item')[2])">
+                    <div class="stat-label">Campuses & Branches</div>
+                    <div class="stat-val" id="s-campuses">1</div>
+                </div>
+                <div class="stat-card" style="border-left-color:#10b981" onclick="nav('courses',document.querySelectorAll('.nav-item')[4])">
                     <div class="stat-label">Active Courses</div>
-                    <div class="stat-val" id="s-courses">—</div>
+                    <div class="stat-val" id="s-courses">0</div>
                 </div>
-                <div class="stat-card" style="border-left-color:#f59e0b"
-                    onclick="nav('reviews',document.querySelectorAll('.nav-item')[4])">
-                    <div class="stat-label">Total Reviews</div>
-                    <div class="stat-val" id="s-reviews">—</div>
-                </div>
-                <div class="stat-card" style="border-left-color:#f43f5e">
+                <div class="stat-card" style="border-left-color:#f59e0b" onclick="nav('reviews',document.querySelectorAll('.nav-item')[5])">
                     <div class="stat-label">Avg Rating</div>
                     <div class="stat-val" id="s-rating">—</div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">🏫 My Centers</div>
-                <div class="centers-grid" id="dash-centers">
-                    <div class="empty">
-                        <div class="empty-icon">🏫</div>Loading…
-                    </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                    <div class="card-title" style="margin:0">🏫 Center & Campuses Overview</div>
+                    <button class="btn btn-ghost" style="font-size:.78rem;padding:.4rem .8rem" onclick="nav('my-center',document.querySelectorAll('.nav-item')[1])">✏️ Edit Profile</button>
+                </div>
+                <div id="dash-center-summary">
+                    <div class="empty"><div class="empty-icon">🏫</div>Loading center summary…</div>
                 </div>
             </div>
         </div>
 
-        <!-- ── MY CENTERS ─────────────────────────────── -->
-        <div class="section" id="section-centers">
-            <div
-                style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
-                <div class="sec-title" style="margin:0">My Centers</div>
-                <button class="btn btn-primary" onclick="nav('add-center',document.querySelectorAll('.nav-item')[2])">➕
-                    Add Center</button>
-            </div>
-            <div class="centers-grid" id="centers-list">
-                <div class="empty">
-                    <div class="empty-icon">🏫</div>Loading…
-                </div>
-            </div>
-
-            <!-- Center detail panel -->
-            <div class="detail-panel" id="center-detail" style="display:none;margin-top:1.5rem">
-                <div class="detail-head">
-                    <div class="detail-title" id="detail-name">Center Details</div>
-                    <button class="modal-close"
-                        onclick="document.getElementById('center-detail').style.display='none'">×</button>
-                </div>
-                <div id="detail-body" style="padding:1.5rem"></div>
-            </div>
-        </div>
-
-        <!-- ── ADD / EDIT CENTER ──────────────────────── -->
-        <div class="section" id="section-add-center">
-            <div class="sec-title" id="center-form-title">Add New Center</div>
+        <!-- ── MY CENTER PROFILE ────────────────────────── -->
+        <div class="section" id="section-my-center">
+            <div class="sec-title">My Learning Center Profile</div>
             <div class="card">
                 <div class="card-title">Center Information</div>
                 <div class="form-grid">
-                    <div class="field"><label>Center Name *</label><input id="f-name"
-                            placeholder="Bright Future Academy" required></div>
-                    <div class="field"><label>City *</label><input id="f-city" placeholder="Tashkent" required></div>
-                    <div class="field"><label>Phone</label><input id="f-phone" placeholder="+998 90 123 4567"
-                            type="tel"></div>
-                    <div class="field"><label>Email</label><input id="f-email" placeholder="info@center.uz"
-                            type="email"></div>
-                    <div class="field"><label>Website</label><input id="f-website" placeholder="https://center.uz"
-                            type="url"></div>
-                    <div class="field"><label>Logo / Image URL</label><input id="f-logo" placeholder="https://…"
-                            oninput="previewLogo(this.value)"></div>
-                    <div class="field full"><label>Address</label><input id="f-address" placeholder="Street, City">
-                    </div>
-                    <div class="field full"><label>Description</label><textarea id="f-desc"
-                            placeholder="Describe your center, what you offer…"></textarea></div>
-                    <div class="field"><label>Latitude</label><input id="f-lat" type="number" step="any"
-                            placeholder="41.2995"></div>
-                    <div class="field"><label>Longitude</label><input id="f-lng" type="number" step="any"
-                            placeholder="69.2401"></div>
+                    <div class="field"><label>Center Name *</label><input id="mc-name" placeholder="Bright Future Academy" required></div>
+                    <div class="field"><label>City *</label><input id="mc-city" placeholder="Tashkent" required></div>
+                    <div class="field"><label>Phone</label><input id="mc-phone" placeholder="+998 90 123 4567" type="tel"></div>
+                    <div class="field"><label>Email</label><input id="mc-email" placeholder="info@center.uz" type="email"></div>
+                    <div class="field"><label>Website</label><input id="mc-website" placeholder="https://center.uz" type="url"></div>
+                    <div class="field"><label>Logo / Image URL</label><input id="mc-logo" placeholder="https://…" oninput="previewLogo(this.value)"></div>
+                    <div class="field full"><label>Main Address</label><input id="mc-address" placeholder="Street, City, Landmark"></div>
+                    <div class="field full"><label>Description</label><textarea id="mc-desc" placeholder="Describe your learning center, features, teaching methodology…"></textarea></div>
+                    <div class="field"><label>Main Latitude</label><input id="mc-lat" type="number" step="any" placeholder="41.2995"></div>
+                    <div class="field"><label>Main Longitude</label><input id="mc-lng" type="number" step="any" placeholder="69.2401"></div>
                 </div>
 
-                <div style="margin-top:1rem">
-                    <label
-                        style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Click
-                        map to set location</label>
-                    <div id="portal-map"></div>
+                <div style="margin-top:1.25rem">
+                    <label style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Click map to set center main location</label>
+                    <div id="center-map"></div>
                 </div>
 
-                <img id="logo-preview"
-                    style="width:120px;height:80px;object-fit:cover;border-radius:10px;margin-top:1rem;display:none;border:1px solid var(--border2)"
-                    alt="preview">
+                <img id="logo-preview" style="width:120px;height:80px;object-fit:cover;border-radius:10px;margin-top:1rem;display:none;border:1px solid var(--border2)" alt="preview">
 
                 <div class="form-actions">
-                    <button class="btn btn-primary" onclick="saveCenter()">💾 Save Center</button>
-                    <button class="btn btn-ghost" onclick="resetCenterForm()">↺ Reset</button>
-                    <button class="btn btn-del" id="del-center-btn" style="display:none"
-                        onclick="deleteCurrentCenter()">🗑 Delete Center</button>
+                    <button class="btn btn-primary" onclick="saveMyCenter()">💾 Save Changes</button>
                 </div>
             </div>
         </div>
 
-        <!-- ── STUDENT LEADS ─────────────────────────────── -->
+        <!-- ── CAMPUSES & BRANCHES ────────────────────── -->
+        <div class="section" id="section-campuses">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+                <div class="sec-title" style="margin:0">Campuses & Branches 📍</div>
+                <button class="btn btn-primary" onclick="openCampusModal()">➕ Add New Campus</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">All Locations for Your Center</div>
+                <div class="campuses-grid" id="campuses-list">
+                    <div class="empty"><div class="empty-icon">📍</div>Loading campuses…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── STUDENT LEADS ───────────────────────────── -->
         <div class="section" id="section-leads">
             <div class="sec-title">Student Leads & Inquiries 📬</div>
             <div class="card">
@@ -1134,9 +663,7 @@
                     <button class="btn btn-ghost" onclick="loadLeadsSection()">↺ Refresh</button>
                 </div>
                 <div id="leads-list">
-                    <div class="empty">
-                        <div class="empty-icon">📭</div>Loading student inquiries…
-                    </div>
+                    <div class="empty"><div class="empty-icon">📭</div>Loading student inquiries…</div>
                 </div>
             </div>
         </div>
@@ -1145,22 +672,17 @@
         <div class="section" id="section-courses">
             <div class="sec-title">Courses</div>
 
-            <!-- Add course form -->
+            <!-- Add Course Card -->
             <div class="card">
                 <div class="card-title" id="course-form-title">Add New Course</div>
-                <div style="margin-bottom:1rem">
-                    <label
-                        style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Select
-                        Center</label>
-                    <select id="course-center-sel"
-                        style="background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;width:100%;max-width:400px;"
-                        onchange="loadCoursesForCenter(this.value)">
-                        <option value="">— Choose a center —</option>
-                    </select>
-                </div>
                 <div class="form-grid">
-                    <div class="field"><label>Course Name *</label><input id="co-name" placeholder="IELTS Preparation"
-                            required></div>
+                    <div class="field"><label>Course Name *</label><input id="co-name" placeholder="IELTS Intensive Preparation" required></div>
+                    <div class="field">
+                        <label>Campus / Branch Location *</label>
+                        <select id="co-campus">
+                            <option value="">📍 Main Campus</option>
+                        </select>
+                    </div>
                     <div class="field"><label>Category</label>
                         <select id="co-category">
                             <option value="english">🇬🇧 English</option>
@@ -1174,20 +696,16 @@
                         </select>
                     </div>
                     <div class="field"><label>Teacher</label><input id="co-teacher" placeholder="Mr. Alisher"></div>
-                    <div class="field"><label>Price (UZS)</label><input id="co-price" type="number" step="any"
-                            placeholder="500000"></div>
+                    <div class="field"><label>Price (UZS)</label><input id="co-price" type="number" step="any" placeholder="650000"></div>
                     <div class="field"><label>Currency</label>
                         <select id="co-currency">
                             <option value="UZS">UZS</option>
                             <option value="USD">USD</option>
                         </select>
                     </div>
-                    <div class="field"><label>Duration (weeks)</label><input id="co-weeks" type="number"
-                            placeholder="12"></div>
-                    <div class="field"><label>Max Students</label><input id="co-max" type="number" placeholder="20">
-                    </div>
-                    <div class="field"><label>Schedule</label><input id="co-schedule"
-                            placeholder="Mon/Wed/Fri 10:00-12:00"></div>
+                    <div class="field"><label>Duration (weeks)</label><input id="co-weeks" type="number" placeholder="12"></div>
+                    <div class="field"><label>Max Students</label><input id="co-max" type="number" placeholder="15"></div>
+                    <div class="field"><label>Schedule</label><input id="co-schedule" placeholder="Mon/Wed/Fri 14:00-16:00"></div>
                     <div class="field"><label>Status</label>
                         <select id="co-status">
                             <option value="active">Active</option>
@@ -1195,41 +713,28 @@
                             <option value="closed">Closed</option>
                         </select>
                     </div>
-                    <div class="field full"><label>Description</label><textarea id="co-desc"
-                            placeholder="What students will learn…"></textarea></div>
+                    <div class="field full"><label>Description</label><textarea id="co-desc" placeholder="Course syllabus, requirements, objectives…"></textarea></div>
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-primary" onclick="saveCourse()">💾 Save Course</button>
-                    <button class="btn btn-ghost" id="co-cancel" style="display:none" onclick="cancelCourseEdit()">✕
-                        Cancel</button>
+                    <button class="btn btn-ghost" id="co-cancel" style="display:none" onclick="cancelCourseEdit()">✕ Cancel</button>
                 </div>
             </div>
 
             <!-- Courses list -->
             <div class="card">
-                <div class="card-title">All Courses</div>
+                <div class="card-title">All Center Courses</div>
                 <div id="courses-list">
-                    <div class="empty">
-                        <div class="empty-icon">📚</div>Select a center above first
-                    </div>
+                    <div class="empty"><div class="empty-icon">📚</div>Loading courses…</div>
                 </div>
             </div>
         </div>
 
         <!-- ── REVIEWS ────────────────────────────────── -->
         <div class="section" id="section-reviews">
-            <div class="sec-title">Reviews</div>
-            <div style="margin-bottom:1.25rem">
-                <select id="rev-center-sel"
-                    style="background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;width:100%;max-width:400px;"
-                    onchange="loadReviews(this.value)">
-                    <option value="">— Choose a center —</option>
-                </select>
-            </div>
+            <div class="sec-title">Student Reviews ⭐</div>
             <div id="reviews-list">
-                <div class="empty">
-                    <div class="empty-icon">⭐</div>Select a center to see its reviews
-                </div>
+                <div class="empty"><div class="empty-icon">⭐</div>Loading reviews…</div>
             </div>
         </div>
 
@@ -1239,7 +744,7 @@
             <div class="card">
                 <div class="card-title">Account Information</div>
                 <div class="info-grid" id="profile-grid">
-                    <div class="empty">Loading…</div>
+                    <div class="empty">Loading profile…</div>
                 </div>
             </div>
             <div class="card">
@@ -1250,17 +755,56 @@
 
     </div><!-- /main -->
 
-    <!-- COURSE EDIT MODAL (for inline edit) -->
-    <div class="modal" id="courseModal">
+    <!-- CAMPUS MODAL -->
+    <div class="modal" id="campusModal">
         <div class="modal-box">
             <div class="modal-head">
-                <h3>Edit Course</h3><button class="modal-close" onclick="closeModal('courseModal')">×</button>
+                <h3 id="campus-modal-title">Add New Campus</h3>
+                <button class="modal-close" onclick="closeModal('campusModal')">×</button>
             </div>
             <div class="modal-body">
                 <div class="form-grid">
-                    <div class="field"><label>Course Name *</label><input id="mco-name" required></div>
+                    <div class="field full"><label>Campus Name *</label><input id="cam-name" placeholder="Chilanzar Branch" required></div>
+                    <div class="field full"><label>Address *</label><input id="cam-address" placeholder="Qatortol Str., 14, Tashkent"></div>
+                    <div class="field"><label>City</label><input id="cam-city" placeholder="Tashkent"></div>
+                    <div class="field"><label>Phone</label><input id="cam-phone" placeholder="+998 90 999 8877"></div>
+                    <div class="field"><label>Latitude</label><input id="cam-lat" type="number" step="any" placeholder="41.2800"></div>
+                    <div class="field"><label>Longitude</label><input id="cam-lng" type="number" step="any" placeholder="69.2000"></div>
+                    <div class="field full" style="flex-direction:row;align-items:center;gap:10px;margin-top:.5rem">
+                        <input type="checkbox" id="cam-is-main" style="width:auto;cursor:pointer">
+                        <label for="cam-is-main" style="cursor:pointer;margin:0">Set as Primary/Main Campus</label>
+                    </div>
+                </div>
+                <div style="margin-top:1.25rem">
+                    <label style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.5rem">Click map to set campus pin</label>
+                    <div id="campus-map"></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeModal('campusModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCampus()">💾 Save Campus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COURSE EDIT MODAL -->
+    <div class="modal" id="courseModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Course</h3>
+                <button class="modal-close" onclick="closeModal('courseModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="field full"><label>Course Name *</label><input id="mco-name" required></div>
+                    <div class="field full">
+                        <label>Campus Location</label>
+                        <select id="mco-campus">
+                            <option value="">📍 Main Campus</option>
+                        </select>
+                    </div>
                     <div class="field"><label>Teacher</label><input id="mco-teacher"></div>
-                    <div class="field"><label>Price</label><input id="mco-price" type="number" step="any"></div>
+                    <div class="field"><label>Price (UZS)</label><input id="mco-price" type="number" step="any"></div>
                     <div class="field"><label>Currency</label>
                         <select id="mco-currency">
                             <option value="UZS">UZS</option>
@@ -1282,72 +826,40 @@
             </div>
             <div class="modal-foot">
                 <button class="btn btn-ghost" onclick="closeModal('courseModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="updateCourse()">💾 Update</button>
+                <button class="btn btn-primary" onclick="updateCourse()">💾 Update Course</button>
             </div>
         </div>
     </div>
 
-    <!-- EDIT CENTER MODAL -->
-    <div class="modal" id="editCenterModal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3>Edit Center Info</h3><button class="modal-close" onclick="closeModal('editCenterModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-grid">
-                    <div class="field"><label>Name *</label><input id="ec-name"></div>
-                    <div class="field"><label>City *</label><input id="ec-city"></div>
-                    <div class="field"><label>Phone</label><input id="ec-phone"></div>
-                    <div class="field"><label>Email</label><input id="ec-email"></div>
-                    <div class="field"><label>Website</label><input id="ec-website"></div>
-                    <div class="field"><label>Logo URL</label><input id="ec-logo"></div>
-                    <div class="field full"><label>Address</label><input id="ec-address"></div>
-                    <div class="field full"><label>Description</label><textarea id="ec-desc"></textarea></div>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn btn-ghost" onclick="closeModal('editCenterModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="submitCenterEdit()">💾 Save</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <script>
-        const API = 'http://localhost:8000';
-
-        // State
-        let partnerId = null;
+        const API = 'http://localhost:8000/api';
         let partnerData = null;
-        let myCenters = [];
-        let editingCenterId = null;
-        let editingCourseId = null;
-        let mapInstance = null;
-        let mapMarker = null;
+        let partnerId = null;
+        let myCenter = null;
+        let myCampuses = [];
 
-        // ── INIT ──────────────────────────────────────────────
+        let centerMapInstance = null, centerMapMarker = null;
+        let campusMapInstance = null, campusMapMarker = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const stored = localStorage.getItem('edufind_partner');
-            if (!stored) { window.location.href = 'partner-login.html'; return; }
+        // ── INIT ─────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            const raw = localStorage.getItem('edufind_partner');
+            if (!raw) { window.location.href = 'partner-login.html'; return; }
+            partnerData = JSON.parse(raw);
+            partnerId = partnerData.partner_id;
 
-            try { partnerData = JSON.parse(stored); partnerId = partnerData.partner_id; }
-            catch (e) { window.location.href = 'partner-login.html'; return; }
-
-            initSidebar();
-            initMap();
+            renderSidebarHeader();
             loadDashboard();
         });
 
-        function initSidebar() {
-            document.getElementById('sb-biz').textContent = partnerData.business_name;
-            document.getElementById('dash-biz').textContent = partnerData.business_name;
+        function renderSidebarHeader() {
+            document.getElementById('sb-biz').textContent = partnerData.business_name || 'Partner Account';
+            document.getElementById('dash-biz').textContent = partnerData.business_name || 'Partner Account';
 
-            const planLabel = { '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' };
-            const plan = partnerData.plan;
-            const lbl = planLabel[plan] || plan;
-
+            const lbl = planLabel(partnerData.plan);
             document.getElementById('sb-plan').textContent = lbl + ' Plan';
             document.getElementById('dash-plan-badge').textContent = lbl + ' Plan';
 
@@ -1357,32 +869,13 @@
                 document.getElementById('sb-exp').textContent = days > 0 ? days + 'd left' : 'Expired';
                 document.getElementById('dash-plan-info').textContent = `Active until ${d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} · ${days > 0 ? days + ' days remaining' : '⚠️ Expired'}`;
             }
-
-            const extBtn = document.getElementById('ext-plan-btn');
-            if (extBtn) {
-                if (partnerData.extension_requested) {
-                    extBtn.textContent = '⌛ Extension Request Pending Review';
-                    extBtn.disabled = true;
-                    extBtn.style.background = 'rgba(245,158,11,0.2)';
-                    extBtn.style.color = '#fcd34d';
-                } else {
-                    extBtn.textContent = '🔄 Request Free 1-Month Extension';
-                    extBtn.disabled = false;
-                    extBtn.style.background = 'rgba(255,255,255,0.08)';
-                    extBtn.style.color = '#fff';
-                }
-            }
         }
 
-        // ── MOBILE SIDEBAR ────────────────────────────────────
-
+        // ── MOBILE SIDEBAR ───────────────────────────────────
         function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const burger = document.getElementById('burger');
-            const ov = document.getElementById('overlay');
-            sb.classList.toggle('open');
-            burger.classList.toggle('open');
-            ov.classList.toggle('show');
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('burger').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
         }
         function closeSidebar() {
             document.getElementById('sidebar').classList.remove('open');
@@ -1390,8 +883,7 @@
             document.getElementById('overlay').classList.remove('show');
         }
 
-        // ── NAV ───────────────────────────────────────────────
-
+        // ── NAV ──────────────────────────────────────────────
         function nav(name, el) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1401,20 +893,17 @@
 
             const loaders = {
                 dashboard: loadDashboard,
-                centers: loadMyCenters,
+                'my-center': loadMyCenterSection,
+                campuses: loadCampusesSection,
                 leads: loadLeadsSection,
                 courses: loadCoursesSection,
                 reviews: loadReviewsSection,
                 profile: loadProfile,
             };
             loaders[name]?.();
-
-            // Resize map if going to add-center
-            if (name === 'add-center') setTimeout(() => mapInstance?.invalidateSize(), 200);
         }
 
-        // ── API HELPER ────────────────────────────────────────
-
+        // ── API HELPER ───────────────────────────────────────
         async function api(path, opts = {}) {
             const headers = { 'Content-Type': 'application/json', 'X-Partner-Id': String(partnerId), ...(opts.headers || {}) };
             const res = await fetch(API + path, { ...opts, headers });
@@ -1423,8 +912,6 @@
             return data;
         }
 
-        // ── TOAST ─────────────────────────────────────────────
-
         function toast(msg, type = 'ok') {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -1432,12 +919,8 @@
             setTimeout(() => t.classList.remove('show'), 3500);
         }
 
-        // ── MODAL ─────────────────────────────────────────────
-
         function openModal(id) { document.getElementById(id).classList.add('open'); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-        // ── LOGOUT ────────────────────────────────────────────
 
         function logout() {
             if (!confirm('Log out?')) return;
@@ -1445,36 +928,99 @@
             window.location.href = 'partner-login.html';
         }
 
-        // ── UTILS ─────────────────────────────────────────────
-
         const fmtDate = s => s ? new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
         const fmtPrice = (p, cur) => p ? (cur || 'UZS') + ' ' + Number(p).toLocaleString() : 'Free';
         const planLabel = p => ({ '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' }[p] || p);
         const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
 
         function infoCell(label, value) {
-            return `<div class="info-cell"><div class="info-lbl">${label}</div><div class="info-val">${value || '—'}</div></div>`;
+            return `<div class="info-cell" style="background:var(--card2);padding:1rem;border-radius:10px;border:1px solid var(--border)"><div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:700">${label}</div><div style="font-size:.95rem;font-weight:700;margin-top:.2rem;color:var(--text)">${value || '—'}</div></div>`;
         }
 
-        // ── MAP ───────────────────────────────────────────────
+        // ── DASHBOARD ────────────────────────────────────────
+        async function loadDashboard() {
+            try {
+                const stats = await api('/portal/stats');
+                document.getElementById('s-center-status').textContent = partnerData.is_active ? '✅ Active' : '⌛ Pending';
+                document.getElementById('s-campuses').textContent = stats.total_campuses || 1;
+                document.getElementById('s-courses').textContent = stats.total_courses || 0;
+                document.getElementById('s-rating').textContent = stats.avg_rating ? '★ ' + stats.avg_rating : '—';
+            } catch (e) { }
 
-        function initMap() {
-            mapInstance = L.map('portal-map').setView([41.2995, 69.2401], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(mapInstance);
-
-            mapInstance.on('click', e => {
-                setMapMarker(e.latlng.lat, e.latlng.lng);
-                document.getElementById('f-lat').value = e.latlng.lat.toFixed(6);
-                document.getElementById('f-lng').value = e.latlng.lng.toFixed(6);
-            });
+            try {
+                myCenter = await api('/portal/my-center');
+                myCampuses = myCenter.campuses || [];
+                renderDashboardSummary();
+            } catch (e) { }
         }
 
-        function setMapMarker(lat, lng) {
-            if (mapMarker) mapInstance.removeLayer(mapMarker);
-            mapMarker = L.marker([lat, lng]).addTo(mapInstance);
-            mapInstance.setView([lat, lng], 14);
+        function renderDashboardSummary() {
+            const container = document.getElementById('dash-center-summary');
+            if (!myCenter) return;
+
+            const campusBadges = myCampuses.map(c => `
+                <div style="background:var(--card2);border:1px solid var(--border);padding:.75rem 1rem;border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+                    <div>
+                        <div style="font-weight:700;font-size:.9rem">📍 ${c.name} ${c.is_main ? '<span class="main-badge">Primary</span>' : ''}</div>
+                        <div style="font-size:.78rem;color:var(--muted)">${c.address || c.city || 'Location'} ${c.phone ? '· 📞 ' + c.phone : ''}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.25rem">
+                    ${infoCell('Center Name', myCenter.name)}
+                    ${infoCell('City / Location', myCenter.city)}
+                    ${infoCell('Phone', myCenter.phone)}
+                    ${infoCell('Email', myCenter.email)}
+                </div>
+                <div style="margin-top:1rem">
+                    <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem">Active Campuses (${myCampuses.length})</div>
+                    ${campusBadges}
+                </div>
+            `;
+        }
+
+        // ── MY CENTER EDIT ───────────────────────────────────
+        async function loadMyCenterSection() {
+            try {
+                myCenter = await api('/portal/my-center');
+                document.getElementById('mc-name').value = myCenter.name || '';
+                document.getElementById('mc-city').value = myCenter.city || '';
+                document.getElementById('mc-phone').value = myCenter.phone || '';
+                document.getElementById('mc-email').value = myCenter.email || '';
+                document.getElementById('mc-website').value = myCenter.website || '';
+                document.getElementById('mc-logo').value = myCenter.logo_url || '';
+                document.getElementById('mc-address').value = myCenter.address || '';
+                document.getElementById('mc-desc').value = myCenter.description || '';
+                document.getElementById('mc-lat').value = myCenter.latitude || '';
+                document.getElementById('mc-lng').value = myCenter.longitude || '';
+                previewLogo(myCenter.logo_url || '');
+
+                initCenterMap(myCenter.latitude || 41.2995, myCenter.longitude || 69.2401);
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        function initCenterMap(lat, lng) {
+            setTimeout(() => {
+                if (!centerMapInstance) {
+                    centerMapInstance = L.map('center-map').setView([lat, lng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(centerMapInstance);
+                    centerMapInstance.on('click', e => {
+                        setCenterMapMarker(e.latlng.lat, e.latlng.lng);
+                        document.getElementById('mc-lat').value = e.latlng.lat.toFixed(6);
+                        document.getElementById('mc-lng').value = e.latlng.lng.toFixed(6);
+                    });
+                }
+                centerMapInstance.invalidateSize();
+                setCenterMapMarker(lat, lng);
+            }, 150);
+        }
+
+        function setCenterMapMarker(lat, lng) {
+            if (centerMapMarker) centerMapInstance.removeLayer(centerMapMarker);
+            centerMapMarker = L.marker([lat, lng]).addTo(centerMapInstance);
+            centerMapInstance.setView([lat, lng], 13);
         }
 
         function previewLogo(url) {
@@ -1483,322 +1029,202 @@
             else img.style.display = 'none';
         }
 
-        // ── DASHBOARD ─────────────────────────────────────────
-
-        async function loadDashboard() {
-            try {
-                const stats = await api('/portal/stats');
-                document.getElementById('s-centers').textContent = stats.total_centers;
-                document.getElementById('s-courses').textContent = stats.total_courses;
-                document.getElementById('s-reviews').textContent = stats.total_reviews;
-                document.getElementById('s-rating').textContent = stats.avg_rating ? '★ ' + stats.avg_rating : '—';
-            } catch (e) { }
-
-            try {
-                const centers = await api('/portal/centers');
-                myCenters = centers;
-                populateCenterSelects();
-                const el = document.getElementById('dash-centers');
-                el.innerHTML = centers.length ? centers.map(centerCard).join('') :
-                    `<div class="empty"><div class="empty-icon">🏫</div><div>No centers yet</div><button class="btn btn-primary" style="margin-top:1rem" onclick="nav('add-center',document.querySelectorAll('.nav-item')[2])">➕ Add your first center</button></div>`;
-            } catch (e) { }
-        }
-
-        // ── CENTERS ───────────────────────────────────────────
-
-        function centerCard(c) {
-            const statusBadge = `<span class="badge badge-${c.status}">${c.status}</span>`;
-            return `
-  <div class="center-card" onclick="showCenterDetail(${c.id})">
-    ${c.logo_url
-                    ? `<img class="center-card-img" src="${c.logo_url}" onerror="this.style.display='none'" alt="">`
-                    : `<div class="center-card-img-ph">🏫</div>`}
-    <div class="center-card-body">
-      <div class="center-card-name">${c.name}</div>
-      <div class="center-card-meta">
-        <span class="meta-chip">📍 ${c.city || '—'}</span>
-        <span class="meta-chip">📚 ${c.course_count || 0} courses</span>
-        <span class="meta-chip">★ ${c.avg_rating || '—'}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        ${statusBadge}
-        <div class="center-card-actions" onclick="event.stopPropagation()">
-          <button class="btn btn-ghost" style="padding:.4rem .8rem;font-size:.78rem" onclick="openEditCenter(${c.id})">✏️ Edit</button>
-          <button class="btn btn-del" style="padding:.4rem .8rem;font-size:.78rem" onclick="confirmDeleteCenter(${c.id},'${c.name.replace(/'/g, "\\'")}')">🗑</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-        }
-
-        async function loadMyCenters() {
-            const el = document.getElementById('centers-list');
-            el.innerHTML = `<div class="empty"><div class="empty-icon">🏫</div>Loading…</div>`;
-            try {
-                const centers = await api('/portal/centers');
-                myCenters = centers;
-                populateCenterSelects();
-                el.innerHTML = centers.length ? centers.map(centerCard).join('') :
-                    `<div class="empty"><div class="empty-icon">🏫</div><div>No centers yet. Add your first one!</div></div>`;
-            } catch (e) {
-                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
-            }
-        }
-
-        async function showCenterDetail(id) {
-            const panel = document.getElementById('center-detail');
-            const body = document.getElementById('detail-body');
-            panel.style.display = 'block';
-            body.innerHTML = `<div class="empty">Loading…</div>`;
-            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-            try {
-                const c = await api(`/portal/centers/${id}`);
-                document.getElementById('detail-name').textContent = c.name;
-
-                const courseRows = c.courses?.length
-                    ? c.courses.map(co => `
-        <div class="course-item">
-          <div style="flex:1">
-            <div class="course-name">${co.name}</div>
-            <div class="course-meta">
-              ${co.teacher_name ? '👤 ' + co.teacher_name + ' · ' : ''}
-              ${co.price ? fmtPrice(co.price, co.currency) : 'Free'}
-              ${co.schedule ? ' · 🕐 ' + co.schedule : ''}
-            </div>
-            <div style="margin-top:.4rem"><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></div>
-          </div>
-        </div>`).join('')
-                    : `<div class="empty" style="padding:1.5rem"><div class="empty-icon">📚</div>No courses yet</div>`;
-
-                const reviewRows = c.reviews?.length
-                    ? c.reviews.map(r => `
-        <div class="review-card">
-          <div class="review-head">
-            <div class="review-name">${r.student_name}</div>
-            <div class="stars">${stars(r.rating)}</div>
-          </div>
-          <div class="review-comment">${r.comment || 'No comment'}</div>
-          <div class="review-date">${fmtDate(r.created_at)}</div>
-        </div>`).join('')
-                    : `<div class="empty" style="padding:1.5rem"><div class="empty-icon">⭐</div>No approved reviews yet</div>`;
-
-                body.innerHTML = `
-      <div class="info-grid" style="margin-bottom:1.5rem">
-        ${infoCell('City', c.city)}
-        ${infoCell('Phone', c.phone)}
-        ${infoCell('Email', c.email)}
-        ${infoCell('Status', `<span class="badge badge-${c.status}">${c.status}</span>`)}
-        ${infoCell('Rating', c.avg_rating ? '★ ' + c.avg_rating : '—')}
-        ${infoCell('Reviews', c.review_count || 0)}
-        ${infoCell('Courses', c.course_count || 0)}
-        ${infoCell('Likes', '❤️ ' + (c.likes_count || 0))}
-      </div>
-      ${c.description ? `<div style="margin-bottom:1.5rem;font-size:.875rem;line-height:1.7;color:var(--muted)">${c.description}</div>` : ''}
-      <div style="margin-bottom:.75rem;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">📚 Courses</div>
-      ${courseRows}
-      <div style="margin:1.25rem 0 .75rem;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem">⭐ Recent Reviews</div>
-      ${reviewRows}
-    `;
-            } catch (e) {
-                body.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
-            }
-        }
-
-        // ── ADD / EDIT CENTER FORM ─────────────────────────────
-
-        let editingCenterIdForm = null;
-
-        function resetCenterForm() {
-            editingCenterIdForm = null;
-            ['f-name', 'f-city', 'f-phone', 'f-email', 'f-website', 'f-logo', 'f-address', 'f-desc', 'f-lat', 'f-lng']
-                .forEach(id => document.getElementById(id).value = '');
-            document.getElementById('logo-preview').style.display = 'none';
-            document.getElementById('center-form-title').textContent = 'Add New Center';
-            document.getElementById('del-center-btn').style.display = 'none';
-        }
-
-        function openEditCenter(id) {
-            const c = myCenters.find(x => x.id === id);
-            if (!c) return;
-
-            editingCenterIdForm = id;
-            document.getElementById('f-name').value = c.name || '';
-            document.getElementById('f-city').value = c.city || '';
-            document.getElementById('f-phone').value = c.phone || '';
-            document.getElementById('f-email').value = c.email || '';
-            document.getElementById('f-website').value = c.website || '';
-            document.getElementById('f-logo').value = c.logo_url || '';
-            document.getElementById('f-address').value = c.address || '';
-            document.getElementById('f-desc').value = c.description || '';
-            document.getElementById('f-lat').value = c.latitude || '';
-            document.getElementById('f-lng').value = c.longitude || '';
-            document.getElementById('center-form-title').textContent = 'Edit Center';
-            document.getElementById('del-center-btn').style.display = 'inline-flex';
-            previewLogo(c.logo_url || '');
-
-            if (c.latitude && c.longitude) {
-                setMapMarker(c.latitude, c.longitude);
-            }
-
-            nav('add-center', document.querySelectorAll('.nav-item')[2]);
-        }
-
-        async function saveCenter() {
-            const name = document.getElementById('f-name').value.trim();
-            const city = document.getElementById('f-city').value.trim();
-            if (!name || !city) { toast('Name and city are required', 'err'); return; }
+        async function saveMyCenter() {
+            const name = document.getElementById('mc-name').value.trim();
+            const city = document.getElementById('mc-city').value.trim();
+            if (!name || !city) { toast('Center Name and City are required', 'err'); return; }
 
             const body = {
                 name, city,
-                phone: document.getElementById('f-phone').value.trim() || null,
-                email: document.getElementById('f-email').value.trim() || null,
-                website: document.getElementById('f-website').value.trim() || null,
-                logo_url: document.getElementById('f-logo').value.trim() || null,
-                address: document.getElementById('f-address').value.trim() || null,
-                description: document.getElementById('f-desc').value.trim() || null,
-                latitude: parseFloat(document.getElementById('f-lat').value) || null,
-                longitude: parseFloat(document.getElementById('f-lng').value) || null,
+                phone: document.getElementById('mc-phone').value.trim() || null,
+                email: document.getElementById('mc-email').value.trim() || null,
+                website: document.getElementById('mc-website').value.trim() || null,
+                logo_url: document.getElementById('mc-logo').value.trim() || null,
+                address: document.getElementById('mc-address').value.trim() || null,
+                description: document.getElementById('mc-desc').value.trim() || null,
+                latitude: parseFloat(document.getElementById('mc-lat').value) || null,
+                longitude: parseFloat(document.getElementById('mc-lng').value) || null,
             };
 
             try {
-                if (editingCenterIdForm) {
-                    await api(`/portal/centers/${editingCenterIdForm}`, { method: 'PATCH', body: JSON.stringify(body) });
-                    toast('✅ Center updated!');
-                } else {
-                    await api('/portal/centers', { method: 'POST', body: JSON.stringify(body) });
-                    toast('✅ Center created! Pending admin approval.');
+                await api('/portal/my-center', { method: 'PATCH', body: JSON.stringify(body) });
+                toast('✅ Center profile updated successfully!');
+                loadDashboard();
+            } catch (e) { toast(e.message, 'err'); }
+        }
+
+        // ── CAMPUSES SECTION ─────────────────────────────────
+        let editingCampusId = null;
+
+        async function loadCampusesSection() {
+            const list = document.getElementById('campuses-list');
+            list.innerHTML = '<div class="empty"><div class="empty-icon">📍</div>Loading campuses…</div>';
+            try {
+                myCampuses = await api('/portal/campuses');
+                if (!myCampuses.length) {
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">📍</div>No campuses found. Click "Add New Campus" above.</div>';
+                    return;
                 }
-                resetCenterForm();
-                nav('centers', document.querySelectorAll('.nav-item')[1]);
+                list.innerHTML = myCampuses.map(c => `
+                    <div class="campus-card">
+                        <div class="campus-head">
+                            <div class="campus-title">${c.name}</div>
+                            ${c.is_main ? '<span class="main-badge">Primary Campus</span>' : ''}
+                        </div>
+                        <div class="campus-meta">
+                            <div>📍 ${c.address || c.city || 'No address set'}</div>
+                            ${c.phone ? `<div>📞 ${c.phone}</div>` : ''}
+                            ${c.latitude ? `<div style="font-size:0.75rem;margin-top:4px;color:rgba(255,255,255,0.4)">🗺 Lat: ${c.latitude.toFixed(4)}, Lng: ${c.longitude.toFixed(4)}</div>` : ''}
+                        </div>
+                        <div class="campus-actions">
+                            <button class="btn btn-ghost" style="padding:.4rem .8rem;font-size:.78rem" onclick="openCampusModal(${c.id})">✏️ Edit</button>
+                            ${!c.is_main ? `<button class="btn btn-del" style="padding:.4rem .8rem;font-size:.78rem" onclick="deleteCampus(${c.id}, '${c.name.replace(/'/g, "\\'")}')">🗑 Delete</button>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { list.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
+        }
+
+        function openCampusModal(id = null) {
+            editingCampusId = id;
+            if (id) {
+                const c = myCampuses.find(x => x.id === id);
+                if (!c) return;
+                document.getElementById('campus-modal-title').textContent = 'Edit Campus';
+                document.getElementById('cam-name').value = c.name || '';
+                document.getElementById('cam-address').value = c.address || '';
+                document.getElementById('cam-city').value = c.city || '';
+                document.getElementById('cam-phone').value = c.phone || '';
+                document.getElementById('cam-lat').value = c.latitude || '';
+                document.getElementById('cam-lng').value = c.longitude || '';
+                document.getElementById('cam-is-main').checked = !!c.is_main;
+                initCampusMap(c.latitude || 41.2995, c.longitude || 69.2401);
+            } else {
+                document.getElementById('campus-modal-title').textContent = 'Add New Campus';
+                ['cam-name', 'cam-address', 'cam-city', 'cam-phone', 'cam-lat', 'cam-lng'].forEach(i => document.getElementById(i).value = '');
+                document.getElementById('cam-is-main').checked = myCampuses.length === 0;
+                initCampusMap(41.2995, 69.2401);
+            }
+            openModal('campusModal');
+        }
+
+        function initCampusMap(lat, lng) {
+            setTimeout(() => {
+                if (!campusMapInstance) {
+                    campusMapInstance = L.map('campus-map').setView([lat, lng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(campusMapInstance);
+                    campusMapInstance.on('click', e => {
+                        setCampusMapMarker(e.latlng.lat, e.latlng.lng);
+                        document.getElementById('cam-lat').value = e.latlng.lat.toFixed(6);
+                        document.getElementById('cam-lng').value = e.latlng.lng.toFixed(6);
+                    });
+                }
+                campusMapInstance.invalidateSize();
+                setCampusMapMarker(lat, lng);
+            }, 150);
+        }
+
+        function setCampusMapMarker(lat, lng) {
+            if (campusMapMarker) campusMapInstance.removeLayer(campusMapMarker);
+            campusMapMarker = L.marker([lat, lng]).addTo(campusMapInstance);
+            campusMapInstance.setView([lat, lng], 13);
+        }
+
+        async function saveCampus() {
+            const name = document.getElementById('cam-name').value.trim();
+            if (!name) { toast('Campus name is required', 'err'); return; }
+
+            const body = {
+                name,
+                address: document.getElementById('cam-address').value.trim() || null,
+                city: document.getElementById('cam-city').value.trim() || null,
+                phone: document.getElementById('cam-phone').value.trim() || null,
+                latitude: parseFloat(document.getElementById('cam-lat').value) || null,
+                longitude: parseFloat(document.getElementById('cam-lng').value) || null,
+                is_main: document.getElementById('cam-is-main').checked ? 1 : 0,
+            };
+
+            try {
+                if (editingCampusId) {
+                    await api(`/portal/campuses/${editingCampusId}`, { method: 'PATCH', body: JSON.stringify(body) });
+                    toast('✅ Campus updated!');
+                } else {
+                    await api('/portal/campuses', { method: 'POST', body: JSON.stringify(body) });
+                    toast('✅ Campus created!');
+                }
+                closeModal('campusModal');
+                loadCampusesSection();
+                loadDashboard();
             } catch (e) { toast(e.message, 'err'); }
         }
 
-        async function deleteCurrentCenter() {
-            if (!editingCenterIdForm) return;
-            const name = document.getElementById('f-name').value;
-            if (!confirm(`Delete "${name}"?`)) return;
-            await confirmDeleteCenter(editingCenterIdForm, name);
-            resetCenterForm();
-        }
-
-        async function confirmDeleteCenter(id, name) {
-            if (!confirm(`Delete "${name}"? This will also delete all its courses and reviews.`)) return;
+        async function deleteCampus(id, name) {
+            if (!confirm(`Delete campus "${name}"?`)) return;
             try {
-                await api(`/portal/centers/${id}`, { method: 'DELETE' });
+                await api(`/portal/campuses/${id}`, { method: 'DELETE' });
                 toast(`🗑 "${name}" deleted`);
-                loadMyCenters();
-                document.getElementById('center-detail').style.display = 'none';
+                loadCampusesSection();
+                loadDashboard();
             } catch (e) { toast(e.message, 'err'); }
         }
 
-        // ── EDIT CENTER MODAL (inline from card) ──────────────
-
-        let editingCenterModalId = null;
-
-        function openEditCenterModal(id) {
-            const c = myCenters.find(x => x.id === id);
-            if (!c) return;
-            editingCenterModalId = id;
-            document.getElementById('ec-name').value = c.name || '';
-            document.getElementById('ec-city').value = c.city || '';
-            document.getElementById('ec-phone').value = c.phone || '';
-            document.getElementById('ec-email').value = c.email || '';
-            document.getElementById('ec-website').value = c.website || '';
-            document.getElementById('ec-logo').value = c.logo_url || '';
-            document.getElementById('ec-address').value = c.address || '';
-            document.getElementById('ec-desc').value = c.description || '';
-            openModal('editCenterModal');
-        }
-
-        async function submitCenterEdit() {
-            if (!editingCenterModalId) return;
-            const name = document.getElementById('ec-name').value.trim();
-            const city = document.getElementById('ec-city').value.trim();
-            if (!name || !city) { toast('Name and city required', 'err'); return; }
-
-            try {
-                await api(`/portal/centers/${editingCenterModalId}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({
-                        name, city,
-                        phone: document.getElementById('ec-phone').value.trim() || null,
-                        email: document.getElementById('ec-email').value.trim() || null,
-                        website: document.getElementById('ec-website').value.trim() || null,
-                        logo_url: document.getElementById('ec-logo').value.trim() || null,
-                        address: document.getElementById('ec-address').value.trim() || null,
-                        description: document.getElementById('ec-desc').value.trim() || null,
-                    })
-                });
-                closeModal('editCenterModal');
-                toast('✅ Center updated!');
-                loadMyCenters();
-            } catch (e) { toast(e.message, 'err'); }
-        }
-
-        // ── POPULATE CENTER SELECTS ───────────────────────────
-
-        function populateCenterSelects() {
-            const opts = myCenters.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            document.getElementById('course-center-sel').innerHTML = `<option value="">— Choose a center —</option>${opts}`;
-            document.getElementById('rev-center-sel').innerHTML = `<option value="">— Choose a center —</option>${opts}`;
-        }
-
-        // ── COURSES SECTION ───────────────────────────────────
-
+        // ── COURSES SECTION ──────────────────────────────────
         let editingCourseModalId = null;
 
         async function loadCoursesSection() {
-            if (!myCenters.length) {
-                try {
-                    myCenters = await api('/portal/centers');
-                    populateCenterSelects();
-                } catch (e) { }
-            }
-        }
-
-        async function loadCoursesForCenter(centerId) {
             const el = document.getElementById('courses-list');
-            if (!centerId) { el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>Select a center above</div>`; return; }
-            el.innerHTML = `<div class="empty">Loading…</div>`;
+            el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div>Loading courses…</div>';
+
             try {
-                const courses = await api(`/portal/centers/${centerId}/courses`);
+                myCenter = await api('/portal/my-center');
+                myCampuses = myCenter.campuses || [];
+                populateCampusSelects();
+
+                const courses = myCenter.courses || [];
                 if (!courses.length) {
-                    el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>No courses yet. Add one above!</div>`;
+                    el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div>No courses added yet. Use the form above to add your first course!</div>';
                     return;
                 }
+
                 el.innerHTML = courses.map(co => `
-      <div class="course-item">
-        <div style="flex:1">
-          <div class="course-name">${co.name}</div>
-          <div class="course-meta">
-            ${co.teacher_name ? '👤 ' + co.teacher_name + ' · ' : ''}
-            ${fmtPrice(co.price, co.currency)}
-            ${co.schedule ? ' · 🕐 ' + co.schedule : ''}
-            ${co.duration_weeks ? ' · ⏱ ' + co.duration_weeks + 'w' : ''}
-            ${co.max_students ? ' · 👥 ' + co.enrolled + '/' + co.max_students : ''}
-          </div>
-          ${co.description ? `<div style="font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.5">${co.description}</div>` : ''}
-          <div style="margin-top:.5rem"><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></div>
-        </div>
-        <div class="course-actions">
-          <button class="btn btn-amber" style="padding:.4rem .8rem;font-size:.78rem" onclick="openCourseEdit(${JSON.stringify(co).replace(/"/g, '&quot;')})">✏️ Edit</button>
-          <button class="btn btn-del"   style="padding:.4rem .8rem;font-size:.78rem" onclick="deleteCourse(${co.id},${centerId})">🗑</button>
-        </div>
-      </div>`).join('');
-            } catch (e) {
-                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
-            }
+                    <div class="course-item">
+                        <div style="flex:1">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                                <span class="course-name">${co.name}</span>
+                                ${co.campus_name ? `<span class="campus-tag">📍 ${co.campus_name}</span>` : ''}
+                            </div>
+                            <div class="course-meta">
+                                ${co.teacher_name ? '👤 ' + co.teacher_name + ' · ' : ''}
+                                ${fmtPrice(co.price, co.currency)}
+                                ${co.schedule ? ' · 🕐 ' + co.schedule : ''}
+                                ${co.duration_weeks ? ' · ⏱ ' + co.duration_weeks + 'w' : ''}
+                                ${co.max_students ? ' · 👥 ' + co.enrolled + '/' + co.max_students : ''}
+                            </div>
+                            ${co.description ? `<div style="font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.5">${co.description}</div>` : ''}
+                            <div style="margin-top:.5rem"><span class="badge badge-${co.status === 'active' ? 'approved' : co.status === 'coming_soon' ? 'pending' : 'rejected'}">${co.status}</span></div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-amber" style="padding:.4rem .8rem;font-size:.78rem" onclick="openCourseEdit(${JSON.stringify(co).replace(/"/g, '&quot;')})">✏️ Edit</button>
+                            <button class="btn btn-del" style="padding:.4rem .8rem;font-size:.78rem" onclick="deleteCourse(${co.id})">🗑</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
+        }
+
+        function populateCampusSelects() {
+            const opts = myCampuses.map(c => `<option value="${c.id}">📍 ${c.name}</option>`).join('');
+            document.getElementById('co-campus').innerHTML = `<option value="">📍 Primary / Center-wide</option>${opts}`;
+            document.getElementById('mco-campus').innerHTML = `<option value="">📍 Primary / Center-wide</option>${opts}`;
         }
 
         async function saveCourse() {
-            const centerId = document.getElementById('course-center-sel').value;
             const name = document.getElementById('co-name').value.trim();
-            if (!centerId) { toast('Select a center first', 'err'); return; }
             if (!name) { toast('Course name is required', 'err'); return; }
 
             const body = {
                 name,
+                campus_id: parseInt(document.getElementById('co-campus').value) || null,
                 category: document.getElementById('co-category').value || 'other',
                 description: document.getElementById('co-desc').value.trim() || null,
                 teacher_name: document.getElementById('co-teacher').value.trim() || null,
@@ -1811,12 +1237,11 @@
             };
 
             try {
-                await api(`/portal/centers/${centerId}/courses`, { method: 'POST', body: JSON.stringify(body) });
-                toast('✅ Course added!');
-                // Reset form
+                await api(`/portal/centers/${myCenter.id}/courses`, { method: 'POST', body: JSON.stringify(body) });
+                toast('✅ Course added successfully!');
                 ['co-name', 'co-teacher', 'co-price', 'co-weeks', 'co-max', 'co-schedule', 'co-desc'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('co-status').value = 'active';
-                loadCoursesForCenter(centerId);
+                loadCoursesSection();
                 loadDashboard();
             } catch (e) { toast(e.message, 'err'); }
         }
@@ -1824,6 +1249,7 @@
         function openCourseEdit(co) {
             editingCourseModalId = co.id;
             document.getElementById('mco-name').value = co.name || '';
+            document.getElementById('mco-campus').value = co.campus_id || '';
             document.getElementById('mco-teacher').value = co.teacher_name || '';
             document.getElementById('mco-price').value = co.price || '';
             document.getElementById('mco-currency').value = co.currency || 'UZS';
@@ -1839,6 +1265,7 @@
             if (!editingCourseModalId) return;
             const body = {
                 name: document.getElementById('mco-name').value.trim(),
+                campus_id: parseInt(document.getElementById('mco-campus').value) || null,
                 description: document.getElementById('mco-desc').value.trim() || null,
                 teacher_name: document.getElementById('mco-teacher').value.trim() || null,
                 price: parseFloat(document.getElementById('mco-price').value) || null,
@@ -1848,76 +1275,26 @@
                 max_students: parseInt(document.getElementById('mco-max').value) || null,
                 status: document.getElementById('mco-status').value,
             };
+
             try {
                 await api(`/portal/courses/${editingCourseModalId}`, { method: 'PATCH', body: JSON.stringify(body) });
                 closeModal('courseModal');
                 toast('✅ Course updated!');
-                const centerId = document.getElementById('course-center-sel').value;
-                if (centerId) loadCoursesForCenter(centerId);
+                loadCoursesSection();
             } catch (e) { toast(e.message, 'err'); }
         }
 
-        function cancelCourseEdit() {
-            editingCourseModalId = null;
-            document.getElementById('course-form-title').textContent = 'Add New Course';
-            ['co-name','co-teacher','co-price','co-weeks','co-max','co-schedule','co-desc']
-                .forEach(id => document.getElementById(id).value = '');
-            document.getElementById('co-status').value = 'active';
-            document.getElementById('co-cancel').style.display = 'none';
-        }
-
-        async function deleteCourse(courseId, centerId) {
+        async function deleteCourse(courseId) {
             if (!confirm('Delete this course?')) return;
             try {
                 await api(`/portal/courses/${courseId}`, { method: 'DELETE' });
                 toast('🗑 Course deleted');
-                loadCoursesForCenter(centerId);
+                loadCoursesSection();
                 loadDashboard();
             } catch (e) { toast(e.message, 'err'); }
         }
 
-        // ── REVIEWS ───────────────────────────────────────────
-
-        async function loadReviewsSection() {
-            if (!myCenters.length) {
-                try { myCenters = await api('/portal/centers'); populateCenterSelects(); } catch (e) { }
-            }
-        }
-
-        async function loadReviews(centerId) {
-            const el = document.getElementById('reviews-list');
-            if (!centerId) { el.innerHTML = `<div class="empty"><div class="empty-icon">⭐</div>Select a center above</div>`; return; }
-            el.innerHTML = `<div class="empty">Loading…</div>`;
-            try {
-                const reviews = await api(`/portal/centers/${centerId}/reviews`);
-                if (!reviews.length) {
-                    el.innerHTML = `<div class="empty"><div class="empty-icon">⭐</div>No approved reviews yet. They'll appear once admin approves them.</div>`;
-                    return;
-                }
-                // avg
-                const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
-                el.innerHTML = `
-      <div style="background:rgba(79,70,229,.1);border:1px solid rgba(79,70,229,.25);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
-        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Average Rating</div><div style="font-size:1.75rem;font-weight:800;color:#fcd34d">★ ${avg}</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Total Reviews</div><div style="font-size:1.75rem;font-weight:800">${reviews.length}</div></div>
-      </div>
-      ${reviews.map(r => `
-        <div class="review-card">
-          <div class="review-head">
-            <div class="review-name">${r.student_name}</div>
-            <div class="stars">${stars(r.rating)}</div>
-          </div>
-          <div class="review-comment">${r.comment || 'No comment'}</div>
-          <div class="review-date">${fmtDate(r.created_at)}</div>
-        </div>`).join('')}
-    `;
-            } catch (e) {
-                el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
-            }
-        }
-
-        // ── STUDENT LEADS ──────────────────────────────────────
-
+        // ── STUDENT LEADS ────────────────────────────────────
         async function loadLeadsSection() {
             const container = document.getElementById('leads-list');
             if (!container) return;
@@ -1954,7 +1331,7 @@
                                 ${a.email ? `<div style="font-size:0.75rem;color:var(--muted);font-weight:400">${a.email}</div>` : ''}
                             </td>
                             <td style="padding:12px 10px">
-                                <div style="font-weight:700;color:var(--accent)">${a.course_name || 'Course #' + a.course_id}</div>
+                                <div style="font-weight:700;color:#a5b4fc">${a.course_name || 'Course #' + a.course_id}</div>
                                 <div style="font-size:0.75rem;color:var(--muted)">🏫 ${a.center_name || 'Center #' + a.center_id}</div>
                             </td>
                             <td style="padding:12px 10px">
@@ -1976,9 +1353,7 @@
                         `).join('')}
                     </tbody>
                 </table>`;
-            } catch (e) {
-                container.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`;
-            }
+            } catch (e) { container.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
         }
 
         async function updateLeadStatus(appId, status) {
@@ -1989,53 +1364,74 @@
             } catch(e) { toast(e.message, 'err'); }
         }
 
-        // ── PROFILE ───────────────────────────────────────────
+        // ── REVIEWS SECTION ──────────────────────────────────
+        async function loadReviewsSection() {
+            const el = document.getElementById('reviews-list');
+            el.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div>Loading reviews…</div>';
+            try {
+                myCenter = await api('/portal/my-center');
+                const reviews = myCenter.reviews || [];
+                if (!reviews.length) {
+                    el.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div>No approved reviews yet. They will appear here once approved.</div>';
+                    return;
+                }
+                const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+                el.innerHTML = `
+                    <div style="background:rgba(79,70,229,.1);border:1px solid rgba(79,70,229,.25);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+                        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Average Rating</div><div style="font-size:1.75rem;font-weight:800;color:#fcd34d">★ ${avg}</div></div>
+                        <div><div style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Total Reviews</div><div style="font-size:1.75rem;font-weight:800">${reviews.length}</div></div>
+                    </div>
+                    ${reviews.map(r => `
+                        <div class="card" style="margin-bottom:1rem">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+                                <div style="font-weight:700;font-size:1rem">${r.student_name}</div>
+                                <div style="color:#fcd34d">${stars(r.rating)}</div>
+                            </div>
+                            <div style="color:var(--muted);font-size:.88rem;line-height:1.6">${r.comment || 'No comment'}</div>
+                            <div style="font-size:.72rem;color:rgba(255,255,255,0.3);margin-top:.5rem">${fmtDate(r.created_at)}</div>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (e) { el.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
+        }
 
+        // ── PROFILE ──────────────────────────────────────────
         function loadProfile() {
             const p = partnerData;
-            const planLabel = { '1month': '1 Month', '3months': '3 Months', '6months': '6 Months', '1year': '1 Year' };
-
             document.getElementById('profile-grid').innerHTML = `
-    ${infoCell('Business Name', p.business_name)}
-    ${infoCell('Contact Person', p.contact_person)}
-    ${infoCell('Email', p.email)}
-    ${infoCell('Phone', p.phone)}
-  `;
+                ${infoCell('Business Name', p.business_name)}
+                ${infoCell('Contact Person', p.contact_person)}
+                ${infoCell('Email', p.email)}
+                ${infoCell('Phone', p.phone)}
+            `;
 
             const expires = p.expires_at ? new Date(p.expires_at) : null;
             const days = expires ? Math.ceil((expires - Date.now()) / 86400000) : null;
 
             document.getElementById('plan-info-block').innerHTML = `
-    <div class="plan-banner" style="margin:0">
-      <div>
-        <div class="plan-banner-title">${planLabel[p.plan] || p.plan} Plan</div>
-        <div class="plan-banner-sub">
-          ${expires ? `Expires ${fmtDate(p.expires_at)} · <strong style="color:${days > 0 ? '#34d399' : '#fb7185'}">${days > 0 ? days + ' days remaining' : '⚠️ Expired'}</strong>` : 'Active'}
-        </div>
-      </div>
-      <div class="plan-badge">${planLabel[p.plan] || p.plan}</div>
-    </div>
-    <p style="margin-top:1rem;font-size:.85rem;color:var(--muted)">To renew or upgrade your plan, click the extension button in dashboard header or contact EduFind support.</p>
-  `;
+                <div class="plan-banner" style="margin:0">
+                    <div>
+                        <div class="plan-banner-title">${planLabel(p.plan)} Plan</div>
+                        <div class="plan-banner-sub">
+                            ${expires ? `Expires ${fmtDate(p.expires_at)} · <strong style="color:${days > 0 ? '#34d399' : '#fb7185'}">${days > 0 ? days + ' days remaining' : '⚠️ Expired'}</strong>` : 'Active'}
+                        </div>
+                    </div>
+                    <div class="plan-badge">${planLabel(p.plan)}</div>
+                </div>
+                <p style="margin-top:1rem;font-size:.85rem;color:var(--muted)">To renew or extend your plan, click the extension button in dashboard header.</p>
+            `;
         }
 
         async function requestPlanExtension() {
             const btn = document.getElementById('ext-plan-btn');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = '⏳ Extending…';
-            }
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ Extending…'; }
             try {
                 const res = await api('/portal/request-extension', { method: 'POST' });
                 toast(res.message);
                 loadDashboard();
-            } catch(e) {
-                toast(e.message, 'err');
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = '🔄 Request Free 1-Month Extension';
-                }
+            } catch(e) { toast(e.message, 'err'); }
+            finally {
+                if (btn) { btn.disabled = false; btn.textContent = '🔄 Request Free 1-Month Extension'; }
             }
         }
     </script>
