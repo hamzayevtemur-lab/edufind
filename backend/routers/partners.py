@@ -292,49 +292,38 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
                 "#f59e0b"
             )
 
-    pwd      = make_password(req.contact_person, req.email)
-    plan_str = req.plan if isinstance(req.plan, str) else req.plan.value
-    expires  = datetime.utcnow() + timedelta(days=PLAN_DAYS.get(plan_str, 30))
-
-    partner = Partner(
-        business_name   = req.business_name,
-        contact_person  = req.contact_person,
-        email           = req.email,
-        phone           = req.phone,
-        address         = req.address,
-        description     = req.description,
-        business_type   = req.business_type,
-        plan            = req.plan,
-        amount_paid     = req.amount,
-        password_hash   = hash_pw(pwd),
-        plan_expires_at = expires,
-    )
-    db.add(partner)
-    db.flush()
-
-    req.status            = PartnerRequestStatus.approved
+    # Mark email as verified and keep status pending for Admin approval
     req.is_email_verified = 1
-    req.reviewed_at       = datetime.utcnow()
-    req.partner_id        = partner.id
     req.approve_token     = None   # one-time use
     db.commit()
 
-    sent = send_email(
-        to        = req.email,
-        subject   = "🎉 Welcome to EduFind — Your Login Details",
-        html      = tpl_credentials(partner, pwd),
-    )
-
-    note = f"Credentials emailed to <strong>{req.email}</strong> ✓" if sent \
-           else f"Save your password: <code>{pwd}</code>"
+    # Notify admin that registrant verified email and is ready for review
+    smtp_admin = os.getenv("SMTP_EMAIL", "").strip()
+    if smtp_admin:
+        try:
+            send_email(
+                to=smtp_admin,
+                subject=f"✅ Email Verified: {req.business_name} (Ready for Admin Approval)",
+                html=f"""
+                <div style="font-family:sans-serif;background:#07070c;padding:36px;color:#fff;border-radius:16px">
+                  <h2 style="color:#10b981">✅ Applicant Email Verified!</h2>
+                  <p style="color:rgba(255,255,255,.8);line-height:1.7">
+                    <strong>{req.contact_person}</strong> ({req.email}) has verified their email address for <strong>{req.business_name}</strong>.<br><br>
+                    This application is now ready for your review and approval in the Admin Panel.
+                  </p>
+                  <a href="{BACKEND_URL}/admin.html" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:700;margin-top:12px">Open Admin Panel →</a>
+                </div>
+                """
+            )
+        except Exception as e:
+            print(f"⚠️ Could not notify admin of email verification: {e}")
 
     return _page(
-        "🎉 Email Verified & Account Activated!",
-        f"Welcome to EduFind! <strong>{req.business_name}</strong> is now active with <strong>1 Month Free Access</strong>.<br><br>"
-        f"<strong>Login Email:</strong> {req.email}<br>"
-        f"<strong>Password:</strong> <code>{pwd}</code><br><br>{note}<br><br>"
-        f"<a class='btn' href='/partner-login.html'>Log In to Partner Portal →</a>",
-        "#10b981",
+        "🎉 Email Verified Successfully!",
+        f"Thank you, <strong>{req.contact_person}</strong>! Your email address (<code>{req.email}</code>) has been verified.<br><br>"
+        f"Your application for <strong>{req.business_name}</strong> is now in the queue for Admin review.<br>"
+        f"Once our team approves your application, your login credentials will be sent directly to your email inbox!",
+        "#10b981"
     )
 
 
