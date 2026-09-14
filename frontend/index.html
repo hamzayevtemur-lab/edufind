@@ -402,31 +402,27 @@
             border-color: rgba(79, 70, 229, .4);
         }
 
-        .cat-card img {
+        .cat-bg-img {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform .55s;
+            transition: transform .55s ease, filter .55s ease;
+            filter: brightness(0.65) contrast(1.1);
+            z-index: 0;
         }
 
-        .cat-card:hover img {
-            transform: scale(1.07);
-        }
-
-        /* When no image, fallback bg is set inline */
-        .cat-card .cat-fallback {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
+        .cat-card:hover .cat-bg-img {
+            transform: scale(1.08);
+            filter: brightness(0.8) contrast(1.15);
         }
 
         .cat-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(5, 5, 8, .95) 0%, rgba(5, 5, 8, .35) 60%, transparent 100%);
+            z-index: 1;
+            background: linear-gradient(to top, rgba(5, 5, 8, .96) 0%, rgba(5, 5, 8, .5) 50%, rgba(5, 5, 8, .15) 100%);
             padding: 22px;
             display: flex;
             flex-direction: column;
@@ -1511,9 +1507,8 @@
 
         <div class="cats-carousel">
 
-            <div class="cat-card" onclick="location.href='centers.html?search=English'"
-                style="background:linear-gradient(135deg,#1e1b4b,#312e81)">
-                <div class="cat-fallback">🇬🇧</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=English'">
+                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80" alt="English" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Language</div>
                     <div class="cat-title">English</div>
@@ -1522,9 +1517,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=IELTS'"
-                style="background:linear-gradient(135deg,#0c1a3a,#1e3a8a)">
-                <div class="cat-fallback">📝</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=IELTS'">
+                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="IELTS & TOEFL" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Exam Prep</div>
                     <div class="cat-title">IELTS & TOEFL</div>
@@ -1533,9 +1527,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=Math'"
-                style="background:linear-gradient(135deg,#14002e,#4c1d95)">
-                <div class="cat-fallback">📐</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=Math'">
+                <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=600&q=80" alt="Mathematics" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Science</div>
                     <div class="cat-title">Mathematics</div>
@@ -1544,9 +1537,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=Programming'"
-                style="background:linear-gradient(135deg,#001a12,#065f46)">
-                <div class="cat-fallback">💻</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=Programming'">
+                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Programming" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Technology</div>
                     <div class="cat-title">Programming</div>
@@ -1555,9 +1547,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=SAT'"
-                style="background:linear-gradient(135deg,#1a0505,#7f1d1d)">
-                <div class="cat-fallback">🎓</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=SAT'">
+                <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80" alt="SAT Prep" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Exam Prep</div>
                     <div class="cat-title">SAT Prep</div>
@@ -1566,9 +1557,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=Russian'"
-                style="background:linear-gradient(135deg,#1a0a00,#92400e)">
-                <div class="cat-fallback">🇷🇺</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=Russian'">
+                <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80" alt="Russian" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Language</div>
                     <div class="cat-title">Russian</div>
@@ -1577,9 +1567,8 @@
                 </div>
             </div>
 
-            <div class="cat-card" onclick="location.href='centers.html?search=Art'"
-                style="background:linear-gradient(135deg,#001a1a,#134e4a)">
-                <div class="cat-fallback">🎨</div>
+            <div class="cat-card" onclick="location.href='centers.html?search=Art'">
+                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80" alt="Art & Design" loading="lazy" class="cat-bg-img" />
                 <div class="cat-overlay">
                     <div class="cat-tag">Creative</div>
                     <div class="cat-title">Art & Design</div>
