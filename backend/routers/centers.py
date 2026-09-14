@@ -81,25 +81,25 @@ def browse_centers(
     per_page: int           = Query(9, ge=1, le=200),
     db: Session = Depends(get_db),
 ):
-    q = (
-        db.query(LearningCenter)
-        .filter(LearningCenter.status == ApprovalStatus.approved)
-        .options(
-            joinedload(LearningCenter.reviews),
-            joinedload(LearningCenter.courses),
-        )
-    )
+    base_q = db.query(LearningCenter).filter(LearningCenter.status == ApprovalStatus.approved)
 
     if search:
         term = f"%{search}%"
-        q = q.filter(or_(
+        base_q = base_q.filter(or_(
             LearningCenter.name.ilike(term),
             LearningCenter.description.ilike(term),
             LearningCenter.city.ilike(term),
         ))
 
     if city:
-        q = q.filter(LearningCenter.city.ilike(f"%{city}%"))
+        base_q = base_q.filter(LearningCenter.city.ilike(f"%{city}%"))
+
+    total = base_q.count()
+
+    q = base_q.options(
+        joinedload(LearningCenter.reviews),
+        joinedload(LearningCenter.courses),
+    )
 
     if sort == "az":
         q = q.order_by(LearningCenter.name.asc())
@@ -108,7 +108,6 @@ def browse_centers(
     else:
         q = q.order_by(LearningCenter.created_at.desc())
 
-    total   = q.count()
     centers = q.offset((page - 1) * per_page).limit(per_page).all()
     items   = [serialize(c) for c in centers]
 
@@ -140,7 +139,7 @@ def browse_courses(
     per_page: int           = Query(12, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    q = (
+    base_q = (
         db.query(Course)
         .join(LearningCenter, Course.center_id == LearningCenter.id)
         .filter(
@@ -151,17 +150,24 @@ def browse_courses(
 
     if search:
         term = f"%{search}%"
-        q = q.filter(or_(
+        base_q = base_q.filter(or_(
             Course.name.ilike(term),
             Course.description.ilike(term),
             Course.teacher_name.ilike(term),
         ))
 
     if city:
-        q = q.filter(LearningCenter.city.ilike(f"%{city}%"))
+        base_q = base_q.filter(LearningCenter.city.ilike(f"%{city}%"))
 
     if category:
-        q = q.filter(func.lower(Course.category) == category.lower())
+        base_q = base_q.filter(func.lower(Course.category) == category.lower())
+
+    total = base_q.count()
+
+    q = base_q.options(
+        joinedload(Course.center),
+        joinedload(Course.campus),
+    )
 
     if sort == "price_asc":
         q = q.order_by(Course.price.asc().nullslast())
@@ -172,7 +178,6 @@ def browse_courses(
     else:
         q = q.order_by(Course.id.desc())
 
-    total   = q.count()
     courses = q.offset((page - 1) * per_page).limit(per_page).all()
 
     items = []

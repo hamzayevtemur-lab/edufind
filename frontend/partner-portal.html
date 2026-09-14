@@ -8,8 +8,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         *,
         *::before,
@@ -511,7 +510,29 @@
             .sidebar.open { transform: translateX(0); }
             .main { margin-left: 0; padding: 5rem 1rem 2rem; }
         }
+        .lang-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .lang-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(124, 58, 237, 0.6);
+        }
+        .lang-select option {
+            background: #0f172a;
+            color: #fff;
+        }
     </style>
+    <script src="i18n.js"></script>
 </head>
 
 <body>
@@ -519,6 +540,11 @@
     <!-- TOPBAR (Mobile) -->
     <div class="topbar">
         <div class="topbar-logo">EDUFIND</div>
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="uz">🇺🇿 UZ</option>
+            <option value="ru">🇷🇺 RU</option>
+        </select>
         <button class="burger" id="burger" onclick="toggleSidebar()">
             <span></span><span></span><span></span>
         </button>
@@ -531,6 +557,14 @@
         <div class="sidebar-head">
             <div class="sidebar-logo">EDUFIND</div>
             <div class="sidebar-biz" id="sb-biz">Loading…</div>
+        </div>
+
+        <div style="padding: 0.5rem 1.25rem;">
+            <select class="lang-select" onchange="setLang(this.value)" style="width:100%" aria-label="Select Language">
+                <option value="en">🇬🇧 English</option>
+                <option value="uz">🇺🇿 O'zbekcha</option>
+                <option value="ru">🇷🇺 Русский</option>
+            </select>
         </div>
 
         <div class="plan-chip">
@@ -547,6 +581,7 @@
 
         <div class="sidebar-section">Content & Leads</div>
         <div class="nav-item" onclick="nav('leads',this)"><span class="nav-icon">📬</span>Student Leads <span class="badge" id="leads-count-badge" style="display:none;margin-left:auto;background:var(--indigo);color:#fff;padding:2px 8px;border-radius:50px;font-size:11px">0</span></div>
+        <div class="nav-item" onclick="nav('course-requests',this)"><span class="nav-icon">💡</span>Course Requests <span class="badge" id="course-reqs-badge" style="display:none;margin-left:auto;background:var(--purple);color:#fff;padding:2px 8px;border-radius:50px;font-size:11px">0</span></div>
         <div class="nav-item" onclick="nav('courses',this)"><span class="nav-icon">📚</span>Courses</div>
         <div class="nav-item" onclick="nav('reviews',this)"><span class="nav-icon">⭐</span>Reviews</div>
 
@@ -619,7 +654,17 @@
                     <div class="field"><label>Phone</label><input id="mc-phone" placeholder="+998 90 123 4567" type="tel"></div>
                     <div class="field"><label>Email</label><input id="mc-email" placeholder="info@center.uz" type="email"></div>
                     <div class="field"><label>Website</label><input id="mc-website" placeholder="https://center.uz" type="url"></div>
-                    <div class="field"><label>Logo / Image URL</label><input id="mc-logo" placeholder="https://…" oninput="previewLogo(this.value)"></div>
+                    <div class="field full">
+                        <label>Center Logo / Cover Image</label>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <input id="mc-logo" placeholder="Paste image URL (https://...) or upload file →" oninput="previewLogo(this.value)" style="flex:1;min-width:240px">
+                            <button type="button" class="btn btn-ghost" onclick="document.getElementById('mc-file-input').click()" style="padding:10px 16px;white-space:nowrap;display:flex;align-items:center;gap:6px">
+                                📁 Upload Image File
+                            </button>
+                            <input type="file" id="mc-file-input" accept="image/*" style="display:none" onchange="uploadLogoFile(this)">
+                        </div>
+                        <div style="font-size:0.75rem;color:var(--muted);margin-top:5px">Option 1: Paste an image URL link. Option 2: Click "Upload Image File" to choose an image from your device.</div>
+                    </div>
                     <div class="field full"><label>Main Address</label><input id="mc-address" placeholder="Street, City, Landmark"></div>
                     <div class="field full"><label>Description</label><textarea id="mc-desc" placeholder="Describe your learning center, features, teaching methodology…"></textarea></div>
                     <div class="field"><label>Main Latitude</label><input id="mc-lat" type="number" step="any" placeholder="41.2995"></div>
@@ -664,6 +709,23 @@
                 </div>
                 <div id="leads-list">
                     <div class="empty"><div class="empty-icon">📭</div>Loading student inquiries…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── COURSE REQUESTS ──────────────────────────── -->
+        <div class="section" id="section-course-requests">
+            <div class="sec-title">Student Course Requests 💡</div>
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                    <div>
+                        <div class="card-title" style="margin:0">Requested Courses by Students</div>
+                        <div style="font-size:0.8rem;color:var(--muted);margin-top:2px">Topics and subjects students want your learning center to launch</div>
+                    </div>
+                    <button class="btn btn-ghost" onclick="loadCourseRequestsSection()">↺ Refresh</button>
+                </div>
+                <div id="course-requests-list">
+                    <div class="empty"><div class="empty-icon">💡</div>Loading course requests…</div>
                 </div>
             </div>
         </div>
@@ -835,7 +897,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const API = 'http://localhost:8000/api';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
         let partnerData = null;
         let partnerId = null;
         let myCenter = null;
@@ -896,6 +958,7 @@
                 'my-center': loadMyCenterSection,
                 campuses: loadCampusesSection,
                 leads: loadLeadsSection,
+                'course-requests': loadCourseRequestsSection,
                 courses: loadCoursesSection,
                 reviews: loadReviewsSection,
                 profile: loadProfile,
@@ -1001,32 +1064,95 @@
             } catch (e) { toast(e.message, 'err'); }
         }
 
+        function loadYandexMaps(cb) {
+            if (window.ymaps) {
+                ymaps.ready(cb);
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = 'https://api-maps.yandex.ru/2.1/?lang=en_US';
+            s.onload = () => ymaps.ready(cb);
+            document.head.appendChild(s);
+        }
+
         function initCenterMap(lat, lng) {
-            setTimeout(() => {
+            loadYandexMaps(() => {
                 if (!centerMapInstance) {
-                    centerMapInstance = L.map('center-map').setView([lat, lng], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(centerMapInstance);
-                    centerMapInstance.on('click', e => {
-                        setCenterMapMarker(e.latlng.lat, e.latlng.lng);
-                        document.getElementById('mc-lat').value = e.latlng.lat.toFixed(6);
-                        document.getElementById('mc-lng').value = e.latlng.lng.toFixed(6);
+                    centerMapInstance = new ymaps.Map('center-map', {
+                        center: [lat, lng],
+                        zoom: 13,
+                        controls: ['zoomControl', 'fullscreenControl', 'typeSelector']
                     });
+                    centerMapInstance.events.add('click', e => {
+                        const coords = e.get('coords');
+                        setCenterMapMarker(coords[0], coords[1]);
+                        document.getElementById('mc-lat').value = coords[0].toFixed(6);
+                        document.getElementById('mc-lng').value = coords[1].toFixed(6);
+                    });
+                } else {
+                    centerMapInstance.setCenter([lat, lng], 13);
                 }
-                centerMapInstance.invalidateSize();
                 setCenterMapMarker(lat, lng);
-            }, 150);
+            });
         }
 
         function setCenterMapMarker(lat, lng) {
-            if (centerMapMarker) centerMapInstance.removeLayer(centerMapMarker);
-            centerMapMarker = L.marker([lat, lng]).addTo(centerMapInstance);
-            centerMapInstance.setView([lat, lng], 13);
+            if (!centerMapInstance) return;
+            if (centerMapMarker) {
+                centerMapMarker.geometry.setCoordinates([lat, lng]);
+            } else {
+                centerMapMarker = new ymaps.Placemark([lat, lng], { hintContent: 'Center Location' }, { preset: 'islands#indigoDotIcon', draggable: true });
+                centerMapMarker.events.add('dragend', () => {
+                    const coords = centerMapMarker.geometry.getCoordinates();
+                    document.getElementById('mc-lat').value = coords[0].toFixed(6);
+                    document.getElementById('mc-lng').value = coords[1].toFixed(6);
+                });
+                centerMapInstance.geoObjects.add(centerMapMarker);
+            }
+            centerMapInstance.setCenter([lat, lng], 13);
         }
 
         function previewLogo(url) {
             const img = document.getElementById('logo-preview');
             if (url) { img.src = url; img.style.display = 'block'; }
             else img.style.display = 'none';
+        }
+
+        async function uploadLogoFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const btn = input.previousElementSibling;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '⏳ Uploading…';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const res = await fetch(`${API}/portal/upload`, {
+                    method: 'POST',
+                    headers: { 'X-Partner-Id': partnerId },
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Upload failed');
+                }
+
+                const data = await res.json();
+                document.getElementById('mc-logo').value = data.url;
+                previewLogo(data.url);
+                toast('✅ Image file uploaded successfully!');
+            } catch (e) {
+                toast(e.message, 'err');
+            } finally {
+                btn.innerHTML = origText;
+                btn.disabled = false;
+                input.value = '';
+            }
         }
 
         async function saveMyCenter() {
@@ -1109,25 +1235,40 @@
         }
 
         function initCampusMap(lat, lng) {
-            setTimeout(() => {
+            loadYandexMaps(() => {
                 if (!campusMapInstance) {
-                    campusMapInstance = L.map('campus-map').setView([lat, lng], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(campusMapInstance);
-                    campusMapInstance.on('click', e => {
-                        setCampusMapMarker(e.latlng.lat, e.latlng.lng);
-                        document.getElementById('cam-lat').value = e.latlng.lat.toFixed(6);
-                        document.getElementById('cam-lng').value = e.latlng.lng.toFixed(6);
+                    campusMapInstance = new ymaps.Map('campus-map', {
+                        center: [lat, lng],
+                        zoom: 13,
+                        controls: ['zoomControl', 'fullscreenControl', 'typeSelector']
                     });
+                    campusMapInstance.events.add('click', e => {
+                        const coords = e.get('coords');
+                        setCampusMapMarker(coords[0], coords[1]);
+                        document.getElementById('cam-lat').value = coords[0].toFixed(6);
+                        document.getElementById('cam-lng').value = coords[1].toFixed(6);
+                    });
+                } else {
+                    campusMapInstance.setCenter([lat, lng], 13);
                 }
-                campusMapInstance.invalidateSize();
                 setCampusMapMarker(lat, lng);
-            }, 150);
+            });
         }
 
         function setCampusMapMarker(lat, lng) {
-            if (campusMapMarker) campusMapInstance.removeLayer(campusMapMarker);
-            campusMapMarker = L.marker([lat, lng]).addTo(campusMapInstance);
-            campusMapInstance.setView([lat, lng], 13);
+            if (!campusMapInstance) return;
+            if (campusMapMarker) {
+                campusMapMarker.geometry.setCoordinates([lat, lng]);
+            } else {
+                campusMapMarker = new ymaps.Placemark([lat, lng], { hintContent: 'Campus Location' }, { preset: 'islands#violetDotIcon', draggable: true });
+                campusMapMarker.events.add('dragend', () => {
+                    const coords = campusMapMarker.geometry.getCoordinates();
+                    document.getElementById('cam-lat').value = coords[0].toFixed(6);
+                    document.getElementById('cam-lng').value = coords[1].toFixed(6);
+                });
+                campusMapInstance.geoObjects.add(campusMapMarker);
+            }
+            campusMapInstance.setCenter([lat, lng], 13);
         }
 
         async function saveCampus() {
@@ -1316,41 +1457,50 @@
                     <thead>
                         <tr style="text-align:left;border-bottom:1px solid var(--border2);color:var(--muted)">
                             <th style="padding:10px">Student</th>
-                            <th style="padding:10px">Course & Center</th>
+                            <th style="padding:10px">Course & Type</th>
                             <th style="padding:10px">Phone</th>
+                            <th style="padding:10px">Preferred Schedule</th>
                             <th style="padding:10px">Notes</th>
                             <th style="padding:10px">Status</th>
                             <th style="padding:10px">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${apps.map(a => `
+                        ${apps.map(a => {
+                            const isSoon = a.course_status === 'coming_soon';
+                            return `
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
                             <td style="padding:12px 10px;font-weight:700">
                                 ${a.student_name}
                                 ${a.email ? `<div style="font-size:0.75rem;color:var(--muted);font-weight:400">${a.email}</div>` : ''}
                             </td>
                             <td style="padding:12px 10px">
-                                <div style="font-weight:700;color:#a5b4fc">${a.course_name || 'Course #' + a.course_id}</div>
+                                <div style="font-weight:700;color:#a5b4fc;display:flex;align-items:center;gap:6px">
+                                    ${a.course_name || 'Course #' + a.course_id}
+                                    ${isSoon ? '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;padding:1px 6px;border-radius:12px;font-size:0.7rem">🟡 Soon (Pre-Reg)</span>' : '<span style="background:rgba(16,185,129,0.2);color:#34d399;padding:1px 6px;border-radius:12px;font-size:0.7rem">🟢 Active</span>'}
+                                </div>
                                 <div style="font-size:0.75rem;color:var(--muted)">🏫 ${a.center_name || 'Center #' + a.center_id}</div>
                             </td>
                             <td style="padding:12px 10px">
                                 <a href="tel:${a.phone}" style="color:#60a5fa;font-weight:700">📞 ${a.phone}</a>
                             </td>
-                            <td style="padding:12px 10px;color:rgba(255,255,255,0.8)">${a.notes || '—'}</td>
+                            <td style="padding:12px 10px;color:rgba(255,255,255,0.95)">
+                                ${a.preferred_schedule ? `<span style="color:#f59e0b;font-weight:600">🕒 ${a.preferred_schedule}</span>` : '—'}
+                            </td>
+                            <td style="padding:12px 10px;color:rgba(255,255,255,0.8);max-width:180px">${a.notes || '—'}</td>
                             <td style="padding:12px 10px">
                                 <span class="badge badge-${a.status === 'enrolled' ? 'approved' : a.status === 'contacted' ? 'pending' : a.status === 'cancelled' ? 'rejected' : 'pending'}">
                                     ${a.status}
                                 </span>
                             </td>
                             <td style="padding:12px 10px">
-                                <div style="display:flex;gap:6px">
+                                <div style="display:flex;gap:6px;flex-wrap:wrap">
                                     ${a.status !== 'contacted' ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem" onclick="updateLeadStatus(${a.id}, 'contacted')">📞 Contacted</button>` : ''}
                                     ${a.status !== 'enrolled' ? `<button class="btn btn-primary" style="padding:4px 8px;font-size:0.75rem" onclick="updateLeadStatus(${a.id}, 'enrolled')">✅ Enrolled</button>` : ''}
                                 </div>
                             </td>
                         </tr>
-                        `).join('')}
+                        `}).join('')}
                     </tbody>
                 </table>`;
             } catch (e) { container.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
@@ -1361,6 +1511,85 @@
                 await api(`/portal/applications/${appId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
                 toast(`✅ Lead status updated to ${status}`);
                 loadLeadsSection();
+            } catch(e) { toast(e.message, 'err'); }
+        }
+
+        // ── STUDENT COURSE REQUESTS ───────────────────────────
+        async function loadCourseRequestsSection() {
+            const container = document.getElementById('course-requests-list');
+            if (!container) return;
+            container.innerHTML = '<div class="empty"><div class="empty-icon">💡</div>Loading course requests…</div>';
+            try {
+                const reqs = await api('/portal/course-requests');
+                const badge = document.getElementById('course-reqs-badge');
+                if (badge) {
+                    const pendingCount = reqs.filter(r => r.status === 'pending').length;
+                    badge.textContent = pendingCount;
+                    badge.style.display = pendingCount ? 'inline-block' : 'none';
+                }
+                if (!reqs.length) {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">💡</div>No student course requests submitted yet</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                <table style="width:100%;border-collapse:collapse;margin-top:1rem;font-size:0.88rem">
+                    <thead>
+                        <tr style="text-align:left;border-bottom:1px solid var(--border2);color:var(--muted)">
+                            <th style="padding:10px">Requested Course / Category</th>
+                            <th style="padding:10px">Votes / Demand</th>
+                            <th style="padding:10px">Preferred Schedule</th>
+                            <th style="padding:10px">Student Contact</th>
+                            <th style="padding:10px">Notes</th>
+                            <th style="padding:10px">Status</th>
+                            <th style="padding:10px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reqs.map(r => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                            <td style="padding:12px 10px">
+                                <div style="font-weight:700;color:#fff;font-size:0.95rem">${r.title}</div>
+                                <div style="font-size:0.75rem;color:var(--muted)">🏷️ Category: <span style="color:#a5b4fc;font-weight:600">${r.category}</span></div>
+                            </td>
+                            <td style="padding:12px 10px">
+                                <span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:20px;font-weight:700;font-size:0.82rem;display:inline-flex;align-items:center;gap:4px">
+                                    👍 ${r.votes_count} ${r.votes_count === 1 ? 'vote' : 'votes'}
+                                </span>
+                            </td>
+                            <td style="padding:12px 10px;color:rgba(255,255,255,0.85)">
+                                ${r.preferred_schedule ? `🕒 ${r.preferred_schedule}` : '—'}
+                            </td>
+                            <td style="padding:12px 10px">
+                                <div style="font-weight:700">${r.student_name}</div>
+                                <a href="tel:${r.phone}" style="color:#60a5fa;font-size:0.8rem;display:block">📞 ${r.phone}</a>
+                                ${r.email ? `<div style="font-size:0.75rem;color:var(--muted)">${r.email}</div>` : ''}
+                            </td>
+                            <td style="padding:12px 10px;color:rgba(255,255,255,0.75);max-width:200px">${r.notes || '—'}</td>
+                            <td style="padding:12px 10px">
+                                <span class="badge badge-${r.status === 'accepted' ? 'approved' : r.status === 'reviewed' ? 'pending' : r.status === 'rejected' ? 'rejected' : 'pending'}">
+                                    ${r.status}
+                                </span>
+                            </td>
+                            <td style="padding:12px 10px">
+                                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                    ${r.status !== 'accepted' ? `<button class="btn btn-primary" style="padding:4px 8px;font-size:0.75rem" onclick="updateCourseRequestStatus(${r.id}, 'accepted')">🎉 Accept / Launch</button>` : ''}
+                                    ${r.status !== 'reviewed' ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem" onclick="updateCourseRequestStatus(${r.id}, 'reviewed')">👀 Reviewed</button>` : ''}
+                                    ${r.status !== 'rejected' ? `<button class="btn btn-ghost" style="padding:4px 8px;font-size:0.75rem;color:var(--rose)" onclick="updateCourseRequestStatus(${r.id}, 'rejected')">✕ Dismiss</button>` : ''}
+                                </div>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>`;
+            } catch (e) { container.innerHTML = `<div class="empty" style="color:var(--rose)">${e.message}</div>`; }
+        }
+
+        async function updateCourseRequestStatus(reqId, status) {
+            try {
+                await api(`/portal/course-requests/${reqId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+                toast(`✅ Course request status updated to ${status}`);
+                loadCourseRequestsSection();
             } catch(e) { toast(e.message, 'err'); }
         }
 

@@ -1,5 +1,5 @@
-import os, hashlib
-from fastapi import APIRouter, Depends, HTTPException, Header
+import os, hashlib, uuid
+from fastapi import APIRouter, Depends, HTTPException, Header, UploadFile, File
 from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ from database import get_db
 from models.center import (
     Partner, LearningCenter, Campus, Course, Review,
     CourseApplication, ApplicationStatus, ApprovalStatus, CourseStatus,
+    CourseRequest, CourseRequestStatus
 )
 
 router = APIRouter(prefix="/portal", tags=["Partner Portal"])
@@ -586,17 +587,19 @@ def list_my_applications(
 
     return [
         {
-            "id":           a.id,
-            "center_id":    a.center_id,
-            "center_name":  a.center.name if a.center else None,
-            "course_id":    a.course_id,
-            "course_name":  a.course.name if a.course else None,
-            "student_name": a.student_name,
-            "phone":        a.phone,
-            "email":        a.email,
-            "notes":        a.notes,
-            "status":       a.status.value if hasattr(a.status, "value") else a.status,
-            "created_at":   a.created_at,
+            "id":                 a.id,
+            "center_id":          a.center_id,
+            "center_name":        a.center.name if a.center else None,
+            "course_id":          a.course_id,
+            "course_name":        a.course.name if a.course else None,
+            "course_status":      a.course.status.value if (a.course and hasattr(a.course.status, "value")) else (a.course.status if a.course else None),
+            "student_name":       a.student_name,
+            "phone":              a.phone,
+            "email":              a.email,
+            "preferred_schedule": a.preferred_schedule,
+            "notes":              a.notes,
+            "status":             a.status.value if hasattr(a.status, "value") else a.status,
+            "created_at":         a.created_at,
         }
         for a in apps
     ]
@@ -619,5 +622,102 @@ def update_application_status(
     except ValueError:
         raise HTTPException(status_code=400, detail=f"Invalid status: {body.status}")
 
+    if app.course_id:
+        course = db.query(Course).filter(Course.id == app.course_id).first()
+        if course:
+            enrolled_count = (
+                db.query(CourseApplication)
+                .filter(
+                    CourseApplication.course_id == app.course_id,
+                    CourseApplication.status == ApplicationStatus.enrolled,
+                )
+                .count()
+            )
+            course.enrolled = enrolled_count
+
     db.commit()
-    return {"id": app.id, "status": app.status}
+    db.refresh(app)
+    return {"message": "Status updated", "id": app.id, "status": app.status.value}
+
+
+# ── COURSE REQUESTS ────────────────────────────────────────────────
+
+class CourseReqStatusBody(BaseModel):
+    status: str
+
+
+@router.get("/course-requests")
+def list_my_course_requests(
+    partner: Partner = Depends(get_partner),
+    db: Session = Depends(get_db),
+):
+    c = _get_or_create_partner_center(partner, db)
+    reqs = (
+        db.query(CourseRequest)
+        .filter(CourseRequest.center_id == c.id)
+        .order_by(CourseRequest.votes_count.desc(), CourseRequest.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id":                 r.id,
+            "center_id":          r.center_id,
+            "center_name":        r.center.name if r.center else None,
+            "title":              r.title,
+            "category":           r.category,
+            "preferred_schedule": r.preferred_schedule,
+            "student_name":       r.student_name,
+            "phone":              r.phone,
+            "email":              r.email,
+            "notes":              r.notes,
+            "votes_count":        r.votes_count,
+            "status":             r.status.value if hasattr(r.status, "value") else r.status,
+            "created_at":         r.created_at,
+        }
+        for r in reqs
+    ]
+
+
+@router.patch("/course-requests/{req_id}/status")
+def update_course_request_status(
+    req_id: int,
+    body: CourseReqStatusBody,
+    partner: Partner = Depends(get_partner),
+    db: Session = Depends(get_db),
+):
+    c = _get_or_create_partner_center(partner, db)
+    req = db.query(CourseRequest).filter(CourseRequest.id == req_id, CourseRequest.center_id == c.id).first()
+    if not req:
+        raise HTTPException(status_code=404, detail="Course request not found")
+
+    try:
+        req.status = CourseRequestStatus(body.status)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status: {body.status}")
+
+    db.commit()
+    db.refresh(req)
+    return {"message": "Status updated", "id": req.id, "status": req.status.value}
+
+
+@router.post("/upload")
+async def upload_image(
+    file: UploadFile = File(...),
+    partner: Partner = Depends(get_partner),
+):
+    allowed_exts = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if not ext or ext not in allowed_exts:
+        raise HTTPException(status_code=400, detail="Invalid image format. Allowed: PNG, JPG, JPEG, WEBP, GIF, SVG")
+
+    filename = f"{uuid.uuid4().hex}{ext}"
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    uploads_dir = os.path.join(base_dir, "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+
+    file_path = os.path.join(uploads_dir, filename)
+    contents = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(contents)
+
+    return {"url": f"/uploads/{filename}", "filename": filename}

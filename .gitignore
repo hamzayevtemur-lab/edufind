@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.DS_Store
+*.sqlite
+*.db
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep

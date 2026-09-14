@@ -975,6 +975,7 @@
      ADMIN PANEL — shown after auth
 ═══════════════════════════════════════ -->
     <div id="admin-panel" style="display:none">
+        <div class="layout">
 
         <!-- SIDEBAR -->
         <aside class="sidebar">
@@ -1007,7 +1008,14 @@
         <div class="main">
             <div class="topbar">
                 <div class="topbar-title" id="topbar-title">Dashboard</div>
-                <div><span class="admin-chip">⚡ Admin</span></div>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="uz">🇺🇿 UZ</option>
+                        <option value="ru">🇷🇺 RU</option>
+                    </select>
+                    <span class="admin-chip">⚡ Admin</span>
+                </div>
             </div>
 
             <!-- DASHBOARD -->
@@ -1394,7 +1402,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const API = 'http://localhost:8000';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
         // ── Auth: token starts null, set after successful entry login ──
         let TOKEN = sessionStorage.getItem('edufind_admin_token') || null;

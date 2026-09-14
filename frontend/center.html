@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Center Detail — EduFind</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         *,
         *::before,
@@ -987,6 +987,30 @@
             }
         }
     </style>
+    <style>
+        .lang-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .lang-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(124, 58, 237, 0.6);
+        }
+        .lang-select option {
+            background: #0f172a;
+            color: #fff;
+        }
+    </style>
+    <script src="i18n.js"></script>
 </head>
 
 <body>
@@ -996,7 +1020,14 @@
             <a class="logo" href="index.html">
                 <div class="logo-dot"></div>EDUFIND
             </a>
-            <a class="back-btn" href="centers.html">← Back to Centers</a>
+            <div style="display:flex;align-items:center;gap:12px">
+                <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="uz">🇺🇿 UZ</option>
+                    <option value="ru">🇷🇺 RU</option>
+                </select>
+                <a class="back-btn" href="centers.html" data-i18n="nav_back_centers">← Back to Centers</a>
+            </div>
         </div>
     </header>
 
@@ -1007,9 +1038,8 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const API = 'http://localhost:8000';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
         const centerId = new URLSearchParams(window.location.search).get('id');
 
         if (!centerId) {
@@ -1026,9 +1056,12 @@
         async function loadCenter(id) {
             try {
                 const res = await fetch(`${API}/public/centers/${id}`);
-                if (!res.ok) throw new Error(res.status);
-                render(await res.json());
-            } catch (_) {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const centerData = await res.json();
+                render(centerData);
+                loadCourseRequests(id);
+            } catch (err) {
+                console.error('loadCenter error:', err);
                 document.getElementById('root').innerHTML = `
                 <div class="state-center">
                     <div class="state-icon">😕</div>
@@ -1113,9 +1146,9 @@
                         <div style="height:100%;width:${fillPct}%;background:var(--grad);border-radius:50px"></div>
                     </div>` : ''}
                 </div>
-                <a href="tel:${window._centerPhone || ''}" class="cc-enroll ${isSoon ? 'soon' : ''}">
-                    ${isSoon ? '🔔 Notify Me' : '📞 Enroll Now'}
-                </a>
+                <button class="cc-enroll ${isSoon ? 'soon' : ''}" data-id="${course.id}" data-name="${(course.name || '').replace(/"/g, '&quot;')}" data-status="${isSoon ? 'coming_soon' : 'active'}" data-schedule="${(course.schedule || '').replace(/"/g, '&quot;')}" onclick="handleEnrollClick(this)">
+                    ${isSoon ? '🔔 Pre-Register' : '📞 Enroll Now'}
+                </button>
             </div>` : '';
 
             return `
@@ -1130,6 +1163,15 @@
                 ${chips ? `<div class="cc-meta">${chips}</div>` : ''}
                 ${footer}
             </div>`;
+        }
+
+        function handleEnrollClick(btn) {
+            openEnrollModal(
+                btn.dataset.id,
+                btn.dataset.name,
+                btn.dataset.status,
+                btn.dataset.schedule
+            );
         }
 
         /* ── Main render ── */
@@ -1174,7 +1216,7 @@
             <div class="center-hero">
                 <div class="hero-inner">
                     <div class="center-avatar" style="background:${bg}">
-                        ${c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" onerror="this.parentElement.textContent='${ini}'">` : ini}
+                        ${c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.textContent='${ini}';">` : ini}
                     </div>
                     <div class="hero-info">
                         <div class="hero-status">✓ Verified Center</div>
@@ -1201,6 +1243,7 @@
                     <div class="tabs-wrap">
                         <button class="tab active" onclick="switchTab(this,'about')">About</button>
                         <button class="tab" onclick="switchTab(this,'courses')">Courses (${activeCourses.length}${soonCourses.length > 0 ? ' + ' + soonCourses.length : ''})</button>
+                        <button class="tab" id="reqTabBtn" onclick="switchTab(this,'requests')">💡 Course Requests (<span id="requestsCountSpan">0</span>)</button>
                         <button class="tab" onclick="switchTab(this,'reviews')">Reviews (${c.reviews.length})</button>
                         <button class="tab" onclick="switchTab(this,'map')">🗺 Map</button>
                     </div>
@@ -1227,6 +1270,67 @@
                                    <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">No courses yet</div>
                                </div>`
                     : `<div class="courses-list">${allCourses.map(buildCourseCard).join('')}</div>`}
+                        
+                        <div style="margin-top:24px;padding:20px;background:linear-gradient(135deg, rgba(79,70,229,0.15), rgba(124,58,237,0.15));border:1px dashed var(--indigo);border-radius:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+                            <div>
+                                <div style="font-weight:700;font-size:1.05rem;color:#fff">💡 Can't find the course you're looking for?</div>
+                                <div style="font-size:0.88rem;color:var(--muted);margin-top:4px">Submit a course request directly to ${c.name} and let them know what topic you want to learn!</div>
+                            </div>
+                            <button class="submit-btn" style="width:auto;padding:10px 20px" onclick="openRequestTab()">Request a Course →</button>
+                        </div>
+                    </div>
+
+                    <!-- COURSE REQUESTS TAB -->
+                    <div class="tab-panel" id="tab-requests">
+                        <div class="review-form" style="margin-bottom:28px">
+                            <h4 style="font-size:1.15rem;display:flex;align-items:center;gap:8px">💡 Request a New Course at ${c.name}</h4>
+                            <p style="color:var(--muted);font-size:0.85rem;margin:-6px 0 16px">Don't see your desired subject or schedule? Tell the center management what course you'd like them to open!</p>
+                            <div class="form-group">
+                                <label>Course Title / Subject *</label>
+                                <input type="text" id="crTitle" placeholder="e.g. Python & Data Science Basics, SAT Math Prep, German B1..."/>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select id="crCategory" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff">
+                                        <option value="programming">Programming & IT</option>
+                                        <option value="ielts">IELTS / TOEFL</option>
+                                        <option value="english">General English</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="sat">SAT Prep</option>
+                                        <option value="kids">Kids Courses</option>
+                                        <option value="art">Art & Design</option>
+                                        <option value="other" selected>Other Topic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Preferred Schedule</label>
+                                    <input type="text" id="crSchedule" placeholder="e.g. Evenings, Weekends, Mon/Wed/Fri"/>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                                <div class="form-group">
+                                    <label>Your Name *</label>
+                                    <input type="text" id="crName" placeholder="e.g. Jasur Karimov"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone Number *</label>
+                                    <input type="text" id="crPhone" placeholder="e.g. +998 90 123 45 67"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Additional Notes / Specific topics</label>
+                                <textarea id="crNotes" rows="2" placeholder="Tell the center what specific skills, level, or duration you prefer..."></textarea>
+                            </div>
+                            <div id="crSubmitWrap">
+                                <button class="submit-btn" onclick="submitCourseRequest(${c.id})">🚀 Submit Course Request</button>
+                            </div>
+                        </div>
+
+                        <h4 style="font-size:1.1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px">📢 Course Requests by Students</h4>
+                        <div id="courseRequestsList">
+                            <div style="text-align:center;padding:20px;color:var(--muted)">Loading requests…</div>
+                        </div>
                     </div>
 
                     <!-- REVIEWS -->
@@ -1362,69 +1466,351 @@
             return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
         }
 
+        function loadYandexMaps(cb) {
+            if (window.ymaps) {
+                ymaps.ready(cb);
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = 'https://api-maps.yandex.ru/2.1/?lang=en_US';
+            s.onload = () => ymaps.ready(cb);
+            s.onerror = () => {
+                const el = document.getElementById('center-map');
+                if (el) el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⚠️ Yandex Maps assets could not be loaded.</div>';
+            };
+            document.head.appendChild(s);
+        }
+
         function initCenterMap() {
             if (centerMap) return;
-            let lat = window._centerLat;
-            let lng = window._centerLng;
-            
-            const campuses = window._campuses || [];
-            if (!lat || !lng) {
-                const mainCam = campuses.find(c => c.latitude && c.longitude);
-                if (mainCam) {
-                    lat = mainCam.latitude;
-                    lng = mainCam.longitude;
-                } else {
-                    lat = 41.2995; lng = 69.2401; // default Tashkent
-                }
-            }
-
-            centerMap = L.map('center-map').setView([lat, lng], 13);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '© OpenStreetMap © CARTO', maxZoom: 19,
-            }).addTo(centerMap);
-
-            const pinIcon = L.divIcon({
-                className: '',
-                html: `<div style="width:32px;height:32px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 4px 14px rgba(79,70,229,.6)"></div>`,
-                iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -34],
-            });
-
-            if (campuses.length > 0) {
-                const bounds = [];
-                campuses.forEach(cam => {
-                    if (cam.latitude && cam.longitude) {
-                        bounds.push([cam.latitude, cam.longitude]);
-                        L.marker([cam.latitude, cam.longitude], { icon: pinIcon })
-                            .addTo(centerMap)
-                            .bindPopup(`<strong style="font-size:14px">${cam.name}</strong><br><span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${cam.address || cam.city || ''}</span>`);
+            loadYandexMaps(() => {
+                if (!window.ymaps || centerMap) return;
+                let lat = window._centerLat;
+                let lng = window._centerLng;
+                
+                const campuses = window._campuses || [];
+                if (!lat || !lng) {
+                    const mainCam = campuses.find(c => c.latitude && c.longitude);
+                    if (mainCam) {
+                        lat = mainCam.latitude;
+                        lng = mainCam.longitude;
+                    } else {
+                        lat = 41.2995; lng = 69.2401; // default Tashkent
                     }
-                });
-                if (bounds.length > 1) {
-                    centerMap.fitBounds(bounds, { padding: [30, 30] });
                 }
-            } else {
-                L.marker([lat, lng], { icon: pinIcon })
-                    .addTo(centerMap)
-                    .bindPopup(`<strong style="font-size:14px">${window._centerName}</strong><br>
-                            <span style="color:rgba(255,255,255,.55);font-size:12px">📍 ${window._centerCity || ''}</span>`)
-                    .openPopup();
-            }
 
-            if (userPos) {
-                const meIcon = L.divIcon({
-                    className: '',
-                    html: `<div style="width:14px;height:14px;background:#f97316;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(249,115,22,.3)"></div>`,
-                    iconSize: [14, 14], iconAnchor: [7, 7],
+                centerMap = new ymaps.Map('center-map', {
+                    center: [lat, lng],
+                    zoom: 13,
+                    controls: ['zoomControl', 'fullscreenControl', 'typeSelector']
                 });
-                L.marker(userPos, { icon: meIcon }).addTo(centerMap)
-                    .bindPopup('<strong style="color:#f97316">📍 You are here</strong>');
-                const km = distKm(userPos[0], userPos[1], lat, lng);
-                const badge = document.getElementById('distanceBadge');
-                const text = document.getElementById('distText');
-                if (badge && text) { text.textContent = `${km} km`; badge.style.display = 'inline-flex'; }
+
+                if (campuses.length > 0) {
+                    campuses.forEach(cam => {
+                        if (cam.latitude && cam.longitude) {
+                            const pm = new ymaps.Placemark([cam.latitude, cam.longitude], {
+                                balloonContentHeader: `<strong style="font-size:14px;color:#1e1b4b">${cam.name}</strong>`,
+                                balloonContentBody: `<span style="color:#475569;font-size:12px">📍 ${cam.address || cam.city || ''}</span>`,
+                                hintContent: cam.name
+                            }, {
+                                preset: cam.is_main ? 'islands#indigoDotIcon' : 'islands#violetDotIcon'
+                            });
+                            centerMap.geoObjects.add(pm);
+                        }
+                    });
+                    if (centerMap.geoObjects.getCount() > 1) {
+                        centerMap.setBounds(centerMap.geoObjects.getBounds(), { checkZoomRange: true, zoomMargin: 30 });
+                    }
+                } else {
+                    const pm = new ymaps.Placemark([lat, lng], {
+                        balloonContentHeader: `<strong style="font-size:14px;color:#1e1b4b">${window._centerName}</strong>`,
+                        balloonContentBody: `<span style="color:#475569;font-size:12px">📍 ${window._centerCity || ''}</span>`,
+                        hintContent: window._centerName
+                    }, {
+                        preset: 'islands#indigoDotIcon'
+                    });
+                    centerMap.geoObjects.add(pm);
+                }
+
+                if (userPos) {
+                    const mePm = new ymaps.Placemark(userPos, {
+                        balloonContentHeader: '<strong style="color:#ea580c">📍 You are here</strong>',
+                        hintContent: 'Your Location'
+                    }, {
+                        preset: 'islands#orangeCircleDotIcon'
+                    });
+                    centerMap.geoObjects.add(mePm);
+                    const km = distKm(userPos[0], userPos[1], lat, lng);
+                    const badge = document.getElementById('distanceBadge');
+                    const text = document.getElementById('distText');
+                    if (badge && text) { text.textContent = `${km} km`; badge.style.display = 'inline-flex'; }
+                }
+            });
+        }
+
+        /* ── User token: generated once per browser, lives in localStorage ── */
+        function getUserToken() {
+            let token = localStorage.getItem('edufind_user_token');
+            if (!token) {
+                token = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                localStorage.setItem('edufind_user_token', token);
+            }
+            return token;
+        }
+
+        /* ── COURSE REQUEST FUNCTIONS ── */
+        window.openRequestTab = () => {
+            const reqBtn = document.getElementById('reqTabBtn');
+            if (reqBtn && window.switchTab) switchTab(reqBtn, 'requests');
+        };
+
+        async function loadCourseRequests(centerId) {
+            const list = document.getElementById('courseRequestsList');
+            if (!list) return;
+            try {
+                const token = getUserToken();
+                const res = await fetch(`${API}/public/centers/${centerId}/course-requests?user_token=${token}`);
+                const reqs = await res.json();
+                const countSpan = document.getElementById('requestsCountSpan');
+                if (countSpan) countSpan.textContent = reqs.length;
+
+                if (!reqs.length) {
+                    list.innerHTML = `
+                    <div style="text-align:center;padding:30px 20px;color:var(--muted);background:rgba(255,255,255,0.02);border-radius:12px;border:1px dashed var(--border)">
+                        <div style="font-size:2rem;margin-bottom:8px">💡</div>
+                        <div style="font-weight:700;color:#fff">No course requests yet</div>
+                        <div style="font-size:0.85rem">Be the first to request a new course topic at this center!</div>
+                    </div>`;
+                    return;
+                }
+
+                list.innerHTML = reqs.map(r => {
+                    const isVoted = r.user_voted;
+                    const btnBg = isVoted ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)';
+                    const btnBorder = isVoted ? 'rgba(16,185,129,0.4)' : 'var(--border)';
+                    const btnColor = isVoted ? '#34d399' : '#fff';
+                    const label = isVoted ? '👍 Voted' : '👍 Vote';
+
+                    return `
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                        <div style="flex:1">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                                <span style="font-weight:700;font-size:1.05rem;color:#fff">${r.title}</span>
+                                <span style="background:rgba(79,70,229,0.2);color:#a5b4fc;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:600">${r.category}</span>
+                                ${r.status === 'accepted' ? `<span style="background:rgba(16,185,129,0.2);color:#34d399;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:600">🎉 Accepted / Planned</span>` : ''}
+                            </div>
+                            <div style="font-size:0.82rem;color:var(--muted);margin-top:6px;display:flex;gap:16px;flex-wrap:wrap">
+                                <span>👤 Requested by <strong>${r.student_name}</strong></span>
+                                ${r.preferred_schedule ? `<span>🕒 Preferred: <strong>${r.preferred_schedule}</strong></span>` : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn req-vote-btn" style="background:${btnBg};border:1px solid ${btnBorder};color:${btnColor};padding:8px 14px;border-radius:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px" data-voted="${isVoted}" onclick="voteCourseRequest(${r.id}, this)">
+                                <span class="vote-label">${label}</span> (<span class="vote-num">${r.votes_count}</span>)
+                            </button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                list.innerHTML = `<div style="color:var(--rose);padding:10px">Failed to load course requests.</div>`;
             }
         }
+
+        async function voteCourseRequest(reqId, btn) {
+            try {
+                const token = getUserToken();
+                const res = await fetch(`${API}/public/course-requests/${reqId}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_token: token })
+                });
+                const data = await res.json();
+
+                const num = btn.querySelector('.vote-num');
+                const label = btn.querySelector('.vote-label');
+                if (num) num.textContent = data.votes_count;
+
+                if (data.voted) {
+                    btn.style.background = 'rgba(16,185,129,0.15)';
+                    btn.style.borderColor = 'rgba(16,185,129,0.4)';
+                    btn.style.color = '#34d399';
+                    if (label) label.textContent = '👍 Voted';
+                } else {
+                    btn.style.background = 'rgba(255,255,255,0.06)';
+                    btn.style.borderColor = 'var(--border)';
+                    btn.style.color = '#fff';
+                    if (label) label.textContent = '👍 Vote';
+                }
+            } catch(e) { alert('Could not submit vote.'); }
+        }
+
+        async function submitCourseRequest(centerId) {
+            const title = document.getElementById('crTitle').value.trim();
+            const category = document.getElementById('crCategory').value;
+            const schedule = document.getElementById('crSchedule').value.trim();
+            const name = document.getElementById('crName').value.trim();
+            const phone = document.getElementById('crPhone').value.trim();
+            const notes = document.getElementById('crNotes').value.trim();
+
+            if (!title) return alert('Please enter the requested course title.');
+            if (!name) return alert('Please enter your name.');
+            if (!phone) return alert('Please enter your phone number.');
+
+            const btn = document.querySelector('#crSubmitWrap .submit-btn');
+            btn.disabled = true; btn.textContent = 'Submitting request…';
+
+            try {
+                const token = getUserToken();
+                const res = await fetch(`${API}/public/centers/${centerId}/course-requests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, category, preferred_schedule: schedule, student_name: name, phone, notes, user_token: token })
+                });
+                if (!res.ok) throw new Error();
+                document.getElementById('crSubmitWrap').innerHTML = `
+                    <div style="padding:14px;text-align:center;color:#34d399;font-weight:700;background:rgba(52,211,153,0.1);border-radius:10px;border:1px solid rgba(52,211,153,0.3)">
+                        🎉 Course request submitted! The center's management team has been notified.
+                    </div>`;
+                loadCourseRequests(centerId);
+            } catch(e) {
+                btn.disabled = false; btn.textContent = '🚀 Submit Course Request';
+                alert('Could not submit request. Please try again.');
+            }
+        }
+
+        /* ── COURSE ENROLLMENT / PRE-REGISTRATION MODAL ── */
+        window.openEnrollModal = (courseId, courseName, status, currentSchedule) => {
+            document.getElementById('emCourseId').value = courseId;
+            document.getElementById('emCourseStatus').value = status;
+            document.getElementById('emTitle').textContent = (status === 'coming_soon' ? '🔔 Pre-Register for ' : '🚀 Enroll in ') + courseName;
+            document.getElementById('emCenter').textContent = window._centerName || 'Learning Center';
+            document.getElementById('emIcon').textContent = status === 'coming_soon' ? '🟡' : '🟢';
+
+            const notice = document.getElementById('emNotice');
+            const reqStar = document.getElementById('emScheduleReqStar');
+            const submitBtn = document.getElementById('emSubmitBtn');
+
+            document.getElementById('emPreferredSchedule').value = currentSchedule || '';
+
+            if (status === 'coming_soon') {
+                notice.style.display = 'block';
+                notice.style.background = 'rgba(245,158,11,0.12)';
+                notice.style.border = '1px solid rgba(245,158,11,0.3)';
+                notice.style.color = '#fbbf24';
+                notice.innerHTML = '<strong>💡 Course Coming Soon:</strong> Pre-register to reserve your spot! Please enter your preferred time schedule below so the center can plan class times.';
+                reqStar.style.display = 'inline';
+                submitBtn.textContent = '🔔 Pre-Register Now';
+            } else {
+                notice.style.display = 'block';
+                notice.style.background = 'rgba(79,70,229,0.12)';
+                notice.style.border = '1px solid rgba(79,70,229,0.3)';
+                notice.style.color = '#a5b4fc';
+                notice.innerHTML = '<strong>🟢 Active Course Enrollment:</strong> Fill out your details below and the center management will contact you to finalize registration.';
+                reqStar.style.display = 'none';
+                submitBtn.textContent = '🚀 Submit Application';
+            }
+
+            const modal = document.getElementById('enrollModal');
+            modal.style.display = 'flex';
+        };
+
+        window.closeEnrollModal = () => {
+            document.getElementById('enrollModal').style.display = 'none';
+            document.getElementById('enrollForm').reset();
+        };
+
+        window.submitEnrollment = async (e) => {
+            e.preventDefault();
+            const courseId = document.getElementById('emCourseId').value;
+            const status = document.getElementById('emCourseStatus').value;
+            const name = document.getElementById('emStudentName').value.trim();
+            const phone = document.getElementById('emPhone').value.trim();
+            const email = document.getElementById('emEmail').value.trim();
+            const prefSchedule = document.getElementById('emPreferredSchedule').value.trim();
+            const notes = document.getElementById('emNotes').value.trim();
+
+            if (!name || !phone) return alert('Please enter your name and phone number.');
+            if (status === 'coming_soon' && !prefSchedule) return alert('Please enter your preferred time schedule for this coming soon course.');
+
+            const btn = document.getElementById('emSubmitBtn');
+            btn.disabled = true; btn.textContent = 'Submitting…';
+
+            try {
+                const res = await fetch(`${API}/public/courses/${courseId}/apply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        student_name: name,
+                        phone: phone,
+                        email: email || null,
+                        preferred_schedule: prefSchedule || null,
+                        notes: notes || null
+                    })
+                });
+                if (!res.ok) throw new Error();
+                
+                closeEnrollModal();
+                alert('🎉 Application submitted successfully! The center management will contact you shortly.');
+            } catch(err) {
+                btn.disabled = false; btn.textContent = 'Submit Application';
+                alert('Could not submit application. Please try again.');
+            }
+        };
     </script>
+
+    <!-- ENROLLMENT / PRE-REGISTRATION MODAL -->
+    <div class="modal-backdrop" id="enrollModal" style="display:none;position:fixed;inset:0;background:rgba(5,5,8,0.85);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;padding:20px">
+        <div class="modal-box" style="background:#0c0c14;border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.8);position:relative">
+            <button onclick="closeEnrollModal()" style="position:absolute;top:18px;right:20px;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer">×</button>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <div id="emIcon" style="font-size:2rem">🚀</div>
+                <div>
+                    <h3 id="emTitle" style="font-size:1.2rem;font-weight:700;color:#fff;margin:0">Enroll in Course</h3>
+                    <div id="emCenter" style="font-size:0.85rem;color:var(--muted);margin-top:2px">Learning Center Name</div>
+                </div>
+            </div>
+
+            <div id="emNotice" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:0.85rem;line-height:1.4"></div>
+
+            <form id="enrollForm" onsubmit="submitEnrollment(event)">
+                <input type="hidden" id="emCourseId" />
+                <input type="hidden" id="emCourseStatus" />
+
+                <div class="form-group" style="margin-bottom:14px">
+                    <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:#fff">Your Name *</label>
+                    <input type="text" id="emStudentName" placeholder="e.g. Malika Akhmedova" required style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff" />
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px">
+                    <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:#fff">Phone Number *</label>
+                    <input type="text" id="emPhone" placeholder="e.g. +998 90 123 45 67" required style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff" />
+                </div>
+
+                <div class="form-group" style="margin-bottom:14px">
+                    <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:#fff">Email Address (Optional)</label>
+                    <input type="email" id="emEmail" placeholder="e.g. malika@gmail.com" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff" />
+                </div>
+
+                <div class="form-group" id="emScheduleGroup" style="margin-bottom:14px">
+                    <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:#fff">
+                        🕒 Preferred Time Schedule <span id="emScheduleReqStar" style="color:var(--rose)">*</span>
+                    </label>
+                    <input type="text" id="emPreferredSchedule" placeholder="e.g. Mon/Wed/Fri 18:00+, Weekends, Morning" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff" />
+                    <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">Specify preferred days or hours that work best for your schedule.</div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:20px">
+                    <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:#fff">Additional Notes / Questions (Optional)</label>
+                    <textarea id="emNotes" rows="2" placeholder="Any special requests, current level, or questions for the center..." style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff"></textarea>
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:flex-end">
+                    <button type="button" onclick="closeEnrollModal()" style="padding:12px 20px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:#fff;font-weight:600;cursor:pointer">Cancel</button>
+                    <button type="submit" id="emSubmitBtn" class="submit-btn" style="width:auto;padding:12px 24px">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>

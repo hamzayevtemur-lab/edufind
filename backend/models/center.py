@@ -108,6 +108,7 @@ class LearningCenter(Base):
     reviews = relationship("Review",     back_populates="center", cascade="all, delete-orphan")
     likes   = relationship("CenterLike", back_populates="center", cascade="all, delete-orphan")
     applications = relationship("CourseApplication", back_populates="center", cascade="all, delete-orphan")
+    course_requests = relationship("CourseRequest", back_populates="center", cascade="all, delete-orphan")
 
     @property
     def avg_rating(self):
@@ -272,11 +273,62 @@ class CourseApplication(Base):
     course_id    = Column(Integer, ForeignKey("courses.id"), nullable=False)
     student_name = Column(String(255), nullable=False)
     phone        = Column(String(50),  nullable=False)
-    email        = Column(String(255), nullable=True)
-    notes        = Column(Text,        nullable=True)
+    email              = Column(String(255), nullable=True)
+    preferred_schedule = Column(String(255), nullable=True)
+    notes              = Column(Text,        nullable=True)
     status       = Column(SAEnum(ApplicationStatus, name="app_status"), nullable=False, server_default="pending", index=True)
     created_at   = Column(DateTime(timezone=True), server_default=func.now())
 
     center = relationship("LearningCenter", back_populates="applications")
     course = relationship("Course", back_populates="applications")
+
+
+# ═══════════════════════════════════════════════
+#  COURSE REQUEST STATUS & MODEL
+# ═══════════════════════════════════════════════
+
+class CourseRequestStatus(str, enum.Enum):
+    pending  = "pending"
+    reviewed = "reviewed"
+    accepted = "accepted"
+    rejected = "rejected"
+
+
+class CourseRequest(Base):
+    """Submitted by students requesting new/custom courses at a Learning Center."""
+    __tablename__ = "course_requests"
+
+    id                 = Column(Integer, primary_key=True, index=True)
+    center_id          = Column(Integer, ForeignKey("learning_centers.id", ondelete="CASCADE"), nullable=False)
+    title              = Column(String(255), nullable=False)
+    category           = Column(String(50), default="other")
+    preferred_schedule = Column(String(255), nullable=True)
+    student_name       = Column(String(255), nullable=False)
+    phone              = Column(String(50),  nullable=False)
+    email              = Column(String(255), nullable=True)
+    notes              = Column(Text,        nullable=True)
+    votes_count        = Column(Integer,     server_default="1", nullable=False)
+    status             = Column(SAEnum(CourseRequestStatus, name="course_req_status"), nullable=False, server_default="pending", index=True)
+    created_at         = Column(DateTime(timezone=True), server_default=func.now())
+
+    center = relationship("LearningCenter", back_populates="course_requests")
+    votes  = relationship("CourseRequestVote", back_populates="request", cascade="all, delete-orphan")
+
+
+class CourseRequestVote(Base):
+    """One row per (request_id, user_token) — prevents duplicate votes on course requests."""
+    __tablename__ = "course_request_votes"
+
+    id         = Column(Integer, primary_key=True, index=True)
+    request_id = Column(Integer, ForeignKey("course_requests.id", ondelete="CASCADE"), nullable=False)
+    user_token = Column(String(128), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    request = relationship("CourseRequest", back_populates="votes")
+
+    __table_args__ = (
+        UniqueConstraint("request_id", "user_token", name="uq_request_user_vote"),
+    )
+
+
     

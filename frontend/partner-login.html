@@ -225,14 +225,41 @@
             font-weight: 600;
         }
 
-        .divider a:hover {
-            text-decoration: underline;
+        .lang-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .lang-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(124, 58, 237, 0.6);
+        }
+        .lang-select option {
+            background: #0f172a;
+            color: #fff;
         }
     </style>
+    <script src="i18n.js"></script>
 </head>
 
 <body>
     <div class="box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <a href="index.html" style="color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:600" data-i18n="nav_back_home">← Back to Home</a>
+            <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+                <option value="en">🇬🇧 EN</option>
+                <option value="uz">🇺🇿 UZ</option>
+                <option value="ru">🇷🇺 RU</option>
+            </select>
+        </div>
         <div class="logo">EDUFIND</div>
         <h1>Partner Login</h1>
         <p class="sub">Sign in to manage your learning centers</p>
@@ -256,7 +283,7 @@
     </div>
 
     <script>
-        const API = 'http://localhost:8000';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
         async function login() {
             const email = document.getElementById('email').value.trim();

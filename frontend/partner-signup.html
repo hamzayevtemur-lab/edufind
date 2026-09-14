@@ -779,6 +779,30 @@
             }
         }
     </style>
+    <style>
+        .lang-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .lang-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(124, 58, 237, 0.6);
+        }
+        .lang-select option {
+            background: #0f172a;
+            color: #fff;
+        }
+    </style>
+    <script src="i18n.js"></script>
 </head>
 
 <body>
@@ -787,7 +811,14 @@
     <header>
         <div class="hdr">
             <a class="logo" href="index.html">EDUFIND</a>
-            <a class="back-btn" href="index.html">← Back to Home</a>
+            <div style="display:flex;align-items:center;gap:12px">
+                <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="uz">🇺🇿 UZ</option>
+                    <option value="ru">🇷🇺 RU</option>
+                </select>
+                <a class="back-btn" href="index.html" data-i18n="nav_back_home">← Back to Home</a>
+            </div>
         </div>
     </header>
 
@@ -938,7 +969,7 @@
     </div><!-- /wrap -->
 
     <script>
-        const API = 'http://localhost:8000';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
         document.getElementById('form1').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -959,7 +990,7 @@
             btn.innerHTML = '⏳ Sending verification link…';
 
             try {
-                const res = await fetch(`${API}/api/partner-signup`, {
+                const res = await fetch(`${API}/partner-signup`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

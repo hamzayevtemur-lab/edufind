@@ -92,14 +92,15 @@ def submit_review(body: ReviewCreate, db: Session = Depends(get_db)):
 
 
 from pydantic import BaseModel
-from models.center import Course, CourseApplication, ApplicationStatus
-from typing import Optional
+from models.center import Course, CourseApplication, ApplicationStatus, CourseRequest, CourseRequestStatus, CourseRequestVote
+from typing import Optional, List
 
 class CourseApplyBody(BaseModel):
-    student_name: str
-    phone:        str
-    email:        Optional[str] = None
-    notes:        Optional[str] = None
+    student_name:       str
+    phone:              str
+    email:              Optional[str] = None
+    preferred_schedule: Optional[str] = None
+    notes:              Optional[str] = None
 
 
 @router.post("/courses/{course_id}/apply", status_code=201)
@@ -109,15 +110,128 @@ def apply_for_course(course_id: int, body: CourseApplyBody, db: Session = Depend
         raise HTTPException(status_code=404, detail="Course not found")
 
     app = CourseApplication(
-        center_id    = course.center_id,
-        course_id    = course_id,
-        student_name = body.student_name.strip(),
-        phone        = body.phone.strip(),
-        email        = body.email.strip() if body.email else None,
-        notes        = body.notes.strip() if body.notes else None,
-        status       = ApplicationStatus.pending
+        center_id          = course.center_id,
+        course_id          = course_id,
+        student_name       = body.student_name.strip(),
+        phone              = body.phone.strip(),
+        email              = body.email.strip() if body.email else None,
+        preferred_schedule = body.preferred_schedule.strip() if body.preferred_schedule else None,
+        notes              = body.notes.strip() if body.notes else None,
+        status             = ApplicationStatus.pending
     )
     db.add(app)
     db.commit()
     db.refresh(app)
     return {"message": "Application submitted successfully!", "application_id": app.id}
+
+
+class CourseRequestBody(BaseModel):
+    title:              str
+    category:           Optional[str] = "other"
+    preferred_schedule: Optional[str] = None
+    student_name:       str
+    phone:              str
+    email:              Optional[str] = None
+    notes:              Optional[str] = None
+    user_token:         Optional[str] = None
+
+
+@router.post("/centers/{center_id}/course-requests", status_code=201)
+def create_course_request(center_id: int, body: CourseRequestBody, db: Session = Depends(get_db)):
+    center = db.query(LearningCenter).filter(LearningCenter.id == center_id).first()
+    if not center:
+        raise HTTPException(status_code=404, detail="Center not found")
+    
+    req = CourseRequest(
+        center_id          = center_id,
+        title              = body.title.strip(),
+        category           = body.category.strip() if body.category else "other",
+        preferred_schedule = body.preferred_schedule.strip() if body.preferred_schedule else None,
+        student_name       = body.student_name.strip(),
+        phone              = body.phone.strip(),
+        email              = body.email.strip() if body.email else None,
+        notes              = body.notes.strip() if body.notes else None,
+        status             = CourseRequestStatus.pending,
+        votes_count        = 1,
+    )
+    db.add(req)
+    db.commit()
+    db.refresh(req)
+
+    if body.user_token:
+        vote = CourseRequestVote(request_id=req.id, user_token=body.user_token.strip())
+        db.add(vote)
+        db.commit()
+
+    return {"message": "Course request submitted successfully!", "request": {
+        "id": req.id, "title": req.title, "category": req.category, "votes_count": req.votes_count
+    }}
+
+
+@router.get("/centers/{center_id}/course-requests")
+def list_center_course_requests(
+    center_id: int,
+    user_token: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    reqs = (
+        db.query(CourseRequest)
+        .filter(CourseRequest.center_id == center_id)
+        .order_by(CourseRequest.votes_count.desc(), CourseRequest.id.desc())
+        .all()
+    )
+
+    voted_req_ids = set()
+    if user_token:
+        votes = db.query(CourseRequestVote.request_id).filter(
+            CourseRequestVote.user_token == user_token
+        ).all()
+        voted_req_ids = {v[0] for v in votes}
+
+    return [
+        {
+            "id":                 r.id,
+            "title":              r.title,
+            "category":           r.category,
+            "preferred_schedule": r.preferred_schedule,
+            "student_name":       r.student_name,
+            "votes_count":        r.votes_count,
+            "status":             r.status.value if hasattr(r.status, "value") else r.status,
+            "created_at":         r.created_at,
+            "user_voted":         r.id in voted_req_ids,
+        }
+        for r in reqs
+    ]
+
+
+class VoteBody(BaseModel):
+    user_token: str
+
+
+@router.post("/course-requests/{request_id}/vote")
+def vote_course_request(request_id: int, body: VoteBody, db: Session = Depends(get_db)):
+    req = db.query(CourseRequest).filter(CourseRequest.id == request_id).first()
+    if not req:
+        raise HTTPException(status_code=404, detail="Course request not found")
+
+    utoken = body.user_token.strip()
+    existing_vote = db.query(CourseRequestVote).filter(
+        CourseRequestVote.request_id == request_id,
+        CourseRequestVote.user_token == utoken
+    ).first()
+
+    if existing_vote:
+        # User already voted -> Toggle off (unvote)
+        db.delete(existing_vote)
+        req.votes_count = max(0, req.votes_count - 1)
+        voted = False
+    else:
+        # User has not voted -> Add vote
+        vote = CourseRequestVote(request_id=request_id, user_token=utoken)
+        db.add(vote)
+        req.votes_count += 1
+        voted = True
+
+    db.commit()
+    db.refresh(req)
+    return {"message": "Vote updated", "votes_count": req.votes_count, "voted": voted}

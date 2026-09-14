@@ -172,6 +172,30 @@
       .cpill { flex-shrink: 0; }
     }
   </style>
+  <style>
+    .lang-select {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+      outline: none;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-family: inherit;
+    }
+    .lang-select:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(124, 58, 237, 0.6);
+    }
+    .lang-select option {
+      background: #0f172a;
+      color: #fff;
+    }
+  </style>
+  <script src="i18n.js"></script>
 </head>
 
 <body>
@@ -183,14 +207,18 @@
         <div class="logo-dot"></div>EDUFIND
       </a>
       <nav id="mainNav">
-        <a href="index.html">Home</a>
-        <a href="centers.html">Centers</a>
-        <a href="courses.html" class="active">Courses</a>
-        <a href="index.html#contact">Contact</a>
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="centers.html" data-i18n="nav_centers">Centers</a>
+        <a href="courses.html" class="active" data-i18n="nav_courses">Courses</a>
       </nav>
       <div class="header-right">
-        <a class="btn-ghost" href="partner-login.html">Partner Login</a>
-        <a class="btn-primary" href="partner-signup.html">List Your Center</a>
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+          <option value="en">🇬🇧 EN</option>
+          <option value="uz">🇺🇿 UZ</option>
+          <option value="ru">🇷🇺 RU</option>
+        </select>
+        <a class="btn-ghost" href="partner-login.html" data-i18n="nav_partner_login">Partner Login</a>
+        <a class="btn-primary" href="partner-signup.html" data-i18n="nav_list_center">List Your Center</a>
         <button class="hamburger" id="hamburger" onclick="toggleNav()">☰</button>
       </div>
     </div>
@@ -293,7 +321,7 @@
   </div>
 
   <script>
-    const API = 'http://localhost:8000';
+    const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
     let currentPage     = 1;
     let currentSearch   = '';
@@ -542,6 +570,7 @@
       const studentName = document.getElementById('mStudentName').value.trim();
       const phone = document.getElementById('mStudentPhone').value.trim();
       const email = document.getElementById('mStudentEmail').value.trim() || null;
+      const schedule = document.getElementById('mStudentSchedule').value.trim() || null;
       const notes = document.getElementById('mStudentNotes').value.trim() || null;
 
       const btn = document.getElementById('mSubmitBtn');
@@ -552,7 +581,7 @@
         const res = await fetch(`${API}/public/courses/${courseId}/apply`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ student_name: studentName, phone, email, notes }),
+          body: JSON.stringify({ student_name: studentName, phone, email, preferred_schedule: schedule, notes }),
         });
 
         if (!res.ok) throw new Error('Failed to submit application');
@@ -596,8 +625,12 @@
           <input type="email" id="mStudentEmail" placeholder="student@example.com" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none" />
         </div>
         <div class="mfield" style="margin-top:16px">
-          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Notes / Preferred Schedule (optional)</label>
-          <textarea id="mStudentNotes" rows="3" placeholder="e.g. Evening classes preferred…" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea>
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Preferred Time Schedule (optional)</label>
+          <input type="text" id="mStudentSchedule" placeholder="e.g. Mon/Wed/Fri 18:00+, Weekends" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none" />
+        </div>
+        <div class="mfield" style="margin-top:16px">
+          <label style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:700">Notes / Questions (optional)</label>
+          <textarea id="mStudentNotes" rows="2" placeholder="Any special requests or questions…" style="width:100%;background:#0d0d14;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;resize:vertical"></textarea>
         </div>
         <div style="display:flex;justify:flex-end;gap:12px;margin-top:24px">
           <button type="button" class="btn-ghost" onclick="closeApplyModal()" style="padding:10px 20px">Cancel</button>

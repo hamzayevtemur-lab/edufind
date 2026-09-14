@@ -104,6 +104,28 @@
             gap: 10px;
         }
 
+        .lang-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-family: inherit;
+        }
+        .lang-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(124, 58, 237, 0.6);
+        }
+        .lang-select option {
+            background: #0f172a;
+            color: #fff;
+        }
+
         .btn-ghost {
             padding: 9px 20px;
             border: 1px solid var(--border);
@@ -159,8 +181,8 @@
             height: 100vh;
             min-height: 640px;
             background:
-                linear-gradient(to bottom, rgba(5, 5, 8, .3) 0%, rgba(5, 5, 8, .6) 55%, rgba(5, 5, 8, 1) 100%),
-                url('images/hero-bg.jpg') center/cover no-repeat;
+                radial-gradient(ellipse at 50% 20%, rgba(79, 70, 229, 0.25), transparent 70%),
+                radial-gradient(ellipse at 80% 80%, rgba(124, 58, 237, 0.2), transparent 70%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1279,6 +1301,7 @@
             }
         }
     </style>
+    <script src="i18n.js"></script>
 </head>
 
 <body>
@@ -1292,16 +1315,20 @@
             </a>
 
             <nav id="mainNav">
-                <a href="#categories">Categories</a>
-                <a href="#featured">Centers</a>
-                <a href="#how">How It Works</a>
-                <a href="#services">Services</a>
-                <a href="#contact">Contact</a>
+                <a href="#categories" data-i18n="nav_categories">Categories</a>
+                <a href="centers.html" data-i18n="nav_centers">Centers</a>
+                <a href="courses.html" data-i18n="nav_courses">Courses</a>
+                <a href="#how" data-i18n="nav_how">How It Works</a>
             </nav>
 
             <div class="header-right">
-                <a class="btn-ghost" href="partner-login.html">Partner Login</a>
-                <a class="btn-primary" href="partner-signup.html">List Your Center</a>
+                <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="uz">🇺🇿 UZ</option>
+                    <option value="ru">🇷🇺 RU</option>
+                </select>
+                <a class="btn-ghost" href="partner-login.html" data-i18n="nav_partner_login">Partner Login</a>
+                <a class="btn-primary" href="partner-signup.html" data-i18n="nav_list_center">List Your Center</a>
                 <button class="hamburger" id="hamburger" onclick="toggleNav()">☰</button>
             </div>
         </div>
@@ -1311,32 +1338,31 @@
     <section class="hero" id="home">
         <div class="hero-content">
             <h1>
-                FIND THE BEST<br>
-                <span class="grad-text">LEARNING CENTERS</span><br>
-                NEAR YOU
+                <span data-i18n="hero_title_1">FIND THE BEST</span><br>
+                <span class="grad-text" data-i18n="hero_title_2">LEARNING CENTERS</span><br>
+                <span data-i18n="hero_title_3">IN UZBEKISTAN</span>
             </h1>
-            <p>Compare courses, prices, schedules and teachers across hundreds of verified learning centers — all in one
-                place.</p>
+            <p data-i18n="hero_sub">Discover top IT, Language, and Exam Prep centers near you in Uzbekistan.</p>
             <div class="hero-cta">
-                <a href="#featured" class="cta-orange">Browse Centers →</a>
-                <a href="partner-signup.html" class="cta-outline">List Your Center</a>
+                <a href="centers.html" class="cta-orange" data-i18n="btn_browse_all">Browse All Centers →</a>
+                <a href="partner-signup.html" class="cta-outline" data-i18n="nav_list_center">List Your Center</a>
             </div>
             <div class="hero-stats">
                 <div class="hero-stat">
                     <strong id="statCenters">50+</strong>
-                    <small>Learning Centers</small>
+                    <small data-i18n="stat_centers">Approved Centers</small>
                 </div>
                 <div class="hero-stat">
                     <strong id="statCourses">300+</strong>
-                    <small>Active Courses</small>
+                    <small data-i18n="nav_courses">Active Courses</small>
                 </div>
                 <div class="hero-stat">
-                    <strong id="statTeachers">—</strong>
-                    <small>Expert Teachers</small>
+                    <strong id="statTeachers">10+</strong>
+                    <small data-i18n="stat_cities">Cities Covered</small>
                 </div>
                 <div class="hero-stat">
                     <strong>Free</strong>
-                    <small>Always Free to Browse</small>
+                    <small data-i18n="stat_rating">Average Rating</small>
                 </div>
             </div>
         </div>
@@ -1611,7 +1637,7 @@
 
     <!-- ════════════════ JAVASCRIPT ════════════════ -->
     <script>
-        const API = 'http://localhost:8000';
+        const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
         /* ── Mobile nav ── */
         function toggleNav() {
@@ -1675,6 +1701,7 @@
         function buildCard(c, idx) {
             const ini = (c.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             const bg = gradients[idx % gradients.length];
+            const hasLogo = !!c.logo_url;
             const starsHtml = (() => {
                 const r = Math.round(c.avg_rating || 0);
                 return Array.from({ length: 5 }, (_, i) => `<span style="color:${i < r ? '#f59e0b' : 'rgba(255,255,255,.2)'};font-size:13px">★</span>`).join('');
@@ -1682,8 +1709,9 @@
 
             return `
       <div class="place-card" data-city="${(c.city || '').toLowerCase()}" onclick="location.href='center.html?id=${c.id}'">
-        <div class="place-img" style="background:${bg};display:flex;align-items:center;justify-content:center;position:relative">
-          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,.1);font-family:Arial">${ini}</div>
+        <div class="place-img" style="background:${bg};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+          ${hasLogo ? `<img src="${c.logo_url}" alt="${c.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:1" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';">` : ''}
+          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,.1);font-family:Arial;display:${hasLogo ? 'none' : 'block'}">${ini}</div>
         </div>
 
         <button
@@ -1798,7 +1826,6 @@
             // Stop click from also navigating to center page
             event.stopPropagation();
 
-            const API = 'http://localhost:8000';
             const token = getUserToken();
 
             // Optimistic UI — update immediately before server responds
@@ -1844,7 +1871,6 @@
 
         /* ── Load liked status for all visible cards ── */
         async function loadLikedStatuses() {
-            const API = 'http://localhost:8000';
             const token = getUserToken();
 
             // Find all like buttons on the page
