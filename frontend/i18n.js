@@ -32,6 +32,7 @@ const TRANSLATIONS = {
         "feat_sub": "Top rated educational centers in Tashkent, Samarkand, and across Uzbekistan",
         "btn_view_details": "View Center →",
         "btn_browse_all": "Browse All Centers →",
+        "btn_view_all_courses": "View All Courses →",
 
         // Centers Directory Page
         "centers_title": "Explore Learning Centers",
@@ -121,6 +122,7 @@ const TRANSLATIONS = {
         "feat_sub": "Toshkent, Samarqand va barcha hududlardagi top o'quv markazlari",
         "btn_view_details": "Batafsil →",
         "btn_browse_all": "Barcha Markazlarni Ko'rish →",
+        "btn_view_all_courses": "Barcha Kurslarni Ko'rish →",
 
         // Centers Directory Page
         "centers_title": "O'quv Markazlarini Qidirish",
@@ -210,6 +212,7 @@ const TRANSLATIONS = {
         "feat_sub": "Лучшие учебные центры в Ташкенте, Самарканде и по всему Узбекистану",
         "btn_view_details": "Подробнее →",
         "btn_browse_all": "Все Учебные Центры →",
+        "btn_view_all_courses": "Все Курсы →",
 
         // Centers Directory Page
         "centers_title": "Каталог Учебных Центров",
