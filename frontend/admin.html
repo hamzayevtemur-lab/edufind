@@ -706,17 +706,47 @@
             color: #34d399;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-240px);
-            }
+        /* ── TOPBAR (Mobile) ────────────────────────── */
+        .topbar {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 200;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 0 1rem; align-items: center; justify-content: space-between;
+        }
+        .topbar-logo { font-family: 'Syne', sans-serif; font-weight: 900; font-size: .95rem; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .burger { width: 38px; height: 38px; border-radius: 9px; background: var(--card); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+        .burger span { width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: .2s; }
 
+        @media (max-width: 768px) {
+            .topbar { display: flex; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform .3s ease;
+                z-index: 250;
+                top: 56px;
+                height: calc(100vh - 56px);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
             .main {
                 margin-left: 0;
+                padding: 5rem 1rem 2rem;
             }
-
-            .grid2 {
+            .grid2, .stats-grid {
                 grid-template-columns: 1fr;
+            }
+            .tcard {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .modal-card, .modal-box {
+                width: 95vw !important;
+                max-width: 95vw !important;
+                padding: 16px !important;
+            }
+            .entry-card {
+                padding: 1.8rem 1.2rem;
             }
         }
 
@@ -975,6 +1005,14 @@
      ADMIN PANEL — shown after auth
 ═══════════════════════════════════════ -->
     <div id="admin-panel" style="display:none">
+        <!-- TOPBAR (Mobile) -->
+        <div class="topbar">
+            <div class="topbar-logo">EDUFIND ADMIN</div>
+            <button class="burger" onclick="toggleAdminSidebar()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
         <div class="layout">
 
         <!-- SIDEBAR -->
@@ -1483,6 +1521,10 @@
             document.getElementById(id).classList.remove('open');
         }
 
+        function toggleAdminSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+
         function navigateTo(name) {
             // Update sections
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1490,7 +1532,10 @@
 
             // Update nav items
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            // Auto-close sidebar on mobile
+            document.querySelector('.sidebar').classList.remove('open');
 
             // Update topbar title
             const titles = {

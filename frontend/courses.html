@@ -154,22 +154,25 @@
     nav.open a { display: block; padding: 14px 24px; border-radius: 0; font-size: 16px; }
 
     @media (max-width: 900px) {
-      .page-body { grid-template-columns: 1fr; gap: 24px; }
-      .sidebar { position: static; }
-      .courses-grid { grid-template-columns: repeat(2,1fr); }
+      .page-body { grid-template-columns: 1fr; gap: 20px; }
+      .sidebar { position: static; padding: 18px; border-radius: 16px; }
+      .courses-grid { grid-template-columns: repeat(2,1fr); gap: 16px; }
     }
-    @media (max-width: 620px) {
+    @media (max-width: 640px) {
       header { padding: 12px 16px; }
       nav:not(.open) { display: none; }
       .hamburger { display: block; }
-      .btn-ghost { display: none; }
-      .page-hero { padding: 110px 16px 50px; }
+      .btn-ghost, header .btn-primary { display: none; }
+      .page-hero { padding: 95px 16px 36px; }
+      .page-hero h1 { font-size: 2rem; }
       .courses-grid { grid-template-columns: 1fr; }
-      .hero-search { flex-direction: column; border-radius: 18px; padding: 12px; }
-      .hero-search button { border-radius: 12px; padding: 12px; }
-      .cats-row { padding: 20px 16px 0; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+      .hero-search { flex-direction: column; border-radius: 16px; padding: 10px; gap: 8px; }
+      .hero-search input { padding: 10px 12px; font-size: 16px; width: 100%; }
+      .hero-search button { border-radius: 12px; padding: 12px; width: 100%; font-size: 15px; }
+      .cats-row { padding: 16px 16px 0; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
       .cats-row::-webkit-scrollbar { display: none; }
       .cpill { flex-shrink: 0; }
+      .modal-card { width: 92vw !important; max-width: 92vw !important; padding: 20px 16px !important; margin: 10px auto; }
     }
   </style>
   <style>

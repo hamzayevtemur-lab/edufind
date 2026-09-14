@@ -744,32 +744,50 @@
     @media (max-width: 900px) {
       .page-body {
         grid-template-columns: 1fr;
-        gap: 24px;
-        padding-top: 32px;
+        gap: 20px;
+        padding-top: 24px;
       }
 
       .sidebar {
         position: static;
         border-radius: 16px;
-      }
-
-      /* Collapse sidebar into horizontal scrollable pills on mobile */
-      .filter-group {
-        margin-bottom: 20px;
+        padding: 18px;
       }
 
       .centers-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 16px;
       }
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 640px) {
       header {
         padding: 12px 16px;
       }
 
-      nav:not(.open) {
+      nav {
         display: none;
+      }
+
+      nav.open {
+        display: flex;
+        position: fixed;
+        top: 58px;
+        left: 0;
+        right: 0;
+        background: rgba(5, 5, 8, .98);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        gap: 0;
+        z-index: 999;
+        border-bottom: 1px solid var(--border);
+        padding: 8px 0;
+      }
+
+      nav.open a {
+        display: block;
+        padding: 14px 24px;
+        font-size: 16px;
       }
 
       .hamburger {
@@ -781,7 +799,11 @@
       }
 
       .page-hero {
-        padding: 110px 16px 50px;
+        padding: 95px 16px 36px;
+      }
+
+      .page-hero h1 {
+        font-size: 2rem;
       }
 
       .centers-grid {
@@ -790,17 +812,26 @@
 
       .hero-search {
         flex-direction: column;
-        border-radius: 18px;
-        padding: 12px;
+        border-radius: 16px;
+        padding: 10px;
+        gap: 8px;
       }
 
       .hero-search input {
-        padding: 6px 4px;
+        padding: 10px 12px;
+        font-size: 16px; /* Prevents iOS auto-zoom */
+        width: 100%;
       }
 
       .hero-search button {
         border-radius: 12px;
         padding: 12px;
+        width: 100%;
+        font-size: 15px;
+      }
+
+      .header-right .btn-primary {
+        display: none;
       }
     }
 
