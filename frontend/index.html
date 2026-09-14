@@ -1255,7 +1255,52 @@
             }
 
             .how-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .how-card {
+                padding: 20px 12px;
+            }
+
+            .how-card::before {
+                right: 8px;
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+
+            .how-title {
+                font-size: 15px;
+                margin-bottom: 6px;
+            }
+
+            .how-desc {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .service-card {
+                padding: 22px 14px;
+            }
+
+            .svc-icon {
+                font-size: 36px;
+                margin-bottom: 12px;
+            }
+
+            .svc-title {
+                font-size: 15px;
+                margin-bottom: 6px;
+            }
+
+            .svc-desc {
+                font-size: 12px;
+                line-height: 1.5;
             }
 
             .stats-inner {
@@ -1277,8 +1322,8 @@
             }
 
             .footer-top {
-                grid-template-columns: 1fr;
-                gap: 28px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 28px 16px;
             }
 
             .footer-brand {
@@ -1303,13 +1348,22 @@
             }
 
             .partner-benefits {
-                flex-direction: column;
-                align-items: center;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                max-width: 100%;
             }
 
             .bchip {
                 width: 100%;
-                max-width: 280px;
+                max-width: 100%;
+                padding: 16px 10px;
+            }
+
+            .bchip:nth-child(5) {
+                grid-column: 1 / -1;
+                max-width: 200px;
+                margin: 0 auto;
             }
         }
 
