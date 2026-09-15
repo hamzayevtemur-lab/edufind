@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Portal — EduMarkaz</title>
+    <link rel="icon" type="image/png" href="logo.png" />
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
         rel="stylesheet">
@@ -539,7 +540,9 @@
 
     <!-- TOPBAR (Mobile) -->
     <div class="topbar">
-        <div class="topbar-logo">EDUMARKAZ</div>
+        <div class="topbar-logo" style="display:flex;align-items:center;gap:8px">
+            <img src="logo.png" alt="EduMarkaz Logo" style="height:26px;width:26px;border-radius:6px;object-fit:cover;" />EDUMARKAZ
+        </div>
         <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
             <option value="en">🇬🇧 EN</option>
             <option value="uz">🇺🇿 UZ</option>
@@ -555,7 +558,9 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-head">
-            <div class="sidebar-logo">EDUMARKAZ</div>
+            <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px">
+                <img src="logo.png" alt="EduMarkaz Logo" style="height:32px;width:32px;border-radius:8px;object-fit:cover;" />EDUMARKAZ
+            </div>
             <div class="sidebar-biz" id="sb-biz">Loading…</div>
         </div>
 
