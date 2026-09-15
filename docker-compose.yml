@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # ── MySQL Database Container ─────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: edumarkaz_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Ironman3106)}
+      MYSQL_DATABASE: ${DB_NAME:-right_center}
+      MYSQL_USER: ${DB_USER:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-Ironman3106)}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend Service ─────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: edumarkaz_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-Ironman3106)}@db:3306/${DB_NAME:-right_center}
+      SECRET_KEY: ${SECRET_KEY:-edufind-super-secret-key-change-in-production-2025}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-Ironman3106)}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost}
+      SMTP_EMAIL: ${SMTP_EMAIL:-hamzaevtemurbek@gmail.com}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-wlryrgvhtijojbzq}
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads_data:/app/uploads
+
+  # ── Nginx Web Server (Frontend & Reverse Proxy) ─────────────
+  web:
+    image: nginx:alpine
+    container_name: edumarkaz_web
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - uploads_data:/var/www/uploads:ro
+
+volumes:
+  mysql_data:
+  uploads_data:
