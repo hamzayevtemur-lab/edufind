@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Center Detail — EduFind</title>
+    <title>Center Detail — EduMarkaz</title>
 
     <style>
         *,
@@ -1051,7 +1051,7 @@
     <header>
         <div class="header-inner">
             <a class="logo" href="index.html">
-                <div class="logo-dot"></div>EDUFIND
+                <div class="logo-dot"></div>EDUMARKAZ
             </a>
             <div style="display:flex;align-items:center;gap:12px">
                 <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
@@ -1209,7 +1209,7 @@
 
         /* ── Main render ── */
         function render(c) {
-            document.title = `${c.name} — EduFind`;
+            document.title = `${c.name} — EduMarkaz`;
 
             const ini = (c.name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             const bg = grads[c.id % grads.length];
@@ -1583,10 +1583,10 @@
 
         /* ── User token: generated once per browser, lives in localStorage ── */
         function getUserToken() {
-            let token = localStorage.getItem('edufind_user_token');
+            let token = localStorage.getItem('edumarkaz_user_token') || localStorage.getItem('edufind_user_token');
             if (!token) {
                 token = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-                localStorage.setItem('edufind_user_token', token);
+                localStorage.setItem('edumarkaz_user_token', token);
             }
             return token;
         }

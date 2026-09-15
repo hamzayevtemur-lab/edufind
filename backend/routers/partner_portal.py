@@ -90,11 +90,11 @@ def request_free_extension(
     try:
         from routers.partners import send_email, SMTP_EMAIL, BACKEND_URL
         if SMTP_EMAIL:
-            admin_token = os.getenv("ADMIN_TOKEN", "edufind-admin-2026")
+            admin_token = os.getenv("ADMIN_TOKEN", "edumarkaz-admin-2026")
             approve_url = f"{BACKEND_URL}/api/admin/approve-extension/{partner.id}?admin_token={admin_token}"
             send_email(
                 to=SMTP_EMAIL,
-                subject=f"[EduFind Extension Request] {partner.business_name}",
+                subject=f"[EduMarkaz Extension Request] {partner.business_name}",
                 html=f"""
                 <div style="font-family:sans-serif;background:#f8fafc;padding:30px">
                   <div style="background:#fff;padding:24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)">

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Portal — EduFind</title>
+    <title>Partner Portal — EduMarkaz</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
         rel="stylesheet">
@@ -539,7 +539,7 @@
 
     <!-- TOPBAR (Mobile) -->
     <div class="topbar">
-        <div class="topbar-logo">EDUFIND</div>
+        <div class="topbar-logo">EDUMARKAZ</div>
         <select class="lang-select" onchange="setLang(this.value)" aria-label="Select Language">
             <option value="en">🇬🇧 EN</option>
             <option value="uz">🇺🇿 UZ</option>
@@ -555,7 +555,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-head">
-            <div class="sidebar-logo">EDUFIND</div>
+            <div class="sidebar-logo">EDUMARKAZ</div>
             <div class="sidebar-biz" id="sb-biz">Loading…</div>
         </div>
 
@@ -908,7 +908,7 @@
 
         // ── INIT ─────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
-            const raw = localStorage.getItem('edufind_partner');
+            const raw = localStorage.getItem('edumarkaz_partner') || localStorage.getItem('edufind_partner');
             if (!raw) { window.location.href = 'partner-login.html'; return; }
             partnerData = JSON.parse(raw);
             partnerId = partnerData.partner_id;
@@ -987,6 +987,7 @@
 
         function logout() {
             if (!confirm('Log out?')) return;
+            localStorage.removeItem('edumarkaz_partner');
             localStorage.removeItem('edufind_partner');
             window.location.href = 'partner-login.html';
         }

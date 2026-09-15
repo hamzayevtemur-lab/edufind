@@ -543,7 +543,7 @@ def approve_partner_request(
         from routers.partners import send_email, tpl_credentials
         send_email(
             to        = req.email,
-            subject   = "🎉 EduFind Partner Account Ready — Your Login Details",
+            subject   = "🎉 EduMarkaz Partner Account Ready — Your Login Details",
             html      = tpl_credentials(partner, pwd),
         )
     except Exception as e:
@@ -641,14 +641,14 @@ def test_email(to: str, db: Session = Depends(get_db)):
         raise HTTPException(400, "SMTP_EMAIL is not set in .env")
     html = """
     <div style="font-family:sans-serif;background:#07070c;padding:40px;color:#fff;border-radius:16px">
-      <h2 style="color:#4f46e5">✅ EduFind Email Test</h2>
+      <h2 style="color:#4f46e5">✅ EduMarkaz Email Test</h2>
       <p style="color:rgba(255,255,255,.7);margin-top:12px">
         If you received this, your Gmail SMTP is working correctly.<br>
         The full email system is ready to go!
       </p>
     </div>
     """
-    sent = send_email(to=to, subject="✅ EduFind — Email Test", html=html)
+    sent = send_email(to=to, subject="✅ EduMarkaz — Email Test", html=html)
     if sent:
         return {"message": f"Test email sent to {to}. Check your inbox!"}
     else:
@@ -695,7 +695,7 @@ def approve_partner_extension(partner_id: int, db: Session = Depends(get_db)):
         from .partners import send_email
         send_email(
             to=p.email,
-            subject="🎉 Your EduFind 1-Month Free Plan Extension is Approved!",
+            subject="🎉 Your EduMarkaz 1-Month Free Plan Extension is Approved!",
             html=f"""
             <div style="font-family:sans-serif;background:#07070c;padding:40px;color:#fff;border-radius:16px">
               <h2 style="color:#10b981">🎉 Plan Extension Approved!</h2>

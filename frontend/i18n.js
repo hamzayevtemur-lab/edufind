@@ -1,5 +1,5 @@
 /* =================================================================
-   EduFind — Internationalization (i18n) Engine (EN, UZ, RU)
+   EduMarkaz — Internationalization (i18n) Engine (EN, UZ, RU)
    ================================================================= */
 
 const TRANSLATIONS = {
@@ -276,12 +276,12 @@ const TRANSLATIONS = {
 };
 
 function getCurrentLang() {
-    return localStorage.getItem('edufind_lang') || 'en';
+    return localStorage.getItem('edumarkaz_lang') || localStorage.getItem('edufind_lang') || 'en';
 }
 
 function setLang(lang) {
     if (!TRANSLATIONS[lang]) lang = 'en';
-    localStorage.setItem('edufind_lang', lang);
+    localStorage.setItem('edumarkaz_lang', lang);
     applyLanguage(lang);
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
 }

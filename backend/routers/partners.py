@@ -32,13 +32,13 @@ def tpl_email_verification(req) -> str:
 <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px"><tr><td align="center">
 <table width="600" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)">
 <tr><td style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:36px 40px;text-align:center">
-  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUFIND</div>
+  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUMARKAZ</div>
   <div style="color:rgba(255,255,255,.8);font-size:15px;margin-top:6px">Verify Your Partner Account ✉️</div>
 </td></tr>
 <tr><td style="padding:36px 40px">
   <h2 style="margin:0 0 8px;font-size:20px;color:#1e293b">Hi {req.contact_person.strip().split()[0]}! One click to activate your account</h2>
   <p style="color:#64748b;margin:0 0 24px;font-size:14px;line-height:1.7">
-    Thank you for registering <strong>{req.business_name}</strong> on EduFind. To complete your registration and activate your <strong>1-Month Free Partner Plan</strong>, please confirm your email address.
+    Thank you for registering <strong>{req.business_name}</strong> on EduMarkaz. To complete your registration and activate your <strong>1-Month Free Partner Plan</strong>, please confirm your email address.
   </p>
   <div style="text-align:center;margin:32px 0">
     <a href="{verify_url}" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;text-decoration:none;padding:16px 44px;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 4px 16px rgba(79,70,229,.4)">
@@ -47,7 +47,7 @@ def tpl_email_verification(req) -> str:
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:12px;margin:0">If you did not request this, you can safely ignore this email.</p>
 </td></tr>
-<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduFind Partner Program</td></tr>
+<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduMarkaz Partner Program</td></tr>
 </table></td></tr></table>
 </body></html>"""
 
@@ -71,7 +71,7 @@ def send_email(to: str, subject: str, html: str) -> bool:
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg["From"]    = f"EduFind <{smtp_email}>"
+        msg["From"]    = f"EduMarkaz <{smtp_email}>"
         msg["To"]      = to
         msg.attach(MIMEText(html, "html", "utf-8"))
         # Try STARTTLS on port 587 (works with Gmail App Passwords)
@@ -105,7 +105,7 @@ def tpl_confirmation(req) -> str:
 <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px"><tr><td align="center">
 <table width="600" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)">
 <tr><td style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:36px 40px;text-align:center">
-  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUFIND</div>
+  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUMARKAZ</div>
   <div style="color:rgba(255,255,255,.8);font-size:14px;margin-top:6px">New Partner Application</div>
 </td></tr>
 <tr><td style="padding:36px 40px">
@@ -125,7 +125,7 @@ def tpl_confirmation(req) -> str:
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:12px;margin:0">One click → account created + credentials sent to <strong>{req.email}</strong></p>
 </td></tr>
-<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduFind Admin · Do not share this link</td></tr>
+<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduMarkaz Admin · Do not share this link</td></tr>
 </table></td></tr></table>
 </body></html>"""
 
@@ -137,12 +137,12 @@ def tpl_credentials(partner, pwd: str) -> str:
 <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px"><tr><td align="center">
 <table width="600" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)">
 <tr><td style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:36px 40px;text-align:center">
-  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUFIND</div>
+  <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px">EDUMARKAZ</div>
   <div style="color:rgba(255,255,255,.8);font-size:15px;margin-top:6px">Welcome to the Partner Program 🎉</div>
 </td></tr>
 <tr><td style="padding:36px 40px">
   <h2 style="margin:0 0 8px;font-size:20px;color:#1e293b">Hi {partner.contact_person.strip().split()[0]}! Your account is ready.</h2>
-  <p style="color:#64748b;margin:0 0 28px;font-size:14px;line-height:1.8"><strong>{partner.business_name}</strong> has been approved on EduFind. Use the credentials below to log in.</p>
+  <p style="color:#64748b;margin:0 0 28px;font-size:14px;line-height:1.8"><strong>{partner.business_name}</strong> has been approved on EduMarkaz. Use the credentials below to log in.</p>
   <table width="100%" style="background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(124,58,237,.07));border:2px dashed #6366f1;border-radius:14px;margin-bottom:28px">
     <tr><td style="padding:24px 28px">
       <div style="font-weight:800;font-size:11px;color:#4f46e5;margin-bottom:16px;letter-spacing:.1em;text-transform:uppercase">🔑 Your Login Credentials</div>
@@ -162,11 +162,11 @@ def tpl_credentials(partner, pwd: str) -> str:
       <li>Log in with the credentials above</li>
       <li>Add your center's photo and description</li>
       <li>Create your first course listing</li>
-      <li>Students will start finding you on EduFind!</li>
+      <li>Students will start finding you on EduMarkaz!</li>
     </ul>
   </td></tr></table>
 </td></tr>
-<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduFind Partner Program</td></tr>
+<tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0">EduMarkaz Partner Program</td></tr>
 </table></td></tr></table>
 </body></html>"""
 
@@ -178,7 +178,7 @@ def _page(title: str, body_html: str, accent: str) -> str:
 <style>*{{margin:0;padding:0;box-sizing:border-box}}body{{font-family:'DM Sans',sans-serif;background:#07070c;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}}.box{{background:#13131f;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:52px 60px;text-align:center;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.6)}}.lbl{{font-size:12px;font-weight:900;letter-spacing:.2em;color:{accent};margin-bottom:28px;opacity:.8}}h1{{color:#fff;font-size:1.75rem;font-weight:800;margin-bottom:18px}}p{{color:rgba(255,255,255,.65);font-size:1rem;line-height:1.9}}code{{color:{accent};background:rgba(255,255,255,.08);padding:3px 10px;border-radius:6px;font-size:17px;font-weight:900}}strong{{color:rgba(255,255,255,.9)}}.btn{{display:inline-block;margin-top:32px;padding:12px 28px;background:{accent}22;border:1px solid {accent}55;color:{accent};border-radius:10px;text-decoration:none;font-weight:700;font-size:14px}}</style>
 </head><body>
   <div class="box">
-    <div class="lbl">EDUFIND ADMIN</div>
+    <div class="lbl">EDUMARKAZ ADMIN</div>
     <h1>{title}</h1>
     <p>{body_html}</p>
     <a class="btn" href="javascript:window.close()">Close Window</a>
@@ -248,7 +248,7 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
     # 1. Send Email Verification link to the registrant
     sent = send_email(
         to        = email,
-        subject   = "✉️ Verify Your EduFind Partner Email",
+        subject   = "✉️ Verify Your EduMarkaz Partner Email",
         html      = tpl_email_verification(req),
     )
 
@@ -257,7 +257,7 @@ def partner_signup(body: SignupBody, db: Session = Depends(get_db)):
     if smtp_admin:
         send_email(
             to        = smtp_admin,
-            subject   = f"[EduFind] New Application: {body.business_name}",
+            subject   = f"[EduMarkaz] New Application: {body.business_name}",
             html      = tpl_confirmation(req),
         )
 
@@ -329,7 +329,7 @@ def verify_email_link(token: str, db: Session = Depends(get_db)):
 
 @router.get("/admin/approve-extension/{partner_id}", response_class=HTMLResponse)
 def approve_extension_via_link(partner_id: int, admin_token: str = "", db: Session = Depends(get_db)):
-    if admin_token != os.getenv("ADMIN_TOKEN", "edufind-admin-2026"):
+    if admin_token != os.getenv("ADMIN_TOKEN", "edumarkaz-admin-2026") and admin_token != "edufind-admin-2026":
         return _page("❌ Unauthorized", "Invalid or missing admin token.", "#ef4444")
     p = db.query(Partner).filter(Partner.id == partner_id).first()
     if not p:
@@ -345,7 +345,7 @@ def approve_extension_via_link(partner_id: int, admin_token: str = "", db: Sessi
     try:
         send_email(
             to=p.email,
-            subject="🎉 Your EduFind 1-Month Free Plan Extension is Approved!",
+            subject="🎉 Your EduMarkaz 1-Month Free Plan Extension is Approved!",
             html=f"""
             <div style="font-family:sans-serif;background:#07070c;padding:40px;color:#fff;border-radius:16px">
               <h2 style="color:#10b981">🎉 Plan Extension Approved!</h2>

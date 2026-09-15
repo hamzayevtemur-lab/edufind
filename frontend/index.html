@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EduFind — Discover Learning Centers</title>
+    <title>EduMarkaz — Discover Learning Centers</title>
     <style>
         /* ==================== GLOBAL ==================== */
         *,
@@ -1440,7 +1440,7 @@
         <div class="header-inner">
             <a class="logo" href="index.html">
                 <div class="logo-dot"></div>
-                EDUFIND
+                EDUMARKAZ
             </a>
 
             <nav id="mainNav">
@@ -1615,7 +1615,7 @@
     <section class="how-section" id="how">
         <div class="section-header">
             <p class="eyebrow">Simple Process</p>
-            <h2 class="section-title">How EduFind Works</h2>
+            <h2 class="section-title">How EduMarkaz Works</h2>
             <p class="section-sub">Find the perfect learning center in minutes, not days</p>
         </div>
 
@@ -1683,7 +1683,7 @@
     <section class="partner-section">
         <div class="partner-inner">
             <h2>Grow Your Learning Center</h2>
-            <p>Join EduFind and connect with thousands of students looking for courses like yours — completely free to
+            <p>Join EduMarkaz and connect with thousands of students looking for courses like yours — completely free to
                 start.</p>
             <div class="partner-benefits">
                 <div class="bchip"><span class="bi">🌟</span><span>Free Listing</span></div>
@@ -1702,7 +1702,7 @@
             <div class="footer-top">
                 <div class="footer-brand">
                     <a class="logo" href="index.html" style="display:inline-flex">
-                        <div class="logo-dot"></div>EDUFIND
+                        <div class="logo-dot"></div>EDUMARKAZ
                     </a>
                     <p>Connecting students with the best verified learning centers across Uzbekistan.</p>
                 </div>
@@ -1727,14 +1727,14 @@
                     <h4>Platform</h4>
                     <ul>
                         <li><a href="admin.html">Admin Panel</a></li>
-                        <li><a href="#">About EduFind</a></li>
+                        <li><a href="#">About EduMarkaz</a></li>
                         <li><a href="#">Privacy Policy</a></li>
                         <li><a href="#">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2025 EduFind. All rights reserved. Built for students, powered by learning.</p>
+                <p>© 2025 EduMarkaz. All rights reserved. Built for students, powered by learning.</p>
             </div>
         </div>
     </footer>
@@ -1916,11 +1916,11 @@
 
         /* ── User token: generated once per browser, lives in localStorage ── */
         function getUserToken() {
-            let token = localStorage.getItem('edufind_user_token');
+            let token = localStorage.getItem('edumarkaz_user_token') || localStorage.getItem('edufind_user_token');
             if (!token) {
                 // Generate a random UUID-like token
                 token = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-                localStorage.setItem('edufind_user_token', token);
+                localStorage.setItem('edumarkaz_user_token', token);
             }
             return token;
         }

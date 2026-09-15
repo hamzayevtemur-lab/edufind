@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Login — EduFind</title>
+    <title>Partner Login — EduMarkaz</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -260,7 +260,7 @@
                 <option value="ru">🇷🇺 RU</option>
             </select>
         </div>
-        <div class="logo">EDUFIND</div>
+        <div class="logo">EDUMARKAZ</div>
         <h1>Partner Login</h1>
         <p class="sub">Sign in to manage your learning centers</p>
 
@@ -309,6 +309,7 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Login failed');
 
+                localStorage.setItem('edumarkaz_partner', JSON.stringify(data));
                 localStorage.setItem('edufind_partner', JSON.stringify(data));
                 window.location.href = 'partner-portal.html';
             } catch (e) {

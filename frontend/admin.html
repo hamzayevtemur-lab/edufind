@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduFind Admin Panel</title>
+    <title>EduMarkaz Admin Panel</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -997,7 +997,7 @@
                 <span id="entry-btn-txt">Access Admin Panel →</span>
             </button>
 
-            <a href="index.html" class="entry-back">← Back to EduFind</a>
+            <a href="index.html" class="entry-back">← Back to EduMarkaz</a>
         </div>
     </div>
 
@@ -1007,7 +1007,7 @@
     <div id="admin-panel" style="display:none">
         <!-- TOPBAR (Mobile) -->
         <div class="topbar">
-            <div class="topbar-logo">EDUFIND ADMIN</div>
+            <div class="topbar-logo">EDUMARKAZ ADMIN</div>
             <button class="burger" onclick="toggleAdminSidebar()">
                 <span></span><span></span><span></span>
             </button>
@@ -1017,7 +1017,7 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="sidebar-logo">EDUFIND</div>
+            <div class="sidebar-logo">EDUMARKAZ</div>
 
             <div class="sidebar-section">Overview</div>
             <div class="nav-item active" onclick="navigateTo('dashboard')">📊 Dashboard</div>
@@ -1443,7 +1443,7 @@
         const API = window.location.origin.includes('http') ? window.location.origin + '/api' : '/api';
 
         // ── Auth: token starts null, set after successful entry login ──
-        let TOKEN = sessionStorage.getItem('edufind_admin_token') || null;
+        let TOKEN = sessionStorage.getItem('edumarkaz_admin_token') || null;
         let H = { 'Content-Type': 'application/json', 'X-Admin-Token': TOKEN };
 
         function adminLogout() {
@@ -1476,6 +1476,7 @@
 
                 TOKEN = token;
                 H = { 'Content-Type': 'application/json', 'X-Admin-Token': TOKEN };
+                sessionStorage.setItem('edumarkaz_admin_token', TOKEN);
                 sessionStorage.setItem('edufind_admin_token', TOKEN);
 
                 document.getElementById('entry-screen').style.display = 'none';
